@@ -1,126 +1,114 @@
 # 💰 PennyWise
 
-**A beautiful and intuitive personal finance tracker built with Flutter**
+**Your Smart Personal Finance Manager**
 
-PennyWise is a modern expense management app that helps you track your income, expenses, and budgets with a sleek dark-themed interface and powerful analytics.
+PennyWise is a comprehensive, modern expense management application built with Flutter. It combines the privacy of local storage with the convenience of cloud sync, helping you track expenses, manage budgets, monitor loans, and achieve your financial goals with a stunning, dark-themed interface.
 
-## ✨ Features
+## ✨ Key Features
 
-### 💸 Transaction Management
-- **Add & Edit Transactions** - Easily record income and expenses with custom categories
-- **Transaction History** - View all your transactions sorted by date
-- **Quick Actions** - Delete or update transactions with a simple tap
+### 🤖 Smart Automation
+- **SMS Expense Tracking** - Automatically detects and records transaction SMS messages from banks (Local processing only for privacy).
+- **Auto-Categorization** - Smartly categorizes transactions based on keywords.
+
+### 💸 Complete Financial Management
+- **Transaction Tracking** - Record income and expenses with ease.
+- **Loan Management** - Keep track of money lent to friends (`Given`) and borrowed (`Taken`).
+- **Financial Goals** - Set savings targets (e.g., "New Laptop", "Vacation") and track your progress.
+- **Net Worth Overview** - Real-time calculation of your total financial health.
 
 ### 📊 Analytics & Insights
-- **Expense Breakdown** - Visual pie charts showing spending by category
-- **Spending Trends** - Track your daily spending patterns over the last 7 days
-- **Budget Tracking** - Set monthly budgets and monitor your progress in real-time
+- **Interactive Charts** - Visual breakdown of spending by category.
+- **Spending Trends** - Analyze your daily spending patterns.
+- **Budget Planning** - Set monthly limits for specific categories and get alerts.
 
-### 🎯 Budget Management
-- **Monthly Budgets** - Set spending limits for each month
-- **Progress Indicators** - Visual progress bars showing how much of your budget you've used
-- **Budget Alerts** - Stay informed about your spending habits
+### ☁️ Hybrid Architecture
+- **Cloud Sync** - Securely sync your data across devices using Firebase (Google Sign-In).
+- **Offline Capable** - Works perfectly offline with Hive local database.
+- **Privacy Focused** - SMS data is stored **locally only** and never uploaded to the cloud.
 
-### 📱 User Experience
-- **Personalized Welcome** - Customizable username and greeting
-- **Multi-Currency Support** - Choose your preferred currency symbol (₹, $, €, etc.)
-- **Dark Theme** - Beautiful gradient-based dark UI with smooth animations
-- **Onboarding Flow** - First-time user setup experience
-
-### 📤 Data Export
-- **CSV Export** - Export transaction data to CSV format
-- **PDF Reports** - Generate professional PDF transaction reports
-- **Local Storage** - All exports saved to a dedicated PennyWise folder
-
-### 🔒 Security & Privacy
-- **Offline First** - All data stored locally using Hive database
-- **No Cloud Dependency** - Your financial data stays on your device
+### 🎨 Premium Experience
+- **Modern Dark UI** - Sleek, gradient-based design with smooth animations.
+- **Customization** - Personalize your profile, currency (₹, $, €, etc.), and categories.
+- **Biometric Lock** - Secure your financial data with Fingerprint/Face ID.
 
 ## 🛠️ Tech Stack
 
 - **Framework**: Flutter 3.10+
-- **State Management**: Provider
-- **Local Database**: Hive
-- **Charts**: FL Chart
-- **Animations**: Flutter Animate
-- **Fonts**: Google Fonts
-- **Authentication**: Local Auth (Biometric)
-
-## 📦 Key Dependencies
-
-```yaml
-- provider: State management
-- hive & hive_flutter: Local NoSQL database
-- fl_chart: Beautiful charts and graphs
-- flutter_animate: Smooth animations
-- google_fonts: Custom typography
-- intl: Date and number formatting
-- csv & pdf: Data export functionality
-- local_auth: Biometric authentication
-```
+- **Architecture**: Provider (State Management)
+- **Backend**:
+  - **Firebase**: Auth, Firestore (Cloud Sync), Crashlytics
+  - **Hive**: Local NoSQL Database (Offline cache & SMS storage)
+- **Key Libraries**:
+  - `fl_chart`: For beautiful analytics graphs
+  - `flutter_animate`: For smooth UI transitions
+  - `flutter_sms_inbox`: For reading transaction SMS
+  - `local_auth`: For biometric security
+  - `google_fonts`: For modern typography
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 - Flutter SDK (3.10.1 or higher)
 - Dart SDK
-- Android Studio / VS Code
+- Firebase Project (for cloud features)
 
 ### Installation
 
-1. Clone the repository
-```bash
-git clone https://github.com/yourusername/PennyWise.git
-cd PennyWise
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Bhanu7773-dev/PennyWise.git
+   cd PennyWise
+   ```
 
-2. Install dependencies
-```bash
-flutter pub get
-```
+2. **Install dependencies**
+   ```bash
+   flutter pub get
+   ```
 
-3. Generate Hive adapters
-```bash
-flutter pub run build_runner build
-```
+3. **Generate Hive adapters**
+   ```bash
+   flutter pub run build_runner build
+   ```
 
-4. Run the app
-```bash
-flutter run
-```
+4. **Run the app**
+   ```bash
+   flutter run
+   ```
 
 ## 📱 Screenshots
 
 <p align="center">
-  <img src="screenshots/welcome.jpg" width="250" alt="Welcome Screen"/>
-  <img src="screenshots/home.jpg" width="250" alt="Home Screen"/>
-  <img src="screenshots/analytics.jpg" width="250" alt="Analytics"/>
+  <img src="screenshots/Home.jpg" width="250" alt="Home Screen"/>
+  <img src="screenshots/Analytics1.jpg" width="250" alt="Analytics Overview"/>
 </p>
 
 <p align="center">
-  <img src="screenshots/edit.jpg" width="250" alt="Edit Transaction"/>
-  <img src="screenshots/settings.jpg" width="250" alt="Settings"/>
+  <img src="screenshots/analytics2.jpg" width="250" alt="Analytics Breakdown"/>
+  <img src="screenshots/analytics3.jpg" width="250" alt="Analytics Trends"/>
 </p>
 
-## 🎨 Features Highlights
-
-- **Real-time Balance Calculation** - Automatically calculates total balance, income, and expenses
-- **Category-based Tracking** - Organize transactions by categories
-- **Date-based Filtering** - View transactions by specific time periods
-- **Responsive Design** - Optimized for different screen sizes
-- **Smooth Animations** - Delightful micro-interactions throughout the app
+<p align="center">
+  <img src="screenshots/advanced.jpg" width="250" alt="Advanced Features"/>
+  <img src="screenshots/Settings.jpg" width="250" alt="Settings"/>
+</p>
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check the issues page.
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## 👨‍💻 Author
 
 **Bhanu Pratap Singh**
-- GitHub: [@Bhanu7773-Dev](https://github.com/Bhanu7773-dev)
+- GitHub: [@Bhanu7773-dev](https://github.com/Bhanu7773-dev)
 - Telegram: [@darkdevil7773](https://t.me/darkdevil7773)
 
-## 🌟 Show your support
+## 🌟 Support
 
 Give a ⭐️ if this project helped you!
 

@@ -5,6 +5,7 @@ import 'package:vibration/vibration.dart';
 import '../models/transaction.dart';
 import '../providers/money_provider.dart';
 import '../utils/app_theme.dart';
+import '../widgets/category_search_sheet.dart';
 
 class EditTransactionScreen extends StatefulWidget {
   final Transaction transaction;
@@ -40,6 +41,23 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
     if (await Vibration.hasVibrator() == true) {
       Vibration.vibrate(duration: 10);
     }
+  }
+
+  void _showCategorySearch(MoneyProvider provider) {
+    _vibrate();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => CategorySearchSheet(
+        isExpense: _isExpense,
+        onCategorySelected: (category) {
+          setState(() {
+            _selectedCategory = category.name;
+          });
+        },
+      ),
+    );
   }
 
   void _onKeyTap(String value) {
@@ -99,6 +117,19 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
           'Edit Transaction',
           style: TextStyle(color: Colors.white),
         ),
+        actions: [
+          Switch(
+            value: !_isExpense,
+            onChanged: (value) {
+              setState(() {
+                _isExpense = !value;
+              });
+            },
+            activeThumbColor: AppTheme.income,
+            inactiveThumbColor: AppTheme.expense,
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SafeArea(
         child: Consumer<MoneyProvider>(
@@ -106,7 +137,6 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                // Amount Display (without container)
                 Column(
                   children: [
                     Text(
@@ -114,6 +144,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
                       style: TextStyle(
                         color: _isExpense ? AppTheme.expense : AppTheme.income,
                         fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -125,119 +156,126 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
                         color: Colors.white,
                       ),
                     ).animate(key: ValueKey(_amount)).fadeIn(duration: 100.ms),
-                ],
-              ),
-              const SizedBox(height: 16),
+                  ],
+                ),
+                const SizedBox(height: 8),
 
-              // Type Toggle
-              Row(
-                children: [
-                  const Text('Expense', style: TextStyle(color: Colors.white)),
-                  const Spacer(),
-                  Switch(
-                    value: !_isExpense,
-                    onChanged: (value) {
-                      setState(() {
-                        _isExpense = !value;
-                      });
-                    },
-                    activeThumbColor: AppTheme.income,
-                    inactiveThumbColor: AppTheme.expense,
-                  ),
-                  const Text('Income', style: TextStyle(color: Colors.white)),
-                ],
-              ),
-              const SizedBox(height: 16),
+                // Category Selector Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Category',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.5),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => _showCategorySearch(provider),
+                      icon: const Icon(
+                        Icons.search,
+                        color: AppTheme.primary,
+                        size: 20,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
 
-              // Category Selector
-              SizedBox(
-                height: 50,
-                child: Consumer<MoneyProvider>(
-                  builder: (context, provider, child) {
-                    final categories = provider.categories;
-                    return ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: categories.length,
-                      itemBuilder: (context, index) {
-                        final category = categories[index];
-                        final isSelected = category.name == _selectedCategory;
-                        return GestureDetector(
-                          onTap: () {
-                            _vibrate();
-                            setState(() {
-                              _selectedCategory = category.name;
-                            });
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 12),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? category.color
-                                  : AppTheme.surface,
-                              borderRadius: BorderRadius.circular(25),
-                              border: Border.all(
-                                color: isSelected
-                                    ? Colors.transparent
-                                    : category.color.withValues(alpha: 0.3),
+                // Category Selector
+                SizedBox(
+                  height: 50,
+                  child: Consumer<MoneyProvider>(
+                    builder: (context, provider, child) {
+                      final categories = provider.categories;
+                      return ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: categories.length,
+                        itemBuilder: (context, index) {
+                          final category = categories[index];
+                          final isSelected = category.name == _selectedCategory;
+                          return GestureDetector(
+                            onTap: () {
+                              _vibrate();
+                              setState(() {
+                                _selectedCategory = category.name;
+                              });
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 12),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
                               ),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  category.icon,
-                                  size: 18,
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? category.color
+                                    : AppTheme.surface,
+                                borderRadius: BorderRadius.circular(25),
+                                border: Border.all(
                                   color: isSelected
-                                      ? Colors.white
-                                      : category.color,
+                                      ? Colors.transparent
+                                      : category.color.withValues(alpha: 0.3),
                                 ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  category.name,
-                                  style: TextStyle(
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    category.icon,
+                                    size: 18,
                                     color: isSelected
                                         ? Colors.white
-                                        : Colors.white,
-                                    fontWeight: FontWeight.w600,
+                                        : category.color,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    category.name,
+                                    style: TextStyle(
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ).animate(delay: (50 * index).ms).fadeIn().scale();
-                      },
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Notes Input
-              TextField(
-                controller: _notesController,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: 'Add notes',
-                  hintStyle: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.5),
-                  ),
-                  filled: true,
-                  fillColor: AppTheme.surface,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
+                          ).animate(delay: (50 * index).ms).fadeIn().scale();
+                        },
+                      );
+                    },
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
+                const SizedBox(height: 16),
 
-              // Keypad
-              _buildKeypad(),
-              const SizedBox(height: 12),
-            ],
+                // Notes Input
+                TextField(
+                  controller: _notesController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: 'Add notes',
+                    hintStyle: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.5),
+                    ),
+                    filled: true,
+                    fillColor: AppTheme.surface,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Keypad
+                _buildKeypad(),
+                const SizedBox(height: 12),
+              ],
             ),
           ),
         ),

@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 /// A shimmer effect widget for skeleton loading
 class ShimmerEffect extends StatefulWidget {
   final Widget child;
-  
+
   const ShimmerEffect({super.key, required this.child});
 
   @override
   State<ShimmerEffect> createState() => _ShimmerEffectState();
 }
 
-class _ShimmerEffectState extends State<ShimmerEffect> with SingleTickerProviderStateMixin {
+class _ShimmerEffectState extends State<ShimmerEffect>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -21,7 +22,7 @@ class _ShimmerEffectState extends State<ShimmerEffect> with SingleTickerProvider
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat();
-    
+
     _animation = Tween<double>(begin: -2, end: 2).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),
     );
@@ -48,11 +49,7 @@ class _ShimmerEffectState extends State<ShimmerEffect> with SingleTickerProvider
                 Colors.grey.shade600,
                 Colors.grey.shade800,
               ],
-              stops: [
-                0.0,
-                (_animation.value + 2) / 4,
-                1.0,
-              ],
+              stops: [0.0, (_animation.value + 2) / 4, 1.0],
               transform: GradientRotation(_animation.value),
             ).createShader(bounds);
           },
@@ -69,7 +66,7 @@ class SkeletonBox extends StatelessWidget {
   final double width;
   final double height;
   final double borderRadius;
-  
+
   const SkeletonBox({
     super.key,
     required this.width,
@@ -134,16 +131,19 @@ class TransactionSkeletonItem extends StatelessWidget {
 /// Skeleton loading for the transaction list
 class TransactionListSkeleton extends StatelessWidget {
   final int itemCount;
-  
+
   const TransactionListSkeleton({super.key, this.itemCount = 5});
 
   @override
   Widget build(BuildContext context) {
     return ShimmerEffect(
-      child: Column(
-        children: List.generate(
-          itemCount,
-          (index) => const TransactionSkeletonItem(),
+      child: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        child: Column(
+          children: List.generate(
+            itemCount,
+            (index) => const TransactionSkeletonItem(),
+          ),
         ),
       ),
     );
@@ -163,10 +163,7 @@ class BalanceCardSkeleton extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Colors.grey.shade900,
-              Colors.grey.shade800,
-            ],
+            colors: [Colors.grey.shade900, Colors.grey.shade800],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -230,8 +227,9 @@ class HomeScreenSkeleton extends StatelessWidget {
                 ShimmerEffect(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: List.generate(4, (index) => 
-                      Column(
+                    children: List.generate(
+                      4,
+                      (index) => Column(
                         children: [
                           SkeletonBox(width: 56, height: 56, borderRadius: 16),
                           const SizedBox(height: 8),

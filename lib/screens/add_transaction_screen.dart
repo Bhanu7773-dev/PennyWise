@@ -6,6 +6,7 @@ import 'package:vibration/vibration.dart';
 import '../providers/money_provider.dart';
 import '../models/transaction.dart';
 import '../utils/app_theme.dart';
+import '../widgets/category_search_sheet.dart';
 
 class AddTransactionScreen extends StatefulWidget {
   final bool initialIsExpense;
@@ -20,7 +21,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   String _amount = '0';
   String _note = '';
   late bool _isExpense;
-  String _selectedCategory = 'Food';
+  String? _selectedCategoryId;
 
   @override
   void initState() {
@@ -28,17 +29,28 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     _isExpense = widget.initialIsExpense;
   }
 
-  final List<String> _categories = [
-    'Food',
-    'Transport',
-    'Shopping',
-    'Entertainment',
-    'Bills',
-    'Health',
-    'Salary',
-    'Investment',
-    'Other',
-  ];
+  void _vibrate() async {
+    if (await Vibration.hasVibrator() == true) {
+      Vibration.vibrate(duration: 10);
+    }
+  }
+
+  void _showCategorySearch(MoneyProvider provider) {
+    _vibrate();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => CategorySearchSheet(
+        isExpense: _isExpense,
+        onCategorySelected: (category) {
+          setState(() {
+            _selectedCategoryId = category.id;
+          });
+        },
+      ),
+    );
+  }
 
   void _onKeyTap(String value) {
     _vibrate();
@@ -65,28 +77,25 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     });
   }
 
-  void _vibrate() async {
-    if (await Vibration.hasVibrator() == true) {
-      Vibration.vibrate(duration: 10);
-    }
-  }
-
   void _saveTransaction() {
     if (double.parse(_amount) == 0) return;
 
+    final provider = Provider.of<MoneyProvider>(context, listen: false);
+    final selectedCategory = provider.categories.firstWhere(
+      (c) => c.id == _selectedCategoryId,
+      orElse: () => provider.categories.firstWhere((c) => c.id == 'other'),
+    );
+
     final transaction = Transaction(
       id: const Uuid().v4(),
-      title: _note.isEmpty ? _selectedCategory : _note,
+      title: _note.isEmpty ? selectedCategory.name : _note,
       amount: double.parse(_amount),
       date: DateTime.now(),
       isExpense: _isExpense,
-      category: _selectedCategory,
+      category: selectedCategory.name,
     );
 
-    Provider.of<MoneyProvider>(
-      context,
-      listen: false,
-    ).addTransaction(transaction);
+    provider.addTransaction(transaction);
     Navigator.pop(context);
   }
 
@@ -132,79 +141,118 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ).animate().scale(duration: 300.ms, curve: Curves.easeOutBack),
-          const SizedBox(height: 32),
+            const SizedBox(height: 32),
 
-          // Note Input
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: TextField(
-              style: const TextStyle(color: Colors.white),
-              textAlign: TextAlign.center,
-              decoration: InputDecoration(
-                hintText: 'Add a note...',
-                hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.3),
+            // Note Input
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: TextField(
+                style: const TextStyle(color: Colors.white),
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  hintText: 'Add a note...',
+                  hintStyle: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.3),
+                  ),
+                  border: InputBorder.none,
                 ),
-                border: InputBorder.none,
+                onChanged: (value) => _note = value,
               ),
-              onChanged: (value) => _note = value,
             ),
-          ),
-          const SizedBox(height: 32),
+            const SizedBox(height: 32),
 
-          // Category Selector
-          SizedBox(
-            height: 50,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _categories.length,
-              itemBuilder: (context, index) {
-                final category = _categories[index];
-                final isSelected = category == _selectedCategory;
-                return GestureDetector(
-                  onTap: () {
-                    _vibrate();
-                    setState(() {
-                      _selectedCategory = category;
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: 200.ms,
-                    margin: const EdgeInsets.only(right: 12),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? (_isExpense ? AppTheme.expense : AppTheme.income)
-                          : AppTheme.surface,
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(
-                        color: isSelected
-                            ? Colors.transparent
-                            : Colors.white.withValues(alpha: 0.1),
-                      ),
-                    ),
-                    child: Text(
-                      category,
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.white70,
-                        fontWeight: FontWeight.w600,
-                      ),
+            // Category Selector Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Category',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.5),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                );
-              },
+                  IconButton(
+                    onPressed: () => _showCategorySearch(provider),
+                    icon: const Icon(
+                      Icons.search,
+                      color: AppTheme.primary,
+                      size: 20,
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 32),
+            const SizedBox(height: 12),
 
-          // Keypad
-          _buildKeypad(),
-          const SizedBox(height: 32),
-        ],
+            SizedBox(
+              height: 50,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: provider.categories.length,
+                itemBuilder: (context, index) {
+                  final category = provider.categories[index];
+                  _selectedCategoryId ??= category.id; // Initialize if null
+                  final isSelected = category.id == _selectedCategoryId;
+                  return GestureDetector(
+                    onTap: () {
+                      _vibrate();
+                      setState(() {
+                        _selectedCategoryId = category.id;
+                      });
+                    },
+                    child: AnimatedContainer(
+                      duration: 200.ms,
+                      margin: const EdgeInsets.only(right: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected ? category.color : AppTheme.surface,
+                        borderRadius: BorderRadius.circular(25),
+                        border: Border.all(
+                          color: isSelected
+                              ? Colors.transparent
+                              : category.color.withValues(alpha: 0.2),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            category.icon,
+                            size: 18,
+                            color: isSelected ? Colors.white : category.color,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            category.name,
+                            style: TextStyle(
+                              color: isSelected ? Colors.white : Colors.white70,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            // Keypad
+            _buildKeypad(),
+            const SizedBox(height: 32),
+          ],
         ),
       ),
     );

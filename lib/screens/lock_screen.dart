@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:local_auth/local_auth.dart';
+import '../services/biometric_service.dart';
 import '../utils/app_theme.dart';
+import 'package:vibration/vibration.dart';
 
 class LockScreen extends StatefulWidget {
   final Widget child;
   final bool isEnabled;
 
-  const LockScreen({
-    super.key,
-    required this.child,
-    required this.isEnabled,
-  });
+  const LockScreen({super.key, required this.child, required this.isEnabled});
 
   @override
   State<LockScreen> createState() => _LockScreenState();
 }
 
 class _LockScreenState extends State<LockScreen> with WidgetsBindingObserver {
-  final LocalAuthentication _localAuth = LocalAuthentication();
+  final BiometricService _biometricService = BiometricService();
   bool _isLocked = true;
   bool _isAuthenticating = false;
 
@@ -42,7 +39,7 @@ class _LockScreenState extends State<LockScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (!widget.isEnabled) return;
-    
+
     if (state == AppLifecycleState.paused) {
       // App went to background - lock it
       setState(() {
@@ -74,17 +71,19 @@ class _LockScreenState extends State<LockScreen> with WidgetsBindingObserver {
 
   Future<void> _authenticate() async {
     if (_isAuthenticating) return;
-    
+
+    // Provide immediate haptic feedback for button press
+    Vibration.vibrate(duration: 50, amplitude: 128);
+
     setState(() {
       _isAuthenticating = true;
     });
 
     try {
-      // Check if biometrics are available
-      final canCheckBiometrics = await _localAuth.canCheckBiometrics;
-      final isDeviceSupported = await _localAuth.isDeviceSupported();
+      // Use combined fast check from BiometricService
+      final isAvailable = await _biometricService.isAvailable();
 
-      if (!canCheckBiometrics || !isDeviceSupported) {
+      if (!isAvailable) {
         // No biometrics available, unlock anyway
         setState(() {
           _isLocked = false;
@@ -93,12 +92,9 @@ class _LockScreenState extends State<LockScreen> with WidgetsBindingObserver {
         return;
       }
 
-      final didAuthenticate = await _localAuth.authenticate(
+      final didAuthenticate = await _biometricService.authenticate(
         localizedReason: 'Authenticate to access PennyWise',
-        options: const AuthenticationOptions(
-          stickyAuth: true,
-          biometricOnly: false, // Allow PIN/pattern as fallback
-        ),
+        biometricOnly: false, // Allow PIN/pattern as fallback
       );
 
       if (didAuthenticate) {
@@ -106,13 +102,14 @@ class _LockScreenState extends State<LockScreen> with WidgetsBindingObserver {
           _isLocked = false;
         });
       }
-    } on PlatformException catch (e) {
+    } catch (e) {
       debugPrint('Auth error: $e');
-      // If there's an error, show the retry button
     } finally {
-      setState(() {
-        _isAuthenticating = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isAuthenticating = false;
+        });
+      }
     }
   }
 
@@ -143,7 +140,7 @@ class _LockScreenState extends State<LockScreen> with WidgetsBindingObserver {
                 ),
               ),
               const SizedBox(height: 32),
-              
+
               // App name
               const Text(
                 'PennyWise',
@@ -154,7 +151,7 @@ class _LockScreenState extends State<LockScreen> with WidgetsBindingObserver {
                 ),
               ),
               const SizedBox(height: 8),
-              
+
               Text(
                 'Locked',
                 style: TextStyle(
@@ -163,12 +160,10 @@ class _LockScreenState extends State<LockScreen> with WidgetsBindingObserver {
                 ),
               ),
               const SizedBox(height: 48),
-              
+
               // Authenticate button
               if (_isAuthenticating)
-                const CircularProgressIndicator(
-                  color: AppTheme.primary,
-                )
+                const CircularProgressIndicator(color: AppTheme.primary)
               else
                 GestureDetector(
                   onTap: _authenticate,
@@ -209,9 +204,9 @@ class _LockScreenState extends State<LockScreen> with WidgetsBindingObserver {
                     ),
                   ),
                 ),
-              
+
               const SizedBox(height: 24),
-              
+
               Text(
                 'Use fingerprint, face, or device PIN',
                 style: TextStyle(

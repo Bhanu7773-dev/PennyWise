@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:local_auth/local_auth.dart';
+import '../services/biometric_service.dart';
 import 'package:intl/intl.dart';
 import '../providers/money_provider.dart';
 import '../utils/app_theme.dart';
@@ -17,7 +17,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final LocalAuthentication _localAuth = LocalAuthentication();
+  final BiometricService _biometricService = BiometricService();
   final GoogleDriveService _driveService = GoogleDriveService();
   bool _canCheckBiometrics = false;
   bool _checkingForUpdates = false;
@@ -85,15 +85,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _checkBiometrics() async {
     try {
-      final canCheck = await _localAuth.canCheckBiometrics;
-      final isSupported = await _localAuth.isDeviceSupported();
-      setState(() {
-        _canCheckBiometrics = canCheck && isSupported;
-      });
+      final available = await _biometricService.isAvailable();
+      if (mounted) {
+        setState(() {
+          _canCheckBiometrics = available;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _canCheckBiometrics = false;
-      });
+      if (mounted) {
+        setState(() {
+          _canCheckBiometrics = false;
+        });
+      }
     }
   }
 
@@ -101,12 +104,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (enable) {
       // Verify biometric before enabling
       try {
-        final didAuthenticate = await _localAuth.authenticate(
+        final didAuthenticate = await _biometricService.authenticate(
           localizedReason: 'Verify your identity to enable biometric lock',
-          options: const AuthenticationOptions(
-            stickyAuth: true,
-            biometricOnly: false,
-          ),
+          biometricOnly: false,
         );
 
         if (didAuthenticate) {
@@ -152,10 +152,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         goals: provider.goals,
         accounts: provider.accounts,
       );
-      
+
       if (mounted) {
         setState(() => _isBackingUp = false);
-        
+
         if (result.success) {
           await _loadBackupInfo(); // Refresh backup info
           ScaffoldMessenger.of(context).showSnackBar(
@@ -227,7 +227,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     if (_backupInfo!.modifiedTime != null)
                       Text(
                         'Date: ${DateFormat('MMM d, yyyy h:mm a').format(_backupInfo!.modifiedTime!)}',
-                        style: const TextStyle(color: Colors.white70, fontSize: 12),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
                       ),
                   ],
                 ),
@@ -260,27 +263,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     try {
       final result = await _driveService.restoreFromGoogleDrive();
-      
+
       if (mounted) {
         setState(() => _isRestoring = false);
-        
+
         if (result.success) {
           // Reload provider data
           final provider = Provider.of<MoneyProvider>(context, listen: false);
-          
+
           // For logged-in users, import restored Hive data to Firebase
           // This ensures transactions go to the right place
           await provider.importRestoredDataToFirebase();
-          
+
           // Reload all data
           await provider.reloadData();
-          
+
           // Force UI update after restore
           provider.notifyListeners();
-          
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${result.message} (${result.itemCount} items restored)'),
+              content: Text(
+                '${result.message} (${result.itemCount} items restored)',
+              ),
               backgroundColor: Colors.green,
             ),
           );
@@ -851,9 +856,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         decoration: BoxDecoration(
           color: AppTheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.blue.withValues(alpha: 0.3),
-          ),
+          border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
@@ -901,10 +904,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               )
             else
-              Icon(
-                Icons.backup,
-                color: Colors.white.withValues(alpha: 0.3),
-              ),
+              Icon(Icons.backup, color: Colors.white.withValues(alpha: 0.3)),
           ],
         ),
       ),
@@ -920,9 +920,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         decoration: BoxDecoration(
           color: AppTheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.green.withValues(alpha: 0.3),
-          ),
+          border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
@@ -972,10 +970,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               )
             else
-              Icon(
-                Icons.restore,
-                color: Colors.white.withValues(alpha: 0.3),
-              ),
+              Icon(Icons.restore, color: Colors.white.withValues(alpha: 0.3)),
           ],
         ),
       ),

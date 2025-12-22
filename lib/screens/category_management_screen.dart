@@ -15,11 +15,26 @@ class CategoryManagementScreen extends StatefulWidget {
 
 class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   final Set<String> _expandedCategories = {};
+  bool _isSearching = false;
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<MoneyProvider>(context);
-    final topLevelCategories = provider.topLevelCategories;
+    var topLevelCategories = provider.topLevelCategories;
+
+    if (_searchQuery.isNotEmpty) {
+      topLevelCategories = topLevelCategories.where((cat) {
+        return cat.name.toLowerCase().contains(_searchQuery.toLowerCase());
+      }).toList();
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F111A),
@@ -30,10 +45,47 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Manage Categories',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Search categories...',
+                  hintStyle: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.3),
+                  ),
+                  border: InputBorder.none,
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+              )
+            : const Text(
+                'Manage Categories',
+                style: TextStyle(color: Colors.white),
+              ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              _isSearching ? Icons.close : Icons.search,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              setState(() {
+                if (_isSearching) {
+                  _isSearching = false;
+                  _searchQuery = '';
+                  _searchController.clear();
+                } else {
+                  _isSearching = true;
+                }
+              });
+            },
+          ),
+        ],
       ),
       body: Container(
         decoration: BoxDecoration(

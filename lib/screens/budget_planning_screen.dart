@@ -20,32 +20,33 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
     final totalBudget = provider.currentBudget?.monthlyLimit ?? 0;
     final totalSpent = provider.monthlySpent;
     final categories = provider.categories;
-
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFF0F111A),
+      backgroundColor: isAmoled
+          ? Colors.black
+          : (isLight ? Colors.white : theme.scaffoldBackgroundColor),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isLight ? Colors.black : Colors.white,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Budget Planning',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: isLight ? Colors.black : Colors.white),
         ),
       ),
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF0F111A),
-              const Color(0xFF1A1F38),
-              const Color(0xFF0F111A),
-            ],
-          ),
+          color: isAmoled
+              ? Colors.black
+              : (isLight ? Colors.transparent : theme.scaffoldBackgroundColor),
         ),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -56,18 +57,25 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppTheme.primary.withValues(alpha: 0.2),
-                      const Color(0xFF2D3459).withValues(alpha: 0.2),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: isAmoled || isLight ? Colors.transparent : null,
+                  gradient: isAmoled || isLight
+                      ? null
+                      : LinearGradient(
+                          colors: [
+                            AppTheme.primary.withOpacity(0.2),
+                            const Color(0xFF2D3459).withOpacity(0.2),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
-                  ),
+                  border: isLight
+                      ? Border.all(color: Colors.black)
+                      : Border.all(
+                          color: isAmoled
+                              ? Colors.white
+                              : Colors.white.withOpacity(0.1),
+                        ),
                 ),
                 child: Column(
                   children: [
@@ -80,7 +88,9 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
                             Text(
                               'Total Budget',
                               style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.7),
+                                color: isLight
+                                    ? Colors.black.withOpacity(0.7)
+                                    : Colors.white.withOpacity(0.7),
                                 fontSize: 14,
                               ),
                             ),
@@ -90,8 +100,8 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
                                 symbol: currency,
                                 decimalDigits: 0,
                               ).format(totalBudget),
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: isLight ? Colors.black : Colors.white,
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -109,12 +119,17 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.1),
+                              color: isLight
+                                  ? Colors.transparent
+                                  : Colors.white.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
+                              border: isLight
+                                  ? Border.all(color: Colors.black)
+                                  : null,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.edit,
-                              color: Colors.white,
+                              color: isLight ? Colors.black : Colors.white,
                               size: 20,
                             ),
                           ),
@@ -132,13 +147,20 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
                             value: totalBudget > 0
                                 ? (totalSpent / totalBudget).clamp(0.0, 1.0)
                                 : 0,
-                            backgroundColor: Colors.white.withValues(
-                              alpha: 0.1,
-                            ),
+                            backgroundColor: isLight
+                                ? Colors.black.withOpacity(0.1)
+                                : Colors.white.withOpacity(0.1),
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              totalSpent > totalBudget
-                                  ? AppTheme.expense
-                                  : AppTheme.primary,
+                              isLight
+                                  ? Colors
+                                        .black // Monochrome
+                                  : (totalSpent > totalBudget
+                                        ? (isAmoled
+                                              ? Colors.white
+                                              : AppTheme.expense)
+                                        : (isAmoled
+                                              ? Colors.white
+                                              : AppTheme.primary)),
                             ),
                             strokeWidth: 12,
                           ),
@@ -147,8 +169,8 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
                           children: [
                             Text(
                               '${((totalBudget > 0 ? totalSpent / totalBudget : 0) * 100).toStringAsFixed(0)}%',
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: isLight ? Colors.black : Colors.white,
                                 fontSize: 32,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -156,7 +178,9 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
                             Text(
                               'Spent',
                               style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.5),
+                                color: isLight
+                                    ? Colors.black.withOpacity(0.5)
+                                    : Colors.white.withOpacity(0.5),
                                 fontSize: 12,
                               ),
                             ),
@@ -171,14 +195,21 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
                         _buildSummaryItem(
                           'Spent',
                           totalSpent,
-                          AppTheme.expense,
+                          isLight
+                              ? Colors
+                                    .black // Monochrome
+                              : (isAmoled ? Colors.white : AppTheme.expense),
                           currency,
+                          isLight,
                         ),
                         _buildSummaryItem(
                           'Remaining',
                           totalBudget - totalSpent,
-                          AppTheme.income,
+                          isLight
+                              ? Colors.black.withOpacity(0.6) // Monochrome
+                              : (isAmoled ? Colors.white : AppTheme.income),
                           currency,
+                          isLight,
                         ),
                       ],
                     ),
@@ -191,7 +222,9 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
               Text(
                 'Category Budgets',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: isLight
+                      ? Colors.black.withOpacity(0.9)
+                      : Colors.white.withOpacity(0.9),
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -229,11 +262,17 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.05),
+                        color: isAmoled || isLight
+                            ? Colors.transparent
+                            : Colors.white.withOpacity(0.05),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.05),
-                        ),
+                        border: isLight
+                            ? Border.all(color: Colors.black)
+                            : Border.all(
+                                color: isAmoled
+                                    ? Colors.white
+                                    : Colors.white.withOpacity(0.05),
+                              ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,22 +285,35 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
                                   Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: category.color.withValues(
-                                        alpha: 0.2,
-                                      ),
+                                      color: isAmoled || isLight
+                                          ? Colors.transparent
+                                          : category.color.withOpacity(0.2),
                                       shape: BoxShape.circle,
+                                      border: isAmoled || isLight
+                                          ? Border.all(
+                                              color: isLight
+                                                  ? Colors.black
+                                                  : Colors.white,
+                                            )
+                                          : null,
                                     ),
                                     child: Icon(
                                       category.icon,
-                                      color: category.color,
+                                      color: isLight
+                                          ? Colors.black
+                                          : (isAmoled
+                                                ? Colors.white
+                                                : category.color),
                                       size: 16,
                                     ),
                                   ),
                                   const SizedBox(width: 12),
                                   Text(
                                     category.name,
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: TextStyle(
+                                      color: isLight
+                                          ? Colors.black
+                                          : Colors.white,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -273,8 +325,12 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
                                     : 'Set Limit',
                                 style: TextStyle(
                                   color: limit > 0
-                                      ? Colors.white
-                                      : AppTheme.primary,
+                                      ? (isLight ? Colors.black : Colors.white)
+                                      : (isAmoled || isLight
+                                            ? (isLight
+                                                  ? Colors.black
+                                                  : Colors.white)
+                                            : AppTheme.primary),
                                   fontSize: 12,
                                   fontWeight: limit > 0
                                       ? FontWeight.normal
@@ -289,11 +345,11 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
                               borderRadius: BorderRadius.circular(4),
                               child: LinearProgressIndicator(
                                 value: progress,
-                                backgroundColor: Colors.white.withValues(
-                                  alpha: 0.1,
-                                ),
+                                backgroundColor: isLight
+                                    ? Colors.black.withOpacity(0.1)
+                                    : Colors.white.withOpacity(0.1),
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  progressColor,
+                                  isLight ? Colors.black : progressColor,
                                 ),
                                 minHeight: 6,
                               ),
@@ -317,6 +373,7 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
     double value,
     Color color,
     String currency,
+    bool isLight,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -324,7 +381,9 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.5),
+            color: isLight
+                ? Colors.black.withOpacity(0.5)
+                : Colors.white.withOpacity(0.5),
             fontSize: 12,
           ),
         ),
@@ -353,28 +412,40 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
   ) {
     String amount = currentLimit > 0 ? currentLimit.toStringAsFixed(0) : '';
 
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          backgroundColor: const Color(0xFF1E293B),
+          backgroundColor: isAmoled
+              ? Colors.black
+              : (isLight ? Colors.white : const Color(0xFF1E293B)),
+          shape: isAmoled || isLight
+              ? RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(
+                    color: isLight ? Colors.black : Colors.white,
+                  ),
+                )
+              : null,
           title: Text(
             'Set $title',
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: isLight ? Colors.black : Colors.white),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 '${provider.currencySymbol}${amount.isEmpty ? "0" : amount}',
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: isLight ? Colors.black : Colors.white,
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 24),
-              _buildKeypad(setState, (val) {
+              _buildKeypad(context, setState, (val) {
                 setState(() {
                   if (val == '⌫') {
                     if (amount.isNotEmpty) {
@@ -406,9 +477,18 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
+                backgroundColor: isAmoled || isLight
+                    ? (isLight ? Colors.white : Colors.white)
+                    : AppTheme.primary,
+                foregroundColor: isAmoled || isLight
+                    ? Colors.black
+                    : Colors.white,
+                side: isLight ? const BorderSide(color: Colors.black) : null,
               ),
-              child: const Text('Save', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                'Save',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
@@ -416,21 +496,35 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
     );
   }
 
-  Widget _buildKeypad(StateSetter setState, Function(String) onTap) {
+  Widget _buildKeypad(
+    BuildContext context,
+    StateSetter setState,
+    Function(String) onTap,
+  ) {
     return Column(
       children: [
-        _buildKeyRow(['1', '2', '3'], onTap),
+        _buildKeyRow(context, ['1', '2', '3'], onTap),
         const SizedBox(height: 12),
-        _buildKeyRow(['4', '5', '6'], onTap),
+        _buildKeyRow(context, ['4', '5', '6'], onTap),
         const SizedBox(height: 12),
-        _buildKeyRow(['7', '8', '9'], onTap),
+        _buildKeyRow(context, ['7', '8', '9'], onTap),
         const SizedBox(height: 12),
-        _buildKeyRow(['.', '0', '⌫'], onTap),
+        _buildKeyRow(context, ['.', '0', '⌫'], onTap),
       ],
     );
   }
 
-  Widget _buildKeyRow(List<String> keys, Function(String) onTap) {
+  Widget _buildKeyRow(
+    BuildContext context,
+    List<String> keys,
+    Function(String) onTap,
+  ) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
     return Row(
       children: keys.map((key) {
         return Expanded(
@@ -446,13 +540,20 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: isAmoled || isLight
+                        ? Colors.transparent
+                        : Colors.white.withOpacity(0.05),
+                    border: isAmoled || isLight
+                        ? Border.all(
+                            color: isLight ? Colors.black : Colors.white,
+                          )
+                        : null,
                   ),
                   child: Text(
                     key,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
-                      color: Colors.white,
+                      color: isLight ? Colors.black : Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

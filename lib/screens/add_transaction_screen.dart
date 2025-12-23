@@ -101,18 +101,23 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<MoneyProvider>(context);
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: isAmoled
+          ? Colors.black
+          : (isLight ? Colors.white : AppTheme.background),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
+          icon: Icon(Icons.close, color: isLight ? Colors.black : Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           _isExpense ? 'New Expense' : 'New Income',
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: isLight ? Colors.black : Colors.white),
         ),
         actions: [
           Switch(
@@ -124,7 +129,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             },
             activeThumbColor: AppTheme.income,
             inactiveThumbColor: AppTheme.expense,
-            inactiveTrackColor: AppTheme.expense.withValues(alpha: 0.5),
+            inactiveTrackColor: AppTheme.expense.withOpacity(0.5),
           ),
           const SizedBox(width: 16),
         ],
@@ -137,7 +142,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             Text(
               '${provider.currencySymbol}$_amount',
               style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                color: _isExpense ? AppTheme.expense : AppTheme.income,
+                color: isAmoled || isLight
+                    ? (isLight ? Colors.black : Colors.white)
+                    : (_isExpense ? AppTheme.expense : AppTheme.income),
                 fontWeight: FontWeight.bold,
               ),
             ).animate().scale(duration: 300.ms, curve: Curves.easeOutBack),
@@ -147,12 +154,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: TextField(
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: isLight ? Colors.black : Colors.white),
                 textAlign: TextAlign.center,
                 decoration: InputDecoration(
                   hintText: 'Add a note...',
                   hintStyle: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.3),
+                    color: isLight
+                        ? Colors.black.withOpacity(0.3)
+                        : Colors.white.withOpacity(0.3),
                   ),
                   border: InputBorder.none,
                 ),
@@ -170,7 +179,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   Text(
                     'Category',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.5),
+                      color: isLight
+                          ? Colors.black.withOpacity(0.5)
+                          : Colors.white.withOpacity(0.5),
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
@@ -216,12 +227,28 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: isSelected ? category.color : AppTheme.surface,
+                        color: isSelected
+                            ? (isAmoled
+                                  ? Colors.white
+                                  : (isLight
+                                        ? Colors.transparent
+                                        : category.color))
+                            : (isAmoled || isLight
+                                  ? Colors.transparent
+                                  : AppTheme.surface),
                         borderRadius: BorderRadius.circular(25),
                         border: Border.all(
                           color: isSelected
-                              ? Colors.transparent
-                              : category.color.withValues(alpha: 0.2),
+                              ? (isAmoled
+                                    ? Colors.white
+                                    : (isLight
+                                          ? Colors.black
+                                          : Colors.transparent))
+                              : (isAmoled
+                                    ? Colors.white.withOpacity(0.3)
+                                    : (isLight
+                                          ? Colors.black.withOpacity(0.1)
+                                          : category.color.withOpacity(0.2))),
                         ),
                       ),
                       child: Row(
@@ -230,13 +257,21 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                           Icon(
                             category.icon,
                             size: 18,
-                            color: isSelected ? Colors.white : category.color,
+                            color: isSelected
+                                ? (isAmoled ? Colors.black : Colors.black)
+                                : (isAmoled
+                                      ? Colors.white
+                                      : (isLight
+                                            ? Colors.black
+                                            : category.color)),
                           ),
                           const SizedBox(width: 8),
                           Text(
                             category.name,
                             style: TextStyle(
-                              color: isSelected ? Colors.white : Colors.white70,
+                              color: isSelected
+                                  ? (isAmoled ? Colors.black : Colors.black)
+                                  : (isLight ? Colors.black : Colors.white),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -259,6 +294,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   Widget _buildKeypad() {
+    final provider = Provider.of<MoneyProvider>(context, listen: false);
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -280,20 +319,26 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               child: ElevatedButton(
                 onPressed: _saveTransaction,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _isExpense
-                      ? AppTheme.expense
-                      : AppTheme.income,
+                  backgroundColor: isAmoled
+                      ? Colors.white
+                      : (isLight
+                            ? Colors.black
+                            : (_isExpense
+                                  ? AppTheme.expense
+                                  : AppTheme.income)),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                   elevation: 0,
                 ),
-                child: const Text(
+                child: Text(
                   'SAVE TRANSACTION',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: isAmoled
+                        ? Colors.black
+                        : (isLight ? Colors.white : Colors.white),
                     letterSpacing: 1.0,
                   ),
                 ),
@@ -306,6 +351,13 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   Widget _buildKeyRow(List<String> keys) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
+
     return Row(
       children: keys.map((key) {
         return Expanded(
@@ -321,16 +373,24 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    color: AppTheme.surface.withValues(alpha: 0.3),
+                    color: isAmoled
+                        ? Colors.transparent
+                        : (isLight
+                              ? Colors.transparent
+                              : AppTheme.surface.withOpacity(0.3)),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.05),
+                      color: isAmoled
+                          ? Colors.white
+                          : (isLight
+                                ? Colors.black.withOpacity(0.1)
+                                : Colors.white.withOpacity(0.05)),
                     ),
                   ),
                   child: Text(
                     key,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 24,
-                      color: Colors.white,
+                      color: isLight ? Colors.black : Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

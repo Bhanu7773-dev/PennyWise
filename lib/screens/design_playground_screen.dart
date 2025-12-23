@@ -9,18 +9,22 @@ class DesignPlaygroundScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
     return Scaffold(
-      backgroundColor: const Color(0xFF0F111A),
+      backgroundColor: isLight ? Colors.white : const Color(0xFF0F111A),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isLight ? Colors.black : Colors.white,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Design Playground',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: isLight ? Colors.black : Colors.white),
         ),
       ),
       body: Consumer<MoneyProvider>(
@@ -36,12 +40,17 @@ class DesignPlaygroundScreen extends StatelessWidget {
                 height: 180,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24),
-                  color: Colors.white.withValues(alpha: 0.04),
+                  color: isLight
+                      ? Colors.transparent
+                      : Colors.white.withOpacity(0.04),
+                  border: isLight ? Border.all(color: Colors.black) : null,
                 ),
                 child: Center(
                   child: Icon(
                     Icons.credit_card,
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: isLight
+                        ? Colors.black
+                        : Colors.white.withOpacity(0.7),
                     size: 60,
                   ),
                 ),
@@ -112,7 +121,7 @@ class DesignPlaygroundScreen extends StatelessWidget {
             ),
 
             // GLASSMORPHISM COLLECTION
-            _buildSectionTitle('━━━ GLASSMORPHISM COLLECTION ━━━'),
+            _buildSectionTitle(context, '━━━ GLASSMORPHISM COLLECTION ━━━'),
             const SizedBox(height: 24),
 
             CardDesignSelector(
@@ -166,7 +175,7 @@ class DesignPlaygroundScreen extends StatelessWidget {
             const SizedBox(height: 32),
 
             // FUTURE & COSMIC COLLECTION
-            _buildSectionTitle('━━━ FUTURE & COSMIC ━━━'),
+            _buildSectionTitle(context, '━━━ FUTURE & COSMIC ━━━'),
             const SizedBox(height: 24),
 
             CardDesignSelector(
@@ -236,11 +245,14 @@ class DesignPlaygroundScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
     return Text(
       title,
       style: TextStyle(
-        color: Colors.white.withValues(alpha: 0.7),
+        color: isLight
+            ? Colors.black.withOpacity(0.7)
+            : Colors.white.withOpacity(0.7),
         fontSize: 14,
         fontWeight: FontWeight.bold,
         letterSpacing: 1.0,
@@ -278,7 +290,7 @@ class CardDesignSelector extends StatelessWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.amber.withValues(alpha: 0.2),
+                    color: Colors.amber.withOpacity(0.2),
                     blurRadius: 16,
                   ),
                 ]
@@ -303,7 +315,7 @@ class CardDesignSelector extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.4),
+                    color: Colors.black.withOpacity(0.4),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(

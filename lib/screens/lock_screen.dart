@@ -130,7 +130,7 @@ class _LockScreenState extends State<LockScreen> with WidgetsBindingObserver {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: AppTheme.primary.withValues(alpha: 0.1),
+                  color: AppTheme.primary.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -156,7 +156,7 @@ class _LockScreenState extends State<LockScreen> with WidgetsBindingObserver {
                 'Locked',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.white.withValues(alpha: 0.6),
+                  color: Colors.white.withOpacity(0.6),
                 ),
               ),
               const SizedBox(height: 48),
@@ -177,7 +177,7 @@ class _LockScreenState extends State<LockScreen> with WidgetsBindingObserver {
                       borderRadius: BorderRadius.circular(30),
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.primary.withValues(alpha: 0.3),
+                          color: AppTheme.primary.withOpacity(0.3),
                           blurRadius: 12,
                           offset: const Offset(0, 6),
                         ),
@@ -211,7 +211,7 @@ class _LockScreenState extends State<LockScreen> with WidgetsBindingObserver {
                 'Use fingerprint, face, or device PIN',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.white.withValues(alpha: 0.4),
+                  color: Colors.white.withOpacity(0.4),
                 ),
               ),
             ],

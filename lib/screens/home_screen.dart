@@ -8,6 +8,8 @@ import '../widgets/budget_widget.dart';
 import '../widgets/transaction_list.dart';
 import '../widgets/profile_dialog.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
+import '../widgets/theme_toggle.dart';
+import '../widgets/theme_reveal.dart';
 import 'add_transaction_screen.dart';
 import 'analytics_screen.dart';
 import 'advance_screen.dart';
@@ -31,7 +33,17 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _pageController = PageController();
+    // Disable animations after initial load
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _shouldAnimate = false;
+        });
+      }
+    });
   }
+
+  bool _shouldAnimate = true;
 
   @override
   void dispose() {
@@ -55,101 +67,86 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Set status bar to transparent with light icons
+    final provider = Provider.of<MoneyProvider>(context);
+    final theme = Theme.of(context);
+    final isLightTheme = provider.appThemeMode == AppThemeMode.light;
+
     SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
+      SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark, // For iOS
+        statusBarIconBrightness: isLightTheme
+            ? Brightness.dark
+            : Brightness.light,
+        statusBarBrightness: isLightTheme ? Brightness.light : Brightness.dark,
       ),
     );
 
-    final provider = Provider.of<MoneyProvider>(context);
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F111A),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFF0F111A),
-                    const Color(0xFF1A1F38),
-                    const Color(0xFF0F111A),
-                  ],
-                ),
+    return ThemeRevealController(
+      child: Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: Stack(
+          children: [
+            // Gradient removed for solid background
+            PageView(
+              controller: _pageController,
+              onPageChanged: _onPageChanged,
+              children: [
+                _buildHomePage(provider),
+                const AnalyticsScreen(),
+                const AdvanceScreen(),
+                const SettingsScreen(),
+              ],
+            ),
+
+            Positioned(
+              bottom: 32,
+              left: 0,
+              right: 0,
+              child: Center(
+                child:
+                    CustomBottomNavBar(
+                          selectedIndex: _currentPage,
+                          onItemSelected: _onNavItemTapped,
+                        )
+                        .animate(value: _shouldAnimate ? null : 1.0)
+                        .fadeIn(delay: 1000.ms)
+                        .slideY(begin: 1.0),
               ),
             ),
-          ),
-
-          PageView(
-            controller: _pageController,
-            onPageChanged: _onPageChanged,
-            children: [
-              _buildHomePage(provider),
-              const AnalyticsScreen(),
-              const AdvanceScreen(),
-              const SettingsScreen(),
-            ],
-          ),
-
-          Positioned(
-            bottom: 32,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: CustomBottomNavBar(
-                selectedIndex: _currentPage,
-                onItemSelected: _onNavItemTapped,
-              ).animate().fadeIn(delay: 1000.ms).slideY(begin: 1.0),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildHomePage(MoneyProvider provider) {
+    final theme = Theme.of(context);
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+    final isHighContrast = isAmoled || isLight;
     return Stack(
       children: [
-        Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  const Color(0xFF0F111A),
-                  const Color(0xFF1A1F38),
-                  const Color(0xFF0F111A),
+        // Gradient removed for solid background
+        if (!isHighContrast)
+          Positioned(
+            top: -100,
+            right: -100,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Theme.of(context).primaryColor.withOpacity(0.05),
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    blurRadius: 100,
+                    spreadRadius: 50,
+                  ),
                 ],
               ),
             ),
           ),
-        ),
-
-        Positioned(
-          top: -100,
-          right: -100,
-          child: Container(
-            width: 300,
-            height: 300,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppTheme.primary.withValues(alpha: 0.05),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.primary.withValues(alpha: 0.1),
-                  blurRadius: 100,
-                  spreadRadius: 50,
-                ),
-              ],
-            ),
-          ),
-        ),
 
         SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -176,112 +173,131 @@ class _HomeScreenState extends State<HomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Welcome Back,',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.6),
-                              fontSize: 14,
-                              letterSpacing: 0.5,
-                            ),
-                          ).animate().fadeIn().slideX(begin: -0.2),
+                                'Welcome Back,',
+                                style: TextStyle(
+                                  color: theme.textTheme.bodySmall?.color
+                                      ?.withOpacity(0.6),
+                                  fontSize: 14,
+                                  letterSpacing: 0.5,
+                                ),
+                              )
+                              .animate(value: _shouldAnimate ? null : 1)
+                              .fadeIn()
+                              .slideX(begin: -0.2),
                           const SizedBox(height: 4),
                           Text(
-                            provider.userName,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
-                            ),
-                          ).animate().fadeIn(delay: 100.ms).slideX(begin: -0.2),
+                                provider.userName,
+                                style: TextStyle(
+                                  color: theme.textTheme.titleLarge?.color,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                              )
+                              .animate(value: _shouldAnimate ? 0 : 1)
+                              .fadeIn(delay: 100.ms)
+                              .slideX(begin: -0.2),
                         ],
                       ),
+                      const Spacer(),
+                      const TriThemeToggle(),
+                      const SizedBox(width: 12),
                       GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              opaque: false,
-                              barrierDismissible: true,
-                              barrierColor: Colors.black.withValues(alpha: 0.5),
-                              transitionDuration: const Duration(
-                                milliseconds: 400,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  opaque: false,
+                                  barrierDismissible: true,
+                                  barrierColor: Colors.black.withOpacity(0.5),
+                                  transitionDuration: const Duration(
+                                    milliseconds: 400,
+                                  ),
+                                  reverseTransitionDuration: const Duration(
+                                    milliseconds: 300,
+                                  ),
+                                  pageBuilder:
+                                      (
+                                        context,
+                                        animation,
+                                        secondaryAnimation,
+                                      ) => const ProfileDialog(),
+                                  transitionsBuilder:
+                                      (
+                                        context,
+                                        animation,
+                                        secondaryAnimation,
+                                        child,
+                                      ) {
+                                        return FadeTransition(
+                                          opacity: animation,
+                                          child: child,
+                                        );
+                                      },
+                                ),
+                              );
+                            },
+                            child: Hero(
+                              tag: 'profile_ring',
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: isHighContrast
+                                        ? theme.iconTheme.color!.withOpacity(
+                                            0.5,
+                                          )
+                                        : theme.primaryColor,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: theme.cardColor,
+                                  backgroundImage: provider.photoURL != null
+                                      ? NetworkImage(provider.photoURL!)
+                                      : null,
+                                  child: provider.photoURL == null
+                                      ? Icon(
+                                          Icons.person,
+                                          color: theme.iconTheme.color,
+                                        )
+                                      : null,
+                                ),
                               ),
-                              reverseTransitionDuration: const Duration(
-                                milliseconds: 300,
-                              ),
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      const ProfileDialog(),
-                              transitionsBuilder:
-                                  (
-                                    context,
-                                    animation,
-                                    secondaryAnimation,
-                                    child,
-                                  ) {
-                                    return FadeTransition(
-                                      opacity: animation,
-                                      child: child,
-                                    );
-                                  },
                             ),
-                          );
-                        },
-                        child: Hero(
-                          tag: 'profile_ring',
-                          child: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: AppTheme.primary,
-                                width: 2,
-                              ),
-                            ),
-                            child: CircleAvatar(
-                              radius: 20,
-                              backgroundColor: const Color(0xFF2D3459),
-                              backgroundImage: provider.photoURL != null
-                                  ? NetworkImage(provider.photoURL!)
-                                  : null,
-                              child: provider.photoURL == null
-                                  ? const Icon(
-                                      Icons.person,
-                                      color: Colors.white,
-                                    )
-                                  : null,
-                            ),
-                          ),
-                        ),
-                      ).animate().scale(delay: 200.ms),
+                          )
+                          .animate(value: _shouldAnimate ? 0 : 1)
+                          .scale(delay: 200.ms),
                     ],
                   ),
 
                   const SizedBox(height: 32),
 
-                  const BalanceCard()
-                      .animate()
-                      .fadeIn(delay: 300.ms)
-                      .slideY(begin: 0.2),
-
+                    HomeBalanceCard(shouldAnimate: _shouldAnimate),
                   const SizedBox(height: 16),
 
-                  const BudgetWidget()
-                      .animate()
+                  BudgetWidget()
+                      .animate(value: _shouldAnimate ? null : 1.0)
                       .fadeIn(delay: 350.ms)
                       .slideY(begin: 0.2),
 
                   const SizedBox(height: 24),
 
                   Text(
-                    'Quick Actions',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.8),
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
-                  ).animate().fadeIn(delay: 400.ms),
+                        'Quick Actions',
+                        style: TextStyle(
+                          color: isHighContrast
+                              ? theme.textTheme.titleLarge?.color
+                              : Colors.white.withOpacity(0.8),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      )
+                      .animate(value: _shouldAnimate ? 0 : 1)
+                      .fadeIn(delay: 400.ms),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -290,9 +306,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         context,
                         icon: Icons.arrow_upward_rounded,
                         label: 'Expense',
-                        color: AppTheme.expense,
+                        color: Colors.red,
                         delay: 500,
                         heroTag: 'hero_action_expense',
+                        isAmoled: isAmoled,
+                        isHighContrast: isHighContrast,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -308,9 +326,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         context,
                         icon: Icons.arrow_downward_rounded,
                         label: 'Income',
-                        color: AppTheme.income,
+                        color: Colors.green,
                         delay: 600,
                         heroTag: 'hero_action_income',
+                        isAmoled: isAmoled,
+                        isHighContrast: isHighContrast,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -329,6 +349,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: const Color(0xFF6366F1),
                         delay: 700,
                         heroTag: 'hero_action_history',
+                        isAmoled: isAmoled,
+                        isHighContrast: isHighContrast,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -346,6 +368,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.cyan,
                         delay: 800,
                         heroTag: 'hero_action_net_worth',
+                        isAmoled: isAmoled,
+                        isHighContrast: isHighContrast,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -361,14 +385,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 8),
 
                   Text(
-                    'Recent Transactions',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.8),
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
-                  ).animate().fadeIn(delay: 900.ms),
+                        'Recent Transactions',
+                        style: TextStyle(
+                          color: isHighContrast
+                              ? theme.textTheme.titleLarge?.color
+                              : Colors.white.withOpacity(0.8),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      )
+                      .animate(value: _shouldAnimate ? 0 : 1)
+                      .fadeIn(delay: 900.ms),
                   const SizedBox(height: 16),
 
                   SizedBox(
@@ -387,7 +415,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ).createShader(bounds);
                       },
                       blendMode: BlendMode.dstIn,
-                      child: const TransactionList(),
+                      child: TransactionList(animate: _shouldAnimate),
                     ),
                   ),
                 ],
@@ -407,37 +435,61 @@ class _HomeScreenState extends State<HomeScreen> {
     required int delay,
     required VoidCallback onTap,
     required String heroTag,
+    bool isAmoled = false,
+    bool isHighContrast = false,
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        children: [
-          Hero(
-            tag: heroTag,
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: color.withValues(alpha: 0.2),
-                  width: 1,
-                ),
+      child:
+          Column(
+                children: [
+                  Hero(
+                    tag: heroTag,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isHighContrast
+                            ? Colors.transparent
+                            : color.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isHighContrast
+                              ? Theme.of(
+                                  context,
+                                ).iconTheme.color!.withOpacity(0.5)
+                              : color.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: Icon(
+                        icon,
+                        color: isHighContrast
+                            ? Theme.of(context).iconTheme.color
+                            : color,
+                        size: 28,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: isHighContrast
+                          ? Theme.of(context).textTheme.bodyMedium?.color
+                          : Colors.white.withOpacity(0.7),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              )
+              .animate(value: _shouldAnimate ? null : 1.0)
+              .fadeIn(delay: delay.ms)
+              .scale(
+                delay: delay.ms,
+                begin: const Offset(0.8, 0.8),
+                curve: Curves.easeOutBack,
               ),
-              child: Icon(icon, color: color, size: 28),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.7),
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    ).animate().fadeIn(delay: delay.ms).slideY(begin: 0.2);
+    );
   }
 }

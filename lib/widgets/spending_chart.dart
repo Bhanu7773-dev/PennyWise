@@ -15,6 +15,8 @@ class SpendingChart extends StatelessWidget {
     final transactions = provider.transactions
         .where((t) => t.isExpense)
         .toList();
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
 
     // Group expenses by day for the last 7 days
     final List<double> dailyTotals = List.filled(7, 0.0);
@@ -50,7 +52,9 @@ class SpendingChart extends StatelessWidget {
                   horizontalInterval: maxY / 4,
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: isLight
+                          ? Colors.black.withOpacity(0.5)
+                          : Colors.white.withOpacity(0.5),
                       strokeWidth: 1,
                     );
                   },
@@ -78,8 +82,10 @@ class SpendingChart extends StatelessWidget {
                             meta: meta,
                             child: Text(
                               DateFormat('E').format(date),
-                              style: const TextStyle(
-                                color: Colors.white54,
+                              style: TextStyle(
+                                color: isLight
+                                    ? Colors.black54
+                                    : Colors.white54,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
                               ),
@@ -97,8 +103,8 @@ class SpendingChart extends StatelessWidget {
                       getTitlesWidget: (value, meta) {
                         return Text(
                           NumberFormat.compact().format(value),
-                          style: const TextStyle(
-                            color: Colors.white54,
+                          style: TextStyle(
+                            color: isLight ? Colors.black54 : Colors.white54,
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
                           ),
@@ -122,8 +128,14 @@ class SpendingChart extends StatelessWidget {
                     isCurved: true,
                     gradient: LinearGradient(
                       colors: [
-                        AppTheme.expense,
-                        AppTheme.expense.withValues(alpha: 0.5),
+                        isAmoled
+                            ? Colors.white
+                            : (isLight ? Colors.black : AppTheme.expense),
+                        isAmoled
+                            ? Colors.white60
+                            : (isLight
+                                  ? Colors.black54
+                                  : AppTheme.expense.withOpacity(0.5)),
                       ],
                     ),
                     barWidth: 5,
@@ -133,9 +145,13 @@ class SpendingChart extends StatelessWidget {
                       getDotPainter: (spot, percent, barData, index) {
                         return FlDotCirclePainter(
                           radius: 4,
-                          color: Colors.white,
+                          color: isLight
+                              ? Colors.white
+                              : (isAmoled ? Colors.black : Colors.white),
                           strokeWidth: 2,
-                          strokeColor: AppTheme.expense,
+                          strokeColor: isAmoled
+                              ? Colors.white
+                              : (isLight ? Colors.black : AppTheme.expense),
                         );
                       },
                     ),
@@ -143,8 +159,14 @@ class SpendingChart extends StatelessWidget {
                       show: true,
                       gradient: LinearGradient(
                         colors: [
-                          AppTheme.expense.withValues(alpha: 0.3),
-                          AppTheme.expense.withValues(alpha: 0.0),
+                          (isAmoled
+                                  ? Colors.white
+                                  : (isLight ? Colors.black : AppTheme.expense))
+                              .withOpacity(0.3),
+                          (isAmoled
+                                  ? Colors.white
+                                  : (isLight ? Colors.black : AppTheme.expense))
+                              .withOpacity(0.0),
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,

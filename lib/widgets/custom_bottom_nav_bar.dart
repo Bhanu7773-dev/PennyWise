@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/money_provider.dart';
 import '../utils/app_theme.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
@@ -14,6 +16,10 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<MoneyProvider>(context);
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(32),
       child: BackdropFilter(
@@ -21,10 +27,18 @@ class CustomBottomNavBar extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: isAmoled
+                ? Colors.black.withOpacity(0.3)
+                : (isLight
+                      ? Colors.white.withOpacity(0.2)
+                      : Theme.of(context).cardColor.withOpacity(0.8)),
             borderRadius: BorderRadius.circular(32),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.1),
+              color: isAmoled
+                  ? Colors.white
+                  : (isLight
+                        ? Colors.black.withOpacity(0.5)
+                        : Theme.of(context).dividerColor),
               width: 1,
             ),
           ),
@@ -40,7 +54,9 @@ class CustomBottomNavBar extends StatelessWidget {
                 child: Container(
                   width: 48,
                   decoration: BoxDecoration(
-                    color: AppTheme.primary,
+                    color: isAmoled || isLight
+                        ? (isLight ? Colors.black : Colors.white)
+                        : Theme.of(context).primaryColor,
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
@@ -51,13 +67,23 @@ class CustomBottomNavBar extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildNavItem(0, Icons.home_rounded, 'Home'),
+                  _buildNavItem(context, 0, Icons.home_rounded, 'Home'),
                   const SizedBox(width: 16),
-                  _buildNavItem(1, Icons.bar_chart_rounded, 'Analytics'),
+                  _buildNavItem(
+                    context,
+                    1,
+                    Icons.bar_chart_rounded,
+                    'Analytics',
+                  ),
                   const SizedBox(width: 16),
-                  _buildNavItem(2, Icons.auto_graph_rounded, 'Advance'),
+                  _buildNavItem(
+                    context,
+                    2,
+                    Icons.auto_graph_rounded,
+                    'Advance',
+                  ),
                   const SizedBox(width: 16),
-                  _buildNavItem(3, Icons.settings_rounded, 'Settings'),
+                  _buildNavItem(context, 3, Icons.settings_rounded, 'Settings'),
                 ],
               ),
             ],
@@ -67,8 +93,17 @@ class CustomBottomNavBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(int index, IconData icon, String label) {
+  Widget _buildNavItem(
+    BuildContext context,
+    int index,
+    IconData icon,
+    String label,
+  ) {
     final isSelected = selectedIndex == index;
+    final theme = Theme.of(context);
+    final provider = Provider.of<MoneyProvider>(context, listen: false);
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => onItemSelected(index),
@@ -79,8 +114,8 @@ class CustomBottomNavBar extends StatelessWidget {
         child: Icon(
           icon,
           color: isSelected
-              ? Colors.white
-              : Colors.white.withValues(alpha: 0.5),
+              ? (isAmoled ? Colors.black : Colors.white)
+              : theme.textTheme.bodyMedium?.color?.withOpacity(0.5),
           size: 24,
         ),
       ),

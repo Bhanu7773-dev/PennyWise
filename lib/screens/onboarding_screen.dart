@@ -178,10 +178,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               height: 300,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppTheme.primary.withValues(alpha: 0.2),
+                color: AppTheme.primary.withOpacity(0.2),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.primary.withValues(alpha: 0.2),
+                    color: AppTheme.primary.withOpacity(0.2),
                     blurRadius: 100,
                     spreadRadius: 50,
                   ),
@@ -221,7 +221,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   decoration: BoxDecoration(
                     color: _currentPage == index
                         ? AppTheme.primary
-                        : Colors.white.withValues(alpha: 0.3),
+                        : Colors.white.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 );
@@ -265,7 +265,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 18,
-              color: Colors.white.withValues(alpha: 0.7),
+              color: Colors.white.withOpacity(0.7),
             ),
           ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.3, end: 0),
           const SizedBox(height: 48),
@@ -324,7 +324,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
-              color: Colors.white.withValues(alpha: 0.7),
+              color: Colors.white.withOpacity(0.7),
             ),
           ).animate().fadeIn(delay: 200.ms),
 
@@ -337,10 +337,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: AppTheme.primary.withValues(alpha: 0.2),
+                  color: AppTheme.primary.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(30),
                   border: Border.all(
-                    color: AppTheme.primary.withValues(alpha: 0.3),
+                    color: AppTheme.primary.withOpacity(0.3),
                   ),
                 ),
                 child: Row(
@@ -376,7 +376,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   color: AppTheme.surface,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: Colors.white.withOpacity(0.1),
                   ),
                 ),
                 child: Column(
@@ -452,7 +452,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: iconColor.withValues(alpha: 0.2),
+            color: iconColor.withOpacity(0.2),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: iconColor, size: 28),
@@ -469,7 +469,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   Text(
                     direction,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: Colors.white.withOpacity(0.6),
                       fontSize: 13,
                     ),
                   ),
@@ -519,7 +519,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
-              color: Colors.white.withValues(alpha: 0.7),
+              color: Colors.white.withOpacity(0.7),
             ),
           ).animate().fadeIn(delay: 200.ms),
           const SizedBox(height: 20),
@@ -531,7 +531,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
               hintText: 'Search country or currency...',
-              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+              hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
               filled: true,
               fillColor: AppTheme.surface,
               border: OutlineInputBorder(
@@ -575,11 +575,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? AppTheme.primary.withValues(alpha: 0.2)
+                            ? AppTheme.primary.withOpacity(0.2)
                             : Colors.transparent,
                         border: Border(
                           bottom: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.05),
+                            color: Colors.white.withOpacity(0.05),
                           ),
                         ),
                       ),
@@ -608,7 +608,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 Text(
                                   currency.name,
                                   style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.6),
+                                    color: Colors.white.withOpacity(0.6),
                                     fontSize: 12,
                                   ),
                                 ),
@@ -631,7 +631,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               Text(
                                 currency.symbol,
                                 style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.6),
+                                  color: Colors.white.withOpacity(0.6),
                                   fontSize: 12,
                                 ),
                               ),
@@ -660,10 +660,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppTheme.primary.withValues(alpha: 0.2),
+              color: AppTheme.primary.withOpacity(0.2),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: AppTheme.primary.withValues(alpha: 0.3),
+                color: AppTheme.primary.withOpacity(0.3),
               ),
             ),
             child: Row(
@@ -688,7 +688,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       Text(
                         _selectedCurrency.name,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
+                          color: Colors.white.withOpacity(0.7),
                           fontSize: 12,
                         ),
                       ),
@@ -739,7 +739,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Icon(
               Icons.rocket_launch_outlined,
               size: 80,
-              color: AppTheme.primary.withValues(alpha: 0.8),
+              color: AppTheme.primary.withOpacity(0.8),
             ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
 
             const SizedBox(height: 24),
@@ -811,7 +811,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               decoration: InputDecoration(
                 hintText: 'Enter your name',
                 hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
+                  color: Colors.white.withOpacity(0.5),
                 ),
                 filled: true,
                 fillColor: AppTheme.surface,
@@ -841,7 +841,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 elevation: 4,
-                shadowColor: AppTheme.primary.withValues(alpha: 0.4),
+                shadowColor: AppTheme.primary.withOpacity(0.4),
               ),
               child: _isAnimating
                   ? const SizedBox(

@@ -190,71 +190,81 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // Show confirmation dialog
     final shouldRestore = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surface,
-        title: const Text(
-          'Restore from Google Drive?',
-          style: TextStyle(color: Colors.white),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'This will replace all your current data with the backup.',
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+      builder: (context) {
+        final theme = Theme.of(context);
+        return AlertDialog(
+          backgroundColor: theme.cardColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: Text(
+            'Restore from Google Drive?',
+            style: TextStyle(
+              color: theme.textTheme.titleLarge?.color,
             ),
-            if (_backupInfo != null) ...[
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(8),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'This will replace all your current data with the backup.',
+                style: TextStyle(
+                  color: theme.textTheme.bodyMedium?.color?.withOpacity(0.8),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Backup Info:',
-                      style: TextStyle(
-                        color: AppTheme.primary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    if (_backupInfo!.modifiedTime != null)
+              ),
+              if (_backupInfo != null) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.dividerColor.withOpacity(0.04),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        'Date: ${DateFormat('MMM d, yyyy h:mm a').format(_backupInfo!.modifiedTime!)}',
-                        style: const TextStyle(
-                          color: Colors.white70,
+                        'Backup Info:',
+                        style: TextStyle(
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
                       ),
-                  ],
+                      const SizedBox(height: 4),
+                      if (_backupInfo!.modifiedTime != null)
+                        Text(
+                          'Date: ${DateFormat('MMM d, yyyy h:mm a').format(_backupInfo!.modifiedTime!)}',
+                          style: TextStyle(
+                            color: theme.textTheme.bodySmall?.color?.withOpacity(0.8),
+                            fontSize: 12,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
+              ],
+              const SizedBox(height: 16),
+              Text(
+                '⚠️ This action cannot be undone!',
+                style: TextStyle(color: Colors.orange.shade700, fontSize: 12),
               ),
             ],
-            const SizedBox(height: 16),
-            const Text(
-              '⚠️ This action cannot be undone!',
-              style: TextStyle(color: Colors.orange, fontSize: 12),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text('Cancel', style: TextStyle(color: theme.textTheme.bodyMedium?.color)),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.primaryColor,
+              ),
+              child: Text('Restore', style: TextStyle(color: theme.colorScheme.onPrimary)),
             ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary),
-            child: const Text('Restore', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
+        );
+      },
     );
 
     if (shouldRestore != true) return;
@@ -279,7 +289,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           await provider.reloadData();
 
           // Force UI update after restore
-          provider.notifyListeners();
+          // Force UI update check handled by reloadData
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -462,118 +472,141 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<bool?> _showImportPreviewDialog(ImportResult result) {
     return showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surface,
-        title: const Text(
-          'Import Preview',
-          style: TextStyle(color: Colors.white),
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Found ${result.successfulRows} of ${result.totalRows} transactions',
-                style: const TextStyle(color: Colors.white70),
-              ),
-              if (result.hasErrors) ...[
-                const SizedBox(height: 8),
+      builder: (context) {
+        final theme = Theme.of(context);
+        final isLight = theme.brightness == Brightness.light;
+        return AlertDialog(
+          backgroundColor: theme.cardColor,
+          shape: isLight
+              ? RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(28),
+                  side: BorderSide(color: theme.dividerColor, width: 1.5),
+                )
+              : RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+          title: Text(
+            'Import Preview',
+            style: TextStyle(
+              color: theme.textTheme.titleLarge?.color,
+            ),
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Text(
-                  '${result.errors.length} rows had errors',
-                  style: const TextStyle(color: Colors.orange, fontSize: 12),
+                  'Found ${result.successfulRows} of ${result.totalRows} transactions',
+                  style: TextStyle(
+                    color: theme.textTheme.bodyMedium?.color?.withOpacity(0.8),
+                  ),
                 ),
-              ],
-              const SizedBox(height: 16),
-              const Text(
-                'Preview:',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                if (result.hasErrors) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    '${result.errors.length} rows had errors',
+                    style: TextStyle(color: Colors.orange.shade700, fontSize: 12),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                Text(
+                  'Preview:',
+                  style: TextStyle(
+                    color: theme.textTheme.bodyLarge?.color,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                constraints: const BoxConstraints(maxHeight: 200),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: result.transactions.length > 5
-                      ? 5
-                      : result.transactions.length,
-                  itemBuilder: (context, index) {
-                    final t = result.transactions[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
-                        children: [
-                          Icon(
-                            t.isExpense
-                                ? Icons.arrow_downward
-                                : Icons.arrow_upward,
-                            color: t.isExpense ? Colors.red : Colors.green,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              t.title,
-                              style: const TextStyle(
-                                color: Colors.white,
+                const SizedBox(height: 8),
+                Container(
+                  constraints: const BoxConstraints(maxHeight: 200),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: result.transactions.length > 5
+                        ? 5
+                        : result.transactions.length,
+                    itemBuilder: (context, index) {
+                      final t = result.transactions[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: [
+                            Icon(
+                              t.isExpense
+                                  ? Icons.arrow_downward
+                                  : Icons.arrow_upward,
+                              color: t.isExpense ? Colors.red : Colors.green,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                t.title,
+                                style: TextStyle(
+                                  color: theme.textTheme.bodyMedium?.color,
+                                  fontSize: 13,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Text(
+                              '${t.isExpense ? '-' : '+'}${t.amount.toStringAsFixed(2)}',
+                              style: TextStyle(
+                                color: t.isExpense ? Colors.red : Colors.green,
                                 fontSize: 13,
                               ),
-                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                          Text(
-                            '${t.isExpense ? '-' : '+'}${t.amount.toStringAsFixed(2)}',
-                            style: TextStyle(
-                              color: t.isExpense ? Colors.red : Colors.green,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-              if (result.transactions.length > 5) ...[
-                const SizedBox(height: 8),
-                Text(
-                  '... and ${result.transactions.length - 5} more',
-                  style: const TextStyle(color: Colors.white54, fontSize: 12),
-                ),
+                if (result.transactions.length > 5) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    '... and ${result.transactions.length - 5} more',
+                    style: TextStyle(
+                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary),
-            child: Text('Import ${result.transactions.length}'),
-          ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text('Cancel', style: TextStyle(color: theme.textTheme.bodyMedium?.color)),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.primaryColor,
+              ),
+              child: Text('Import ${result.transactions.length}', style: TextStyle(color: theme.colorScheme.onPrimary)),
+            ),
+          ],
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<MoneyProvider>(context);
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         automaticallyImplyLeading: false,
-        title: const Text('Settings', style: TextStyle(color: Colors.white)),
+        title: Text(
+          'Settings',
+          style: TextStyle(color: theme.textTheme.titleLarge?.color),
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
@@ -648,27 +681,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildUpdateTile() {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
     return GestureDetector(
       onTap: _checkingForUpdates ? null : _checkForUpdates,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: isAmoled || isLight
+              ? Colors.transparent
+              : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppTheme.primary.withValues(alpha: 0.3)),
+          border: Border.all(
+            color: isLight
+                ? Colors.black
+                : (isAmoled
+                      ? Colors.white
+                      : Theme.of(context).primaryColor.withOpacity(0.3)),
+          ),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppTheme.primary.withValues(alpha: 0.1),
+                color: isLight
+                    ? Colors.black.withOpacity(0.05)
+                    : (isAmoled
+                          ? Colors.transparent
+                          : Theme.of(context).primaryColor.withOpacity(0.1)),
                 shape: BoxShape.circle,
+                border: isAmoled
+                    ? Border.all(color: Colors.white.withOpacity(0.2))
+                    : null,
               ),
               child: Icon(
                 Icons.system_update,
-                color: AppTheme.primary,
+                color: isLight
+                    ? Colors.black
+                    : (isAmoled
+                          ? Colors.white
+                          : Theme.of(context).primaryColor),
                 size: 20,
               ),
             ),
@@ -677,15 +735,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Check for Updates',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(
+                      color: isLight
+                          ? Colors.black
+                          : Theme.of(context).textTheme.titleMedium?.color,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Current: v$_currentVersion',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: isLight
+                          ? Colors.black.withOpacity(0.5)
+                          : Colors.white.withOpacity(0.6),
                       fontSize: 12,
                     ),
                   ),
@@ -698,11 +764,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primary),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isLight
+                        ? Colors.black
+                        : (isAmoled
+                              ? Colors.white
+                              : Theme.of(context).primaryColor),
+                  ),
                 ),
               )
             else
-              Icon(Icons.refresh, color: AppTheme.primary),
+              Icon(
+                Icons.refresh,
+                color: isLight
+                    ? Colors.black
+                    : (isAmoled
+                          ? Colors.white
+                          : Theme.of(context).primaryColor),
+              ),
           ],
         ),
       ),
@@ -710,12 +789,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildSection(String title) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12, top: 8),
       child: Text(
         title,
         style: TextStyle(
-          color: AppTheme.primary,
+          color: isLight
+              ? Colors.black
+              : (isAmoled ? Colors.white : Theme.of(context).primaryColor),
           fontSize: 14,
           fontWeight: FontWeight.bold,
         ),
@@ -729,18 +816,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
     IconData icon,
     VoidCallback onTap,
   ) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: isAmoled || isLight
+              ? Colors.transparent
+              : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
+          border: isLight
+              ? Border.all(color: Colors.black)
+              : (isAmoled ? Border.all(color: Colors.white) : null),
         ),
         child: Row(
           children: [
-            Icon(icon, color: AppTheme.primary),
+            Icon(
+              icon,
+              color: isLight
+                  ? Colors.black
+                  : (isAmoled ? Colors.white : Theme.of(context).primaryColor),
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -748,13 +851,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(
+                      color: isLight
+                          ? Colors.black
+                          : Theme.of(context).textTheme.titleMedium?.color,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.color?.withOpacity(0.6),
                       fontSize: 12,
                     ),
                   ),
@@ -763,7 +874,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             Icon(
               Icons.chevron_right,
-              color: Colors.white.withValues(alpha: 0.3),
+              color: Theme.of(
+                context,
+              ).textTheme.bodySmall?.color?.withOpacity(0.3),
             ),
           ],
         ),
@@ -772,24 +885,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildInfoTile(String title, String value) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: isAmoled ? Colors.transparent : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
+        border: isLight
+            ? Border.all(color: Colors.black)
+            : (isAmoled ? Border.all(color: Colors.white) : null),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             title,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
+            style: TextStyle(
+              color: isLight
+                  ? Colors.black
+                  : (isAmoled
+                        ? Colors.white
+                        : Theme.of(context).textTheme.titleMedium?.color),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           Text(
             value,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.6),
+              color: isLight
+                  ? Colors.black.withOpacity(0.7)
+                  : (isAmoled
+                        ? Colors.white70
+                        : Theme.of(
+                            context,
+                          ).textTheme.bodySmall?.color?.withOpacity(0.6)),
               fontSize: 14,
             ),
           ),
@@ -805,16 +941,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
     bool value,
     void Function(bool)? onChanged,
   ) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: isAmoled ? Colors.transparent : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
+        border: isLight
+            ? Border.all(color: Colors.black)
+            : (isAmoled ? Border.all(color: Colors.white) : null),
       ),
       child: Row(
         children: [
-          Icon(icon, color: AppTheme.primary),
+          Icon(
+            icon,
+            color: isLight
+                ? Colors.black
+                : (isAmoled ? Colors.white : Theme.of(context).primaryColor),
+          ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -822,13 +972,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                  style: TextStyle(
+                    color: isLight
+                        ? Colors.black
+                        : Theme.of(context).textTheme.titleMedium?.color,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.6),
+                    color: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.color?.withOpacity(0.6),
                     fontSize: 12,
                   ),
                 ),
@@ -838,9 +996,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: AppTheme.primary,
+            activeColor: isAmoled
+                ? Colors.white
+                : Theme.of(context).primaryColor,
+            activeTrackColor: isAmoled
+                ? Colors.white.withOpacity(0.3)
+                : (isLight ? Colors.black.withOpacity(0.3) : null),
             inactiveThumbColor: Colors.grey,
-            inactiveTrackColor: Colors.grey.withValues(alpha: 0.3),
+            inactiveTrackColor: Colors.grey.withOpacity(0.3),
           ),
         ],
       ),
@@ -848,27 +1011,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildGoogleDriveBackupTile() {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
     return GestureDetector(
       onTap: _isBackingUp ? null : _backupToGoogleDrive,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: isAmoled ? Colors.transparent : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
+          border: Border.all(
+            color: isLight
+                ? Colors.black
+                : (isAmoled ? Colors.white : Colors.blue.withOpacity(0.3)),
+          ),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.blue.withValues(alpha: 0.1),
+                color: isAmoled
+                    ? Colors.transparent
+                    : Colors.blue.withOpacity(0.1),
                 shape: BoxShape.circle,
+                border: isAmoled
+                    ? Border.all(color: Colors.white.withOpacity(0.2))
+                    : null,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.cloud_upload,
-                color: Colors.blue,
+                color: isLight
+                    ? Colors.black
+                    : (isAmoled ? Colors.white : Colors.blue),
                 size: 20,
               ),
             ),
@@ -877,9 +1057,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Backup to Google Drive',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(
+                      color: Theme.of(context).textTheme.titleMedium?.color,
+                      fontSize: 16,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -887,7 +1070,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ? 'Last backup: ${DateFormat('MMM d, yyyy h:mm a').format(_backupInfo!.modifiedTime!)}'
                         : 'Backup your data to Google Drive',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.color?.withOpacity(0.6),
                       fontSize: 12,
                     ),
                   ),
@@ -904,7 +1089,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               )
             else
-              Icon(Icons.backup, color: Colors.white.withValues(alpha: 0.3)),
+              Icon(
+                Icons.backup,
+                color: isLight
+                    ? Colors.black.withOpacity(0.3)
+                    : Colors.white.withOpacity(0.3),
+              ),
           ],
         ),
       ),
@@ -912,27 +1102,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildGoogleDriveRestoreTile() {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
     return GestureDetector(
       onTap: _isRestoring ? null : _restoreFromGoogleDrive,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: isAmoled ? Colors.transparent : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+          border: Border.all(
+            color: isAmoled ? Colors.white : Colors.green.withOpacity(0.3),
+          ),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.green.withValues(alpha: 0.1),
+                color: isAmoled
+                    ? Colors.transparent
+                    : Colors.green.withOpacity(0.1),
                 shape: BoxShape.circle,
+                border: isAmoled
+                    ? Border.all(color: Colors.white.withOpacity(0.2))
+                    : null,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.cloud_download,
-                color: Colors.green,
+                color: isLight
+                    ? Colors.black
+                    : (isAmoled ? Colors.white : Colors.green),
                 size: 20,
               ),
             ),
@@ -941,9 +1146,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Restore from Google Drive',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(
+                      color: Theme.of(context).textTheme.titleMedium?.color,
+                      fontSize: 16,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -952,8 +1160,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         : 'No backup found',
                     style: TextStyle(
                       color: _backupInfo != null
-                          ? Colors.green.withValues(alpha: 0.8)
-                          : Colors.white.withValues(alpha: 0.6),
+                          ? Colors.green.withOpacity(0.8)
+                          : Theme.of(
+                              context,
+                            ).textTheme.bodySmall?.color?.withOpacity(0.6),
                       fontSize: 12,
                     ),
                   ),
@@ -970,7 +1180,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               )
             else
-              Icon(Icons.restore, color: Colors.white.withValues(alpha: 0.3)),
+              Icon(
+                Icons.restore,
+                color: isLight
+                    ? Colors.black.withOpacity(0.3)
+                    : Colors.white.withOpacity(0.3),
+              ),
           ],
         ),
       ),

@@ -221,7 +221,7 @@ class UpdateService {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppTheme.primary.withValues(alpha: 0.2),
+                color: AppTheme.primary.withOpacity(0.2),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.system_update, color: AppTheme.primary),
@@ -242,7 +242,7 @@ class UpdateService {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: Colors.white.withOpacity(0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -254,7 +254,7 @@ class UpdateService {
                       Text(
                         'Current',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.5),
+                          color: Colors.white.withOpacity(0.5),
                           fontSize: 12,
                         ),
                       ),
@@ -269,7 +269,7 @@ class UpdateService {
                   ),
                   Icon(
                     Icons.arrow_forward,
-                    color: Colors.white.withValues(alpha: 0.3),
+                    color: Colors.white.withOpacity(0.3),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -277,7 +277,7 @@ class UpdateService {
                       Text(
                         'Latest',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.5),
+                          color: Colors.white.withOpacity(0.5),
                           fontSize: 12,
                         ),
                       ),
@@ -298,7 +298,7 @@ class UpdateService {
               Text(
                 'What\'s New:',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7),
+                  color: Colors.white.withOpacity(0.7),
                   fontWeight: FontWeight.bold,
                   fontSize: 13,
                 ),
@@ -310,7 +310,7 @@ class UpdateService {
                   child: Text(
                     info.releaseNotes!,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: Colors.white.withOpacity(0.6),
                       fontSize: 13,
                     ),
                   ),
@@ -324,7 +324,7 @@ class UpdateService {
             onPressed: () => Navigator.pop(context),
             child: Text(
               'Later',
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
+              style: TextStyle(color: Colors.white.withOpacity(0.6)),
             ),
           ),
           ElevatedButton.icon(
@@ -359,7 +359,7 @@ class UpdateService {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppTheme.income.withValues(alpha: 0.2),
+                color: AppTheme.income.withOpacity(0.2),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.check_circle, color: AppTheme.income),
@@ -373,7 +373,7 @@ class UpdateService {
         ),
         content: Text(
           'You\'re running the latest version (v$currentVersion)',
-          style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+          style: TextStyle(color: Colors.white.withOpacity(0.7)),
         ),
         actions: [
           TextButton(
@@ -397,7 +397,7 @@ class UpdateService {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppTheme.expense.withValues(alpha: 0.2),
+                color: AppTheme.expense.withOpacity(0.2),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.error_outline, color: AppTheme.expense),
@@ -411,7 +411,7 @@ class UpdateService {
         ),
         content: Text(
           'Unable to check for updates. Please check your internet connection and try again.',
-          style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+          style: TextStyle(color: Colors.white.withOpacity(0.7)),
         ),
         actions: [
           TextButton(
@@ -571,8 +571,8 @@ class _DownloadProgressDialogState extends State<_DownloadProgressDialog> {
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: _hasError 
-                  ? AppTheme.expense.withValues(alpha: 0.2)
-                  : AppTheme.primary.withValues(alpha: 0.2),
+                  ? AppTheme.expense.withOpacity(0.2)
+                  : AppTheme.primary.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -598,7 +598,7 @@ class _DownloadProgressDialogState extends State<_DownloadProgressDialog> {
               borderRadius: BorderRadius.circular(8),
               child: LinearProgressIndicator(
                 value: _isDownloading ? _progress : 1.0,
-                backgroundColor: Colors.white.withValues(alpha: 0.1),
+                backgroundColor: Colors.white.withOpacity(0.1),
                 valueColor: AlwaysStoppedAnimation<Color>(
                   _progress >= 1.0 ? AppTheme.income : AppTheme.primary,
                 ),
@@ -623,7 +623,7 @@ class _DownloadProgressDialogState extends State<_DownloadProgressDialog> {
           Text(
             _status,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.7),
+              color: Colors.white.withOpacity(0.7),
               fontSize: 14,
             ),
             textAlign: TextAlign.center,
@@ -634,7 +634,7 @@ class _DownloadProgressDialogState extends State<_DownloadProgressDialog> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppTheme.expense.withValues(alpha: 0.1),
+                color: AppTheme.expense.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -655,7 +655,7 @@ class _DownloadProgressDialogState extends State<_DownloadProgressDialog> {
             onPressed: _cancelDownload,
             child: Text(
               'Cancel',
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
+              style: TextStyle(color: Colors.white.withOpacity(0.6)),
             ),
           )
         else if (_hasError) ...[

@@ -18,19 +18,27 @@ class GoalsScreen extends StatelessWidget {
     final overallProgress = totalTarget > 0
         ? (totalSaved / totalTarget).clamp(0.0, 1.0)
         : 0.0;
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F111A),
+      backgroundColor: isAmoled
+          ? Colors.black
+          : (isLight ? Colors.white : theme.scaffoldBackgroundColor),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isLight ? Colors.black : Colors.white,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Financial Goals',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: isLight ? Colors.black : Colors.white),
         ),
       ),
       body: Column(
@@ -52,13 +60,17 @@ class GoalsScreen extends StatelessWidget {
                         Icon(
                           Icons.flag_outlined,
                           size: 64,
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: isLight
+                              ? Colors.black26
+                              : Colors.white.withOpacity(0.2),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           'No goals set yet',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.5),
+                            color: isLight
+                                ? Colors.black45
+                                : Colors.white.withOpacity(0.5),
                             fontSize: 16,
                           ),
                         ),
@@ -85,8 +97,21 @@ class GoalsScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddGoalDialog(context, provider),
-        backgroundColor: AppTheme.primary,
-        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: isAmoled
+            ? Colors.white
+            : (isLight ? Colors.white : AppTheme.primary),
+        shape: isLight
+            ? RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: const BorderSide(color: Colors.black),
+              )
+            : null,
+        child: Icon(
+          Icons.add,
+          color: isAmoled
+              ? Colors.black
+              : (isLight ? Colors.black : Colors.white),
+        ),
       ),
     );
   }
@@ -100,20 +125,30 @@ class GoalsScreen extends StatelessWidget {
   ) {
     final currency = provider.currencySymbol;
 
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppTheme.primary.withValues(alpha: 0.2),
-            const Color(0xFF2D3459).withValues(alpha: 0.2),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: isAmoled || isLight ? Colors.transparent : null,
+        gradient: isAmoled || isLight
+            ? null
+            : LinearGradient(
+                colors: [
+                  AppTheme.primary.withOpacity(0.2),
+                  const Color(0xFF2D3459).withOpacity(0.2),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: isLight
+            ? Border.all(color: Colors.black)
+            : Border.all(
+                color: isAmoled ? Colors.white : Colors.white.withOpacity(0.1),
+              ),
       ),
       child: Column(
         children: [
@@ -126,7 +161,9 @@ class GoalsScreen extends StatelessWidget {
                   Text(
                     'Total Saved',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: isLight
+                          ? Colors.black.withOpacity(0.7)
+                          : Colors.white.withOpacity(0.7),
                       fontSize: 14,
                     ),
                   ),
@@ -135,8 +172,8 @@ class GoalsScreen extends StatelessWidget {
                     NumberFormat.compactCurrency(
                       symbol: currency,
                     ).format(totalSaved),
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: isLight ? Colors.black : Colors.white,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
@@ -149,7 +186,9 @@ class GoalsScreen extends StatelessWidget {
                   Text(
                     'Target',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: isLight
+                          ? Colors.black.withOpacity(0.7)
+                          : Colors.white.withOpacity(0.7),
                       fontSize: 14,
                     ),
                   ),
@@ -158,8 +197,8 @@ class GoalsScreen extends StatelessWidget {
                     NumberFormat.compactCurrency(
                       symbol: currency,
                     ).format(totalTarget),
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: isLight ? Colors.black : Colors.white,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
@@ -173,8 +212,14 @@ class GoalsScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: Colors.white.withValues(alpha: 0.1),
-              valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primary),
+              backgroundColor: isLight
+                  ? Colors.black.withOpacity(0.1)
+                  : Colors.white.withOpacity(0.1),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isAmoled || isLight
+                    ? (isLight ? Colors.black : Colors.white)
+                    : AppTheme.primary,
+              ),
               minHeight: 12,
             ),
           ),
@@ -182,7 +227,9 @@ class GoalsScreen extends StatelessWidget {
           Text(
             '${(progress * 100).toStringAsFixed(0)}% Completed',
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.5),
+              color: isLight
+                  ? Colors.black.withOpacity(0.5)
+                  : Colors.white.withOpacity(0.5),
               fontSize: 12,
             ),
           ),
@@ -197,15 +244,23 @@ class GoalsScreen extends StatelessWidget {
     Goal goal,
     int index,
   ) {
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     final currency = provider.currencySymbol;
     final progress = goal.progress;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: isAmoled || isLight
+            ? Colors.transparent
+            : Colors.white.withOpacity(0.05),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        border: isLight
+            ? Border.all(color: Colors.black)
+            : Border.all(
+                color: isAmoled ? Colors.white : Colors.white.withOpacity(0.05),
+              ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -218,12 +273,12 @@ class GoalsScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: Colors.red.withValues(alpha: 0.1),
+                  color: Colors.red.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   Icons.delete_outline,
-                  color: Colors.red.withValues(alpha: 0.7),
+                  color: Colors.red.withOpacity(0.7),
                   size: 18,
                 ),
               ),
@@ -237,20 +292,32 @@ class GoalsScreen extends StatelessWidget {
                 width: 70,
                 child: CircularProgressIndicator(
                   value: progress,
-                  backgroundColor: Colors.white.withValues(alpha: 0.1),
-                  valueColor: AlwaysStoppedAnimation<Color>(goal.color),
+                  backgroundColor: isLight
+                      ? Colors.black.withOpacity(0.1)
+                      : Colors.white.withOpacity(0.1),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isAmoled || isLight
+                        ? (isLight ? Colors.black : Colors.white)
+                        : goal.color,
+                  ),
                   strokeWidth: 8,
                 ),
               ),
-              Icon(goal.icon, color: goal.color, size: 28),
+              Icon(
+                goal.icon,
+                color: isAmoled || isLight
+                    ? (isLight ? Colors.black : Colors.white)
+                    : goal.color,
+                size: 28,
+              ),
             ],
           ),
           Column(
             children: [
               Text(
                 goal.title,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: isLight ? Colors.black : Colors.white,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
@@ -262,7 +329,9 @@ class GoalsScreen extends StatelessWidget {
               Text(
                 '${NumberFormat.compactCurrency(symbol: currency).format(goal.savedAmount)} / ${NumberFormat.compactCurrency(symbol: currency).format(goal.targetAmount)}',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
+                  color: isLight
+                      ? Colors.black.withOpacity(0.5)
+                      : Colors.white.withOpacity(0.5),
                   fontSize: 11,
                 ),
               ),
@@ -273,12 +342,19 @@ class GoalsScreen extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () => _showAddSavingsDialog(context, provider, goal),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white.withValues(alpha: 0.1),
-                foregroundColor: Colors.white,
+                backgroundColor: isLight
+                    ? Colors.black.withOpacity(0.05)
+                    : Colors.white.withOpacity(0.1),
+                foregroundColor: isLight ? Colors.black : Colors.white,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
+                  side: isAmoled || isLight
+                      ? (isLight
+                            ? const BorderSide(color: Colors.black)
+                            : const BorderSide(color: Colors.white))
+                      : BorderSide.none,
                 ),
               ),
               child: const Text('Add Money', style: TextStyle(fontSize: 12)),
@@ -295,24 +371,45 @@ class GoalsScreen extends StatelessWidget {
     Color selectedColor = Colors.blue;
     IconData selectedIcon = Icons.savings;
 
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          backgroundColor: const Color(0xFF1E293B),
-          title: const Text('New Goal', style: TextStyle(color: Colors.white)),
+          backgroundColor: isAmoled
+              ? Colors.black
+              : (isLight ? Colors.white : const Color(0xFF1E293B)),
+          shape: isAmoled || isLight
+              ? RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(
+                    color: isLight ? Colors.black : Colors.white,
+                  ),
+                )
+              : null,
+          title: Text(
+            'New Goal',
+            style: TextStyle(color: isLight ? Colors.black : Colors.white),
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: titleController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
+                  style: TextStyle(
+                    color: isLight ? Colors.black : Colors.white,
+                  ),
+                  decoration: InputDecoration(
                     labelText: 'Goal Title',
-                    labelStyle: TextStyle(color: Colors.white70),
+                    labelStyle: TextStyle(
+                      color: isLight ? Colors.black54 : Colors.white70,
+                    ),
                     enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white30),
+                      borderSide: BorderSide(
+                        color: isLight ? Colors.black26 : Colors.white30,
+                      ),
                     ),
                   ),
                 ),
@@ -320,19 +417,27 @@ class GoalsScreen extends StatelessWidget {
                 TextField(
                   controller: amountController,
                   keyboardType: TextInputType.number,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
+                  style: TextStyle(
+                    color: isLight ? Colors.black : Colors.white,
+                  ),
+                  decoration: InputDecoration(
                     labelText: 'Target Amount',
-                    labelStyle: TextStyle(color: Colors.white70),
+                    labelStyle: TextStyle(
+                      color: isLight ? Colors.black54 : Colors.white70,
+                    ),
                     enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white30),
+                      borderSide: BorderSide(
+                        color: isLight ? Colors.black26 : Colors.white30,
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
-                const Text(
+                Text(
                   'Pick Color',
-                  style: TextStyle(color: Colors.white70),
+                  style: TextStyle(
+                    color: isLight ? Colors.black54 : Colors.white70,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Wrap(
@@ -356,7 +461,12 @@ class GoalsScreen extends StatelessWidget {
                               color: color,
                               shape: BoxShape.circle,
                               border: selectedColor == color
-                                  ? Border.all(color: Colors.white, width: 2)
+                                  ? Border.all(
+                                      color: isLight
+                                          ? Colors.black
+                                          : Colors.white,
+                                      width: 2,
+                                    )
                                   : null,
                             ),
                           ),
@@ -369,7 +479,14 @@ class GoalsScreen extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: isLight
+                      ? Colors.black54
+                      : (isAmoled ? Colors.white : null),
+                ),
+              ),
             ),
             ElevatedButton(
               onPressed: () {
@@ -390,9 +507,18 @@ class GoalsScreen extends StatelessWidget {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
+                backgroundColor: isAmoled || isLight
+                    ? (isLight ? Colors.white : Colors.white)
+                    : AppTheme.primary,
+                foregroundColor: isAmoled || isLight
+                    ? Colors.black
+                    : Colors.white,
+                side: isLight ? const BorderSide(color: Colors.black) : null,
               ),
-              child: const Text('Save', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                'Save',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
@@ -407,30 +533,51 @@ class GoalsScreen extends StatelessWidget {
   ) {
     final amountController = TextEditingController();
 
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: isAmoled
+            ? Colors.black
+            : (isLight ? Colors.white : const Color(0xFF1E293B)),
+        shape: isAmoled || isLight
+            ? RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: isLight ? Colors.black : Colors.white),
+              )
+            : null,
         title: Text(
           'Add to ${goal.title}',
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: isLight ? Colors.black : Colors.white),
         ),
         content: TextField(
           controller: amountController,
           keyboardType: TextInputType.number,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
+          style: TextStyle(color: isLight ? Colors.black : Colors.white),
+          decoration: InputDecoration(
             labelText: 'Amount',
-            labelStyle: TextStyle(color: Colors.white70),
+            labelStyle: TextStyle(
+              color: isLight ? Colors.black54 : Colors.white70,
+            ),
             enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white30),
+              borderSide: BorderSide(
+                color: isLight ? Colors.black26 : Colors.white30,
+              ),
             ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: isLight
+                    ? Colors.black54
+                    : (isAmoled ? Colors.white : null),
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -440,8 +587,19 @@ class GoalsScreen extends StatelessWidget {
                 Navigator.pop(context);
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary),
-            child: const Text('Add', style: TextStyle(color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isAmoled || isLight
+                  ? (isLight ? Colors.white : Colors.white)
+                  : AppTheme.primary,
+              foregroundColor: isAmoled || isLight
+                  ? Colors.black
+                  : Colors.white,
+              side: isLight ? const BorderSide(color: Colors.black) : null,
+            ),
+            child: const Text(
+              'Add',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -453,22 +611,39 @@ class GoalsScreen extends StatelessWidget {
     MoneyProvider provider,
     Goal goal,
   ) {
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
-        title: const Text(
+        backgroundColor: isAmoled
+            ? Colors.black
+            : (isLight ? Colors.white : const Color(0xFF1E293B)),
+        shape: isAmoled || isLight
+            ? RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: isLight ? Colors.black : Colors.white),
+              )
+            : null,
+        title: Text(
           'Delete Goal?',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: isLight ? Colors.black : Colors.white),
         ),
-        content: const Text(
+        content: Text(
           'This action cannot be undone.',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(color: isLight ? Colors.black54 : Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: isLight
+                    ? Colors.black54
+                    : (isAmoled ? Colors.white : null),
+              ),
+            ),
           ),
           TextButton(
             onPressed: () {

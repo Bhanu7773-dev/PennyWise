@@ -12,6 +12,10 @@ class BudgetWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = Provider.of<MoneyProvider>(context);
 
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+    final isHighContrast = isAmoled || isLight;
+
     return GestureDetector(
       onTap: () => _showBudgetDialog(context, provider),
       child: ClipRRect(
@@ -21,31 +25,41 @@ class BudgetWidget extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  const Color(0xFF2D3459).withValues(alpha: 0.3),
-                  const Color(0xFF1A1F38).withValues(alpha: 0.4),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: isHighContrast ? Colors.transparent : null,
+              gradient: isHighContrast
+                  ? null
+                  : LinearGradient(
+                      colors: [
+                        const Color(0xFF2D3459).withOpacity(0.3),
+                        const Color(0xFF1A1F38).withOpacity(0.4),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: isHighContrast
+                    ? Theme.of(context).iconTheme.color!.withOpacity(0.5)
+                    : Colors.white.withOpacity(0.1),
                 width: 1,
               ),
             ),
-            child: provider.currentBudget != null &&
+            child:
+                provider.currentBudget != null &&
                     provider.currentBudget!.monthlyLimit > 0
-                ? _buildBudgetProgress(context, provider)
-                : _buildSetBudgetButton(context),
+                ? _buildBudgetProgress(context, provider, isHighContrast)
+                : _buildSetBudgetButton(context, isAmoled, isHighContrast),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildBudgetProgress(BuildContext context, MoneyProvider provider) {
+  Widget _buildBudgetProgress(
+    BuildContext context,
+    MoneyProvider provider,
+    bool isHighContrast,
+  ) {
     final progress = provider.budgetProgress;
     final isOverBudget = progress > 1.0;
     final progressColor = progress > 0.8 ? AppTheme.expense : AppTheme.income;
@@ -61,12 +75,23 @@ class BudgetWidget extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: progressColor.withValues(alpha: 0.15),
+                    color: isHighContrast
+                        ? Colors.transparent
+                        : progressColor.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(10),
+                    border: isHighContrast
+                        ? Border.all(
+                            color: Theme.of(
+                              context,
+                            ).iconTheme.color!.withOpacity(0.5),
+                          )
+                        : null,
                   ),
                   child: Icon(
                     Icons.account_balance_wallet_outlined,
-                    color: progressColor,
+                    color: isHighContrast
+                        ? Theme.of(context).iconTheme.color
+                        : progressColor,
                     size: 20,
                   ),
                 ),
@@ -74,10 +99,12 @@ class BudgetWidget extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Monthly Budget',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: isHighContrast
+                            ? Theme.of(context).textTheme.titleSmall?.color
+                            : Colors.white,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -97,7 +124,9 @@ class BudgetWidget extends StatelessWidget {
             ),
             Icon(
               Icons.edit_outlined,
-              color: Colors.white.withValues(alpha: 0.5),
+              color: isHighContrast
+                  ? Theme.of(context).iconTheme.color!.withOpacity(0.5)
+                  : Colors.white.withOpacity(0.5),
               size: 18,
             ),
           ],
@@ -109,7 +138,9 @@ class BudgetWidget extends StatelessWidget {
             Container(
               height: 10,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: isHighContrast
+                    ? Theme.of(context).dividerColor
+                    : Colors.white.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -120,13 +151,13 @@ class BudgetWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: isOverBudget
-                        ? [AppTheme.expense, AppTheme.expense.withValues(alpha: 0.8)]
-                        : [progressColor, progressColor.withValues(alpha: 0.7)],
+                        ? [AppTheme.expense, AppTheme.expense.withOpacity(0.8)]
+                        : [progressColor, progressColor.withOpacity(0.7)],
                   ),
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
-                      color: progressColor.withValues(alpha: 0.4),
+                      color: progressColor.withOpacity(0.4),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -143,14 +174,18 @@ class BudgetWidget extends StatelessWidget {
             Text(
               'Spent: ${provider.currencySymbol}${NumberFormat.compact().format(provider.monthlySpent)}',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
+                color: isHighContrast
+                    ? Theme.of(context).textTheme.bodySmall?.color
+                    : Colors.white.withOpacity(0.7),
                 fontSize: 12,
               ),
             ),
             Text(
               'Limit: ${provider.currencySymbol}${NumberFormat.compact().format(provider.currentBudget!.monthlyLimit)}',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
+                color: isHighContrast
+                    ? Theme.of(context).textTheme.bodySmall?.color
+                    : Colors.white.withOpacity(0.7),
                 fontSize: 12,
               ),
             ),
@@ -161,13 +196,17 @@ class BudgetWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: AppTheme.expense.withValues(alpha: 0.15),
+              color: AppTheme.expense.withOpacity(0.15),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.warning_amber_rounded, color: AppTheme.expense, size: 14),
+                Icon(
+                  Icons.warning_amber_rounded,
+                  color: AppTheme.expense,
+                  size: 14,
+                ),
                 const SizedBox(width: 6),
                 Text(
                   'Over budget by ${provider.currencySymbol}${NumberFormat.compact().format(provider.monthlySpent - provider.currentBudget!.monthlyLimit)}',
@@ -185,18 +224,31 @@ class BudgetWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildSetBudgetButton(BuildContext context) {
+  Widget _buildSetBudgetButton(
+    BuildContext context,
+    bool isAmoled,
+    bool isHighContrast,
+  ) {
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: AppTheme.primary.withValues(alpha: 0.15),
+            color: isHighContrast
+                ? Colors.transparent
+                : AppTheme.primary.withOpacity(0.15),
             borderRadius: BorderRadius.circular(12),
+            border: isHighContrast
+                ? Border.all(
+                    color: Theme.of(context).iconTheme.color!.withOpacity(0.5),
+                  )
+                : null,
           ),
           child: Icon(
             Icons.add_chart,
-            color: AppTheme.primary,
+            color: isHighContrast
+                ? Theme.of(context).iconTheme.color
+                : AppTheme.primary,
             size: 22,
           ),
         ),
@@ -205,10 +257,12 @@ class BudgetWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Set Monthly Budget',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isHighContrast
+                      ? Theme.of(context).textTheme.titleMedium?.color
+                      : Colors.white,
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                 ),
@@ -217,7 +271,9 @@ class BudgetWidget extends StatelessWidget {
               Text(
                 'Track your spending with a budget limit',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
+                  color: isHighContrast
+                      ? Theme.of(context).textTheme.bodySmall?.color
+                      : Colors.white.withOpacity(0.5),
                   fontSize: 12,
                 ),
               ),
@@ -226,7 +282,9 @@ class BudgetWidget extends StatelessWidget {
         ),
         Icon(
           Icons.arrow_forward_ios,
-          color: Colors.white.withValues(alpha: 0.4),
+          color: isHighContrast
+              ? Theme.of(context).iconTheme.color!.withOpacity(0.4)
+              : Colors.white.withOpacity(0.4),
           size: 16,
         ),
       ],
@@ -241,10 +299,7 @@ class BudgetWidget extends StatelessWidget {
       barrierColor: Colors.black54,
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, animation, secondaryAnimation) {
-        return _AnimatedBudgetDialog(
-          provider: provider,
-          animation: animation,
-        );
+        return _AnimatedBudgetDialog(provider: provider, animation: animation);
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) {
         return child;
@@ -273,7 +328,8 @@ class _AnimatedBudgetDialogState extends State<_AnimatedBudgetDialog> {
   void initState() {
     super.initState();
     _controller = TextEditingController(
-      text: widget.provider.currentBudget?.monthlyLimit.toStringAsFixed(0) ?? '',
+      text:
+          widget.provider.currentBudget?.monthlyLimit.toStringAsFixed(0) ?? '',
     );
   }
 
@@ -327,41 +383,53 @@ class _AnimatedBudgetDialogState extends State<_AnimatedBudgetDialog> {
   }
 
   Widget _buildDialogContent(BuildContext context) {
+    final isAmoled = widget.provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = widget.provider.appThemeMode == AppThemeMode.light;
+    final isHighContrast = isAmoled || isLight;
+
     return Material(
       color: Colors.transparent,
       child: Container(
         width: MediaQuery.of(context).size.width * 0.85,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              const Color(0xFF1A1F38),
-              const Color(0xFF2D3459),
-              AppTheme.primary.withValues(alpha: 0.6),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: isAmoled ? Colors.black : (isLight ? Colors.white : null),
+          gradient: isHighContrast
+              ? null
+              : LinearGradient(
+                  colors: [
+                    const Color(0xFF1A1F38),
+                    const Color(0xFF2D3459),
+                    AppTheme.primary.withOpacity(0.6),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.15),
+            color: isAmoled
+                ? Colors.white
+                : (isLight ? Colors.black : Colors.white.withOpacity(0.15)),
+            width: isHighContrast ? 2 : 1,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.4),
-              blurRadius: 25,
-              spreadRadius: 5,
-              offset: const Offset(0, 15),
-            ),
-          ],
+          boxShadow: isHighContrast
+              ? null
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.4),
+                    blurRadius: 25,
+                    spreadRadius: 5,
+                    offset: const Offset(0, 15),
+                  ),
+                ],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               'Set Monthly Budget',
               style: TextStyle(
-                color: Colors.white,
+                color: isLight ? Colors.black : Colors.white,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.5,
@@ -372,8 +440,8 @@ class _AnimatedBudgetDialogState extends State<_AnimatedBudgetDialog> {
               controller: _controller,
               keyboardType: TextInputType.number,
               autofocus: true,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: isLight ? Colors.black : Colors.white,
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
               ),
@@ -381,30 +449,38 @@ class _AnimatedBudgetDialogState extends State<_AnimatedBudgetDialog> {
               decoration: InputDecoration(
                 hintText: '0',
                 hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.3),
+                  color: isLight
+                      ? Colors.black.withOpacity(0.3)
+                      : Colors.white.withOpacity(0.3),
                 ),
                 prefixText: '${widget.provider.currencySymbol} ',
-                prefixStyle: const TextStyle(
-                  color: Colors.white,
+                prefixStyle: TextStyle(
+                  color: isLight ? Colors.black : Colors.white,
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: isLight
+                        ? Colors.black.withOpacity(0.2)
+                        : Colors.white.withOpacity(0.2),
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: isLight
+                        ? Colors.black.withOpacity(0.2)
+                        : Colors.white.withOpacity(0.2),
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide(
-                    color: AppTheme.primary,
+                    color: isHighContrast
+                        ? (isLight ? Colors.black : Colors.white)
+                        : AppTheme.primary,
                     width: 2,
                   ),
                 ),
@@ -418,15 +494,17 @@ class _AnimatedBudgetDialogState extends State<_AnimatedBudgetDialog> {
                     onPressed: () => Navigator.pop(context),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: Colors.white.withValues(alpha: 0.1),
+                      backgroundColor: isLight
+                          ? Colors.black.withOpacity(0.05)
+                          : Colors.white.withOpacity(0.1),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Cancel',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: isLight ? Colors.black : Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -443,7 +521,7 @@ class _AnimatedBudgetDialogState extends State<_AnimatedBudgetDialog> {
                       },
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: AppTheme.expense.withValues(alpha: 0.2),
+                        backgroundColor: AppTheme.expense.withOpacity(0.2),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -471,15 +549,19 @@ class _AnimatedBudgetDialogState extends State<_AnimatedBudgetDialog> {
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: AppTheme.primary,
+                      backgroundColor: isHighContrast
+                          ? (isLight ? Colors.black : Colors.white)
+                          : AppTheme.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Save',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: isHighContrast
+                            ? (isLight ? Colors.white : Colors.black)
+                            : Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),

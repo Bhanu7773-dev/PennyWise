@@ -12,6 +12,7 @@ import '../repositories/hive_transaction_repository.dart';
 import '../repositories/firestore_transaction_repository.dart';
 import '../services/sms_service.dart';
 import '../services/account_service.dart';
+import '../utils/app_theme.dart';
 
 class MoneyProvider extends ChangeNotifier {
   late TransactionRepository _repository;
@@ -31,6 +32,7 @@ class MoneyProvider extends ChangeNotifier {
   bool _smsTrackingEnabled = false;
   bool _biometricLockEnabled = false;
   bool _isLoading = true; // Loading state for skeleton
+  AppThemeMode _appThemeMode = AppThemeMode.defaultDark;
 
   // Multi-account support
   AccountService? _accountService;
@@ -50,6 +52,7 @@ class MoneyProvider extends ChangeNotifier {
   bool get smsTrackingEnabled => _smsTrackingEnabled;
   bool get biometricLockEnabled => _biometricLockEnabled;
   bool get isLoading => _isLoading; // Expose loading state
+  AppThemeMode get appThemeMode => _appThemeMode;
 
   // Account getters
   List<Account> get accounts => _accounts;
@@ -60,13 +63,15 @@ class MoneyProvider extends ChangeNotifier {
   String _selectedCardDesign = 'default';
   String get selectedCardDesign => _selectedCardDesign;
 
-
   MoneyProvider() {
     _init();
   }
 
   void _loadCardDesign() {
-    _selectedCardDesign = _settingsBox.get('selectedCardDesign', defaultValue: 'default');
+    _selectedCardDesign = _settingsBox.get(
+      'selectedCardDesign',
+      defaultValue: 'default',
+    );
     notifyListeners();
   }
 
@@ -90,19 +95,19 @@ class MoneyProvider extends ChangeNotifier {
 
     // Reload transactions
     await _loadTransactions();
-    
+
     // Reload categories
     _categories = _categoryBox.values.toList();
-    
+
     // Reload budgets
     _loadCurrentBudget();
-    
+
     // Reload loans
     _loadLoans();
-    
+
     // Reload goals
     _loadGoals();
-    
+
     // Reload settings
     _loadSettings();
 
@@ -119,13 +124,13 @@ class MoneyProvider extends ChangeNotifier {
     }
 
     debugPrint('Importing restored data to Firebase...');
-    
+
     // Get transactions from Hive that were restored
     final transactionBox = Hive.box<Transaction>('transactions');
     final restoredTransactions = transactionBox.values.toList();
-    
+
     debugPrint('Found ${restoredTransactions.length} transactions to import');
-    
+
     int imported = 0;
     for (final t in restoredTransactions) {
       // Skip SMS transactions - they stay in Hive
@@ -133,13 +138,13 @@ class MoneyProvider extends ChangeNotifier {
         debugPrint('Skipping SMS transaction: ${t.title}');
         continue;
       }
-      
+
       try {
         // Determine which account to add to
-        final accountId = t.accountId.isNotEmpty && t.accountId != 'default' 
-            ? t.accountId 
+        final accountId = t.accountId.isNotEmpty && t.accountId != 'default'
+            ? t.accountId
             : _activeAccountId!;
-        
+
         // Create transaction with correct userId
         final transaction = Transaction(
           id: t.id,
@@ -155,7 +160,7 @@ class MoneyProvider extends ChangeNotifier {
           receiptBase64: t.receiptBase64,
           subcategory: t.subcategory,
         );
-        
+
         await _accountService!.addTransaction(accountId, transaction);
         imported++;
         debugPrint('Imported: ${t.title}');
@@ -163,9 +168,9 @@ class MoneyProvider extends ChangeNotifier {
         debugPrint('Error importing transaction ${t.title}: $e');
       }
     }
-    
+
     debugPrint('Imported $imported transactions to Firebase');
-    
+
     // Clear the Hive transactions box (keep only SMS transactions)
     final smsTransactions = restoredTransactions
         .where((t) => t.smsBody != null && t.smsBody!.isNotEmpty)
@@ -174,7 +179,7 @@ class MoneyProvider extends ChangeNotifier {
     for (final t in smsTransactions) {
       await transactionBox.add(t);
     }
-    
+
     // Import loans
     final loanBox = Hive.box<Loan>('loans');
     final restoredLoans = loanBox.values.toList();
@@ -186,7 +191,7 @@ class MoneyProvider extends ChangeNotifier {
         debugPrint('Error importing loan: $e');
       }
     }
-    
+
     // Import goals
     final goalBox = Hive.box<Goal>('goals');
     final restoredGoals = goalBox.values.toList();
@@ -198,7 +203,7 @@ class MoneyProvider extends ChangeNotifier {
         debugPrint('Error importing goal: $e');
       }
     }
-    
+
     // Reload data from Firebase
     await _loadAccountData(_activeAccountId!);
     notifyListeners();
@@ -279,7 +284,14 @@ class MoneyProvider extends ChangeNotifier {
       'biometricLockEnabled',
       defaultValue: false,
     );
-    _selectedCardDesign = _settingsBox.get('selectedCardDesign', defaultValue: 'default');
+    _selectedCardDesign = _settingsBox.get(
+      'selectedCardDesign',
+      defaultValue: 'default',
+    );
+
+    final themeIndex = _settingsBox.get('appThemeMode', defaultValue: 0);
+    _appThemeMode = AppThemeMode.values[themeIndex];
+
     if (_smsTrackingEnabled) {
       syncSmsTransactions();
     }
@@ -301,6 +313,12 @@ class MoneyProvider extends ChangeNotifier {
   Future<void> setSelectedCardDesign(String design) async {
     _selectedCardDesign = design;
     await _settingsBox.put('selectedCardDesign', design);
+    notifyListeners();
+  }
+
+  Future<void> setThemeMode(AppThemeMode mode) async {
+    _appThemeMode = mode;
+    await _settingsBox.put('appThemeMode', mode.index);
     notifyListeners();
   }
 
@@ -1556,6 +1574,17 @@ class MoneyProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('Error merging transactions: $e');
     }
+  }
+
+  /// Update the stored profile photo URL and persist it to settings.
+  Future<void> setPhotoURL(String? photoURL) async {
+    _photoURL = photoURL;
+    if (photoURL != null && photoURL.isNotEmpty) {
+      await _settingsBox.put('photoURL', photoURL);
+    } else {
+      await _settingsBox.delete('photoURL');
+    }
+    notifyListeners();
   }
 
   /// Load budget from list

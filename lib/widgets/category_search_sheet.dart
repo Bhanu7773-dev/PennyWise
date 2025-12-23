@@ -56,7 +56,7 @@ class _CategorySearchSheetState extends State<CategorySearchSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.1),
+              color: Colors.white.withOpacity(0.1),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -71,9 +71,7 @@ class _CategorySearchSheetState extends State<CategorySearchSheet> {
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 hintText: 'Search categories...',
-                hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.3),
-                ),
+                hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
                 prefixIcon: const Icon(Icons.search, color: AppTheme.primary),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
@@ -133,13 +131,13 @@ class _CategorySearchSheetState extends State<CategorySearchSheet> {
           Icon(
             Icons.category_outlined,
             size: 64,
-            color: Colors.white.withValues(alpha: 0.1),
+            color: Colors.white.withOpacity(0.1),
           ),
           const SizedBox(height: 16),
           Text(
             'No categories found',
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.5),
+              color: Colors.white.withOpacity(0.5),
               fontSize: 16,
             ),
           ),
@@ -158,16 +156,16 @@ class _CategorySearchSheetState extends State<CategorySearchSheet> {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppTheme.surface.withValues(alpha: 0.5),
+          color: AppTheme.surface.withOpacity(0.5),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+          border: Border.all(color: Colors.white.withOpacity(0.05)),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: category.color.withValues(alpha: 0.15),
+                color: category.color.withOpacity(0.15),
                 shape: BoxShape.circle,
               ),
               child: Icon(category.icon, color: category.color, size: 20),
@@ -189,17 +187,14 @@ class _CategorySearchSheetState extends State<CategorySearchSheet> {
                     Text(
                       'Subcategory',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.4),
+                        color: Colors.white.withOpacity(0.4),
                         fontSize: 12,
                       ),
                     ),
                 ],
               ),
             ),
-            Icon(
-              Icons.chevron_right,
-              color: Colors.white.withValues(alpha: 0.2),
-            ),
+            Icon(Icons.chevron_right, color: Colors.white.withOpacity(0.2)),
           ],
         ),
       ),

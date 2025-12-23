@@ -3,23 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
-import 'package:pennywise/widgets/card_designs.dart';
+import 'card_designs.dart';
 import '../providers/money_provider.dart';
 import '../models/account.dart';
 import '../utils/app_theme.dart';
 import 'animated_digit_text.dart';
 import 'skeleton_loading.dart';
 
-class BalanceCard extends StatefulWidget {
+class HomeBalanceCard extends StatefulWidget {
   final VoidCallback? onBudgetTap;
+  final bool shouldAnimate;
 
-  const BalanceCard({super.key, this.onBudgetTap});
+  const HomeBalanceCard({super.key, this.onBudgetTap, this.shouldAnimate = true});
 
   @override
-  State<BalanceCard> createState() => _BalanceCardState();
+  State<HomeBalanceCard> createState() => _HomeBalanceCardState();
 }
 
-class _BalanceCardState extends State<BalanceCard> {
+class _HomeBalanceCardState extends State<HomeBalanceCard> {
+
   @override
   void dispose() {
     super.dispose();
@@ -28,7 +30,7 @@ class _BalanceCardState extends State<BalanceCard> {
   void _showAccountSwitcherBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.surface,
+      backgroundColor: Theme.of(context).cardColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -48,7 +50,7 @@ class _BalanceCardState extends State<BalanceCard> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.3),
+                    color: Theme.of(context).dividerColor,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -57,10 +59,10 @@ class _BalanceCardState extends State<BalanceCard> {
                 // Header
                 Row(
                   children: [
-                    const Text(
+                    Text(
                       'Select Account',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).textTheme.titleLarge?.color,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -77,7 +79,7 @@ class _BalanceCardState extends State<BalanceCard> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: AppTheme.primary.withValues(alpha: 0.2),
+                          color: AppTheme.primary.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
@@ -119,13 +121,13 @@ class _BalanceCardState extends State<BalanceCard> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: isActive
-                            ? account.color.withValues(alpha: 0.2)
-                            : Colors.white.withValues(alpha: 0.05),
+                            ? account.color.withOpacity(0.2)
+                            : Colors.white.withOpacity(0.05),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: isActive
                               ? account.color
-                              : Colors.white.withValues(alpha: 0.1),
+                              : Colors.white.withOpacity(0.1),
                           width: isActive ? 2 : 1,
                         ),
                       ),
@@ -134,7 +136,7 @@ class _BalanceCardState extends State<BalanceCard> {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: account.color.withValues(alpha: 0.2),
+                              color: account.color.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(
@@ -150,8 +152,10 @@ class _BalanceCardState extends State<BalanceCard> {
                               children: [
                                 Text(
                                   account.name,
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium?.color,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -160,9 +164,11 @@ class _BalanceCardState extends State<BalanceCard> {
                                   Text(
                                     'SMS enabled',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.5,
-                                      ),
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color
+                                          ?.withOpacity(0.5),
                                       fontSize: 12,
                                     ),
                                   ),
@@ -185,7 +191,7 @@ class _BalanceCardState extends State<BalanceCard> {
                           else
                             Icon(
                               Icons.chevron_right,
-                              color: Colors.white.withValues(alpha: 0.3),
+                              color: Colors.white.withOpacity(0.3),
                             ),
                         ],
                       ),
@@ -197,7 +203,7 @@ class _BalanceCardState extends State<BalanceCard> {
                 Text(
                   'Long press an account for more options',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.4),
+                    color: Colors.white.withOpacity(0.4),
                     fontSize: 12,
                   ),
                 ),
@@ -228,7 +234,7 @@ class _BalanceCardState extends State<BalanceCard> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppTheme.primary.withValues(alpha: 0.2),
+                  color: AppTheme.primary.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.add_card, color: AppTheme.primary, size: 20),
@@ -251,16 +257,10 @@ class _BalanceCardState extends State<BalanceCard> {
                 maxLength: 20,
                 decoration: InputDecoration(
                   labelText: 'Account Name',
-                  labelStyle: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
-                  ),
+                  labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
                   hintText: 'e.g., Business, Family, Savings',
-                  hintStyle: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.4),
-                  ),
-                  counterStyle: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.5),
-                  ),
+                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.4)),
+                  counterStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
                   prefixIcon: Icon(
                     Icons.account_balance_wallet,
                     color: AppTheme.primary,
@@ -268,7 +268,7 @@ class _BalanceCardState extends State<BalanceCard> {
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: Colors.white.withValues(alpha: 0.2),
+                      color: Colors.white.withOpacity(0.2),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
@@ -282,12 +282,12 @@ class _BalanceCardState extends State<BalanceCard> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: Colors.white.withOpacity(0.05),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: showSmsTransactions
-                        ? AppTheme.primary.withValues(alpha: 0.5)
-                        : Colors.white.withValues(alpha: 0.1),
+                        ? AppTheme.primary.withOpacity(0.5)
+                        : Colors.white.withOpacity(0.1),
                   ),
                 ),
                 child: Row(
@@ -296,8 +296,8 @@ class _BalanceCardState extends State<BalanceCard> {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: showSmsTransactions
-                            ? AppTheme.primary.withValues(alpha: 0.2)
-                            : Colors.white.withValues(alpha: 0.1),
+                            ? AppTheme.primary.withOpacity(0.2)
+                            : Colors.white.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
@@ -324,7 +324,7 @@ class _BalanceCardState extends State<BalanceCard> {
                           Text(
                             'Show bank SMS in this account',
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.5),
+                              color: Colors.white.withOpacity(0.5),
                               fontSize: 12,
                             ),
                           ),
@@ -350,7 +350,7 @@ class _BalanceCardState extends State<BalanceCard> {
               onPressed: () => Navigator.pop(context),
               child: Text(
                 'Cancel',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
+                style: TextStyle(color: Colors.white.withOpacity(0.6)),
               ),
             ),
             ElevatedButton(
@@ -440,149 +440,188 @@ class _BalanceCardState extends State<BalanceCard> {
     BuildContext context,
     MoneyProvider provider,
   ) {
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+    final isHighContrast = isAmoled || isLight;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-            child: Container(
-              width: double.infinity,
-              height: 200,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF6C5CE7).withValues(alpha: 0.3),
-                    const Color(0xFF1A1F38).withValues(alpha: 0.6),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.15),
-                  width: 1.5,
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildChip(),
-                      GestureDetector(
-                        onTap: () => _showCardNameDialog(context, provider),
-                        child: Row(
-                          children: [
-                            Text(
-                              provider.cardName,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w900,
-                                fontStyle: FontStyle.italic,
-                                letterSpacing: 1.5,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Icon(
-                              Icons.edit,
-                              color: Colors.white.withValues(alpha: 0.5),
-                              size: 16,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+              borderRadius: BorderRadius.circular(24),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                child: Container(
+                  width: double.infinity,
+                  height: 200,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: isHighContrast ? Colors.transparent : null,
+                    gradient: isHighContrast
+                        ? null
+                        : LinearGradient(
+                            colors: [
+                              const Color(0xFF6C5CE7).withOpacity(0.3),
+                              const Color(0xFF1A1F38).withOpacity(0.6),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: isHighContrast
+                          ? Theme.of(context).iconTheme.color!.withOpacity(0.5)
+                          : Colors.white.withOpacity(0.15),
+                      width: 1.5,
+                    ),
                   ),
-                  const Spacer(),
-                  Column(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Total Balance',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.6),
-                          fontSize: 13,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildChip(),
+                          GestureDetector(
+                            onTap: () => _showCardNameDialog(context, provider),
+                            child: Row(
+                              children: [
+                                Text(
+                                  provider.cardName,
+                                  style: TextStyle(
+                                    color: isHighContrast
+                                        ? Theme.of(
+                                            context,
+                                          ).textTheme.titleLarge?.color
+                                        : Colors.white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w900,
+                                    fontStyle: FontStyle.italic,
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Icon(
+                                  Icons.edit,
+                                  color: isHighContrast
+                                      ? Theme.of(
+                                          context,
+                                        ).iconTheme.color!.withOpacity(0.5)
+                                      : Colors.white.withOpacity(0.5),
+                                  size: 16,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 4),
-                      AnimatedDigitText(
-                        value: NumberFormat.currency(
-                          symbol: provider.currencySymbol,
-                          decimalDigits: 0,
-                        ).format(provider.totalBalance),
-                        style: const TextStyle(
-                          fontSize: 34,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                        duration: const Duration(milliseconds: 600),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
+                      const Spacer(),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'CARD HOLDER',
+                            'Total Balance',
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.4),
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
+                              color: isHighContrast
+                                  ? Theme.of(context).textTheme.bodySmall?.color
+                                  : Colors.white.withOpacity(0.6),
+                              fontSize: 13,
                             ),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            provider.userName.toUpperCase(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
+                          const SizedBox(height: 4),
+                          AnimatedDigitText(
+                            value: NumberFormat.currency(
+                              symbol: provider.currencySymbol,
+                              decimalDigits: 0,
+                            ).format(provider.totalBalance),
+                            style: TextStyle(
+                              fontSize: 34,
+                              fontWeight: FontWeight.bold,
+                              color: isHighContrast
+                                  ? Theme.of(
+                                      context,
+                                    ).textTheme.titleLarge?.color
+                                  : Colors.white,
                             ),
+                            duration: const Duration(milliseconds: 600),
                           ),
                         ],
                       ),
+                      const Spacer(),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _buildMiniStat(
-                            provider.totalIncome,
-                            AppTheme.income,
-                            Icons.arrow_downward,
-                            provider.currencySymbol,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'CARD HOLDER',
+                                style: TextStyle(
+                                  color: isHighContrast
+                                      ? Theme.of(
+                                          context,
+                                        ).textTheme.bodySmall?.color
+                                      : Colors.white.withOpacity(0.4),
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                provider.userName.toUpperCase(),
+                                style: TextStyle(
+                                  color: isHighContrast
+                                      ? Theme.of(
+                                          context,
+                                        ).textTheme.titleMedium?.color
+                                      : Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 16),
-                          _buildMiniStat(
-                            provider.totalExpense,
-                            AppTheme.expense,
-                            Icons.arrow_upward,
-                            provider.currencySymbol,
+                          Row(
+                            children: [
+                              _buildMiniStat(
+                                provider.totalIncome,
+                                AppTheme.income,
+                                Icons.arrow_downward,
+                                provider.currencySymbol,
+                                isAmoled,
+                                isHighContrast,
+                              ),
+                              const SizedBox(width: 16),
+                              _buildMiniStat(
+                                provider.totalExpense,
+                                AppTheme.expense,
+                                Icons.arrow_upward,
+                                provider.currencySymbol,
+                                isAmoled,
+                                isHighContrast,
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-        ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.3, end: 0),
       ],
     );
   }
+  
 
   Widget _buildMainCard(
     BuildContext context,
     MoneyProvider provider,
     Account account,
   ) {
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+    final isHighContrast = isAmoled || isLight;
     final hasMultipleAccounts = provider.accounts.length > 1;
 
     return ClipRRect(
@@ -594,27 +633,34 @@ class _BalanceCardState extends State<BalanceCard> {
           height: 200,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                account.color.withValues(alpha: 0.3),
-                const Color(0xFF1A1F38).withValues(alpha: 0.6),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            color: isHighContrast ? Colors.transparent : null,
+            gradient: isHighContrast
+                ? null
+                : LinearGradient(
+                    colors: [
+                      account.color.withOpacity(0.3),
+                      const Color(0xFF1A1F38).withOpacity(0.6),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.15),
+              color: isHighContrast
+                  ? Theme.of(context).iconTheme.color!.withOpacity(0.5)
+                  : Colors.white.withOpacity(0.15),
               width: 1.5,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 25,
-                spreadRadius: -5,
-                offset: const Offset(0, 15),
-              ),
-            ],
+            boxShadow: isHighContrast
+                ? []
+                : [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 25,
+                      spreadRadius: -5,
+                      offset: const Offset(0, 15),
+                    ),
+                  ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -634,22 +680,32 @@ class _BalanceCardState extends State<BalanceCard> {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.1),
+                            color: Colors.transparent,
                             borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.15),
+                              width: 1,
+                            ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
                                 Icons.swap_horiz,
-                                color: Colors.white.withValues(alpha: 0.6),
+                                color: isHighContrast
+                                    ? Theme.of(context).iconTheme.color
+                                    : Colors.white.withOpacity(0.6),
                                 size: 14,
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 'Tap',
                                 style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.6),
+                                  color: isHighContrast
+                                      ? Theme.of(
+                                          context,
+                                        ).textTheme.bodySmall?.color
+                                      : Colors.white.withOpacity(0.6),
                                   fontSize: 10,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -670,13 +726,19 @@ class _BalanceCardState extends State<BalanceCard> {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: account.color.withValues(alpha: 0.3),
+                            color: isHighContrast
+                                ? Theme.of(context).dividerColor
+                                : account.color.withOpacity(0.3),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             account.name.toUpperCase(),
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: isHighContrast
+                                  ? Theme.of(
+                                      context,
+                                    ).textTheme.bodyMedium?.color
+                                  : Colors.white,
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1,
@@ -686,25 +748,33 @@ class _BalanceCardState extends State<BalanceCard> {
                         const SizedBox(width: 8),
                         Text(
                           provider.cardName,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: isHighContrast
+                                ? Theme.of(context).textTheme.titleLarge?.color
+                                : Colors.white,
                             fontSize: 22,
                             fontWeight: FontWeight.w900,
                             fontStyle: FontStyle.italic,
                             letterSpacing: 1.5,
-                            shadows: [
-                              Shadow(
-                                color: Colors.black26,
-                                offset: Offset(0, 2),
-                                blurRadius: 4,
-                              ),
-                            ],
+                            shadows: isHighContrast
+                                ? []
+                                : [
+                                    Shadow(
+                                      color: Colors.black26,
+                                      offset: Offset(0, 2),
+                                      blurRadius: 4,
+                                    ),
+                                  ],
                           ),
                         ),
                         const SizedBox(width: 6),
                         Icon(
                           Icons.edit,
-                          color: Colors.white.withValues(alpha: 0.5),
+                          color: isHighContrast
+                              ? Theme.of(
+                                  context,
+                                ).iconTheme.color!.withOpacity(0.5)
+                              : Colors.white.withOpacity(0.5),
                           size: 16,
                         ),
                       ],
@@ -721,7 +791,9 @@ class _BalanceCardState extends State<BalanceCard> {
                   Text(
                     'Total Balance',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: isHighContrast
+                          ? Theme.of(context).textTheme.bodySmall?.color
+                          : Colors.white.withOpacity(0.6),
                       fontSize: 13,
                       letterSpacing: 0.5,
                     ),
@@ -732,18 +804,22 @@ class _BalanceCardState extends State<BalanceCard> {
                       symbol: provider.currencySymbol,
                       decimalDigits: 0,
                     ).format(provider.totalBalance),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 34,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: isHighContrast
+                          ? Theme.of(context).textTheme.titleLarge?.color
+                          : Colors.white,
                       letterSpacing: 0.5,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black26,
-                          offset: Offset(0, 2),
-                          blurRadius: 4,
-                        ),
-                      ],
+                      shadows: isHighContrast
+                          ? []
+                          : [
+                              Shadow(
+                                color: Colors.black26,
+                                offset: Offset(0, 2),
+                                blurRadius: 4,
+                              ),
+                            ],
                     ),
                     duration: const Duration(milliseconds: 600),
                   ),
@@ -761,7 +837,9 @@ class _BalanceCardState extends State<BalanceCard> {
                       Text(
                         'CARD HOLDER',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.4),
+                          color: isHighContrast
+                              ? Theme.of(context).textTheme.bodySmall?.color
+                              : Colors.white.withOpacity(0.4),
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.0,
@@ -770,8 +848,10 @@ class _BalanceCardState extends State<BalanceCard> {
                       const SizedBox(height: 2),
                       Text(
                         provider.userName.toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: isHighContrast
+                              ? Theme.of(context).textTheme.titleMedium?.color
+                              : Colors.white,
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1.0,
@@ -787,6 +867,8 @@ class _BalanceCardState extends State<BalanceCard> {
                         AppTheme.income,
                         Icons.arrow_downward,
                         provider.currencySymbol,
+                        isAmoled,
+                        isHighContrast,
                       ),
                       const SizedBox(width: 16),
                       _buildMiniStat(
@@ -794,6 +876,8 @@ class _BalanceCardState extends State<BalanceCard> {
                         AppTheme.expense,
                         Icons.arrow_upward,
                         provider.currencySymbol,
+                        isAmoled,
+                        isHighContrast,
                       ),
                     ],
                   ),
@@ -803,7 +887,7 @@ class _BalanceCardState extends State<BalanceCard> {
           ),
         ),
       ),
-    ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.3, end: 0);
+    );
   }
 
   Widget _buildSelectedCard(
@@ -811,6 +895,8 @@ class _BalanceCardState extends State<BalanceCard> {
     MoneyProvider provider,
     Account account,
   ) {
+    // Do not special-case AMOLED mode — use the selected card design
+
     switch (provider.selectedCardDesign) {
       case 'ocean_wave':
         return OceanWaveHeader(provider: provider);
@@ -892,7 +978,7 @@ class _BalanceCardState extends State<BalanceCard> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.3),
+                color: Colors.white.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -904,7 +990,7 @@ class _BalanceCardState extends State<BalanceCard> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: account.color.withValues(alpha: 0.2),
+                    color: account.color.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -931,7 +1017,7 @@ class _BalanceCardState extends State<BalanceCard> {
                             ? 'SMS enabled'
                             : 'SMS disabled',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.5),
+                          color: Colors.white.withOpacity(0.5),
                           fontSize: 13,
                         ),
                       ),
@@ -947,7 +1033,7 @@ class _BalanceCardState extends State<BalanceCard> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppTheme.primary.withValues(alpha: 0.2),
+                  color: AppTheme.primary.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -964,7 +1050,7 @@ class _BalanceCardState extends State<BalanceCard> {
                 account.showSmsTransactions
                     ? 'Tap to disable'
                     : 'Tap to enable',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                style: TextStyle(color: Colors.white.withOpacity(0.5)),
               ),
               trailing: Switch(
                 value: account.showSmsTransactions,
@@ -990,7 +1076,7 @@ class _BalanceCardState extends State<BalanceCard> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppTheme.expense.withValues(alpha: 0.2),
+                  color: AppTheme.expense.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -1005,7 +1091,7 @@ class _BalanceCardState extends State<BalanceCard> {
               ),
               subtitle: Text(
                 'Remove this account and all its data',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                style: TextStyle(color: Colors.white.withOpacity(0.5)),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -1033,7 +1119,7 @@ class _BalanceCardState extends State<BalanceCard> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppTheme.expense.withValues(alpha: 0.2),
+                color: AppTheme.expense.withOpacity(0.2),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -1061,11 +1147,9 @@ class _BalanceCardState extends State<BalanceCard> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppTheme.expense.withValues(alpha: 0.1),
+                color: AppTheme.expense.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: AppTheme.expense.withValues(alpha: 0.3),
-                ),
+                border: Border.all(color: AppTheme.expense.withOpacity(0.3)),
               ),
               child: Row(
                 children: [
@@ -1075,7 +1159,7 @@ class _BalanceCardState extends State<BalanceCard> {
                     child: Text(
                       'This will permanently delete all transactions, budgets, loans, and goals in this account.',
                       style: TextStyle(
-                        color: AppTheme.expense.withValues(alpha: 0.9),
+                        color: AppTheme.expense.withOpacity(0.9),
                         fontSize: 13,
                       ),
                     ),
@@ -1090,7 +1174,7 @@ class _BalanceCardState extends State<BalanceCard> {
             onPressed: () => Navigator.pop(context),
             child: Text(
               'Cancel',
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
+              style: TextStyle(color: Colors.white.withOpacity(0.6)),
             ),
           ),
           ElevatedButton(
@@ -1152,20 +1236,12 @@ class _BalanceCardState extends State<BalanceCard> {
               maxLength: 20,
               decoration: InputDecoration(
                 labelText: 'Card Name',
-                labelStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7),
-                ),
+                labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
                 hintText: 'e.g., VISA, MASTERCARD',
-                hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
-                ),
-                counterStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
-                ),
+                hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                counterStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
                 enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.3),
-                  ),
+                  borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(color: AppTheme.primary),
@@ -1180,20 +1256,12 @@ class _BalanceCardState extends State<BalanceCard> {
               maxLength: 30,
               decoration: InputDecoration(
                 labelText: 'Cardholder Name',
-                labelStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7),
-                ),
+                labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
                 hintText: 'e.g., John Doe',
-                hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
-                ),
-                counterStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
-                ),
+                hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                counterStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
                 enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.3),
-                  ),
+                  borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(color: AppTheme.primary),
@@ -1243,26 +1311,26 @@ class _BalanceCardState extends State<BalanceCard> {
             right: 0,
             top: 14,
             height: 1,
-            child: Container(color: Colors.black.withValues(alpha: 0.2)),
+            child: Container(color: Colors.black.withOpacity(0.2)),
           ),
           Positioned(
             top: 0,
             bottom: 0,
             left: 14,
             width: 1,
-            child: Container(color: Colors.black.withValues(alpha: 0.2)),
+            child: Container(color: Colors.black.withOpacity(0.2)),
           ),
           Positioned(
             top: 0,
             bottom: 0,
             right: 14,
             width: 1,
-            child: Container(color: Colors.black.withValues(alpha: 0.2)),
+            child: Container(color: Colors.black.withOpacity(0.2)),
           ),
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: Colors.black.withValues(alpha: 0.1)),
+              border: Border.all(color: Colors.black.withOpacity(0.1)),
             ),
           ),
         ],
@@ -1275,23 +1343,36 @@ class _BalanceCardState extends State<BalanceCard> {
     Color color,
     IconData icon,
     String currencySymbol,
+    bool isAmoled,
+    bool isHighContrast,
   ) {
     final currencyFormat = NumberFormat.compactCurrency(symbol: currencySymbol);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
+        color: isHighContrast ? Colors.transparent : color.withOpacity(0.15),
         borderRadius: BorderRadius.circular(12),
+        border: isHighContrast
+            ? Border.all(
+                color: Theme.of(context).iconTheme.color!.withOpacity(0.5),
+              )
+            : null,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 14),
+          Icon(
+            icon,
+            color: isHighContrast ? Theme.of(context).iconTheme.color : color,
+            size: 14,
+          ),
           const SizedBox(width: 4),
           AnimatedDigitText(
             value: currencyFormat.format(amount),
             style: TextStyle(
-              color: color,
+              color: isHighContrast
+                  ? Theme.of(context).textTheme.bodyMedium?.color
+                  : color,
               fontSize: 12,
               fontWeight: FontWeight.bold,
             ),

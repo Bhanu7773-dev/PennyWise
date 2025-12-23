@@ -49,28 +49,28 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
     _notes = widget.transaction.notes;
     _receiptPath = widget.transaction.receiptPath;
     _receiptBase64 = widget.transaction.receiptBase64;
-    
+
     // For non-SMS transactions, restore receipt from base64 if needed
     _restoreReceiptFromBase64();
   }
 
   // Restore receipt image from base64 if local file doesn't exist
   Future<void> _restoreReceiptFromBase64() async {
-    final isSmsTransaction = widget.transaction.smsBody != null && 
-                             widget.transaction.smsBody!.isNotEmpty;
-    
+    final isSmsTransaction =
+        widget.transaction.smsBody != null &&
+        widget.transaction.smsBody!.isNotEmpty;
+
     // Only for non-SMS transactions with base64 but missing local file
-    if (!isSmsTransaction && 
-        _receiptBase64 != null && 
+    if (!isSmsTransaction &&
+        _receiptBase64 != null &&
         _receiptBase64!.isNotEmpty) {
-      
       bool needsRestore = _receiptPath == null || _receiptPath!.isEmpty;
-      
+
       if (!needsRestore && _receiptPath != null) {
         final file = File(_receiptPath!);
         needsRestore = !await file.exists();
       }
-      
+
       if (needsRestore) {
         try {
           final appDir = await getApplicationDocumentsDirectory();
@@ -78,14 +78,14 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
           if (!await receiptsDir.exists()) {
             await receiptsDir.create(recursive: true);
           }
-          
+
           final fileName = 'receipt_${widget.transaction.id}_restored.jpg';
           final savedPath = '${receiptsDir.path}/$fileName';
-          
+
           // Decode base64 and save to file
           final bytes = base64Decode(_receiptBase64!);
           await File(savedPath).writeAsBytes(bytes);
-          
+
           if (mounted) {
             setState(() {
               _receiptPath = savedPath;
@@ -127,9 +127,13 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
         widget.transaction.smsBody != null &&
         widget.transaction.smsBody!.isNotEmpty;
     final provider = Provider.of<MoneyProvider>(context);
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: isAmoled
+          ? Colors.black
+          : (isLight ? Colors.white : AppTheme.background),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -137,17 +141,24 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.1),
+              color: isAmoled || isLight
+                  ? Colors.transparent
+                  : Colors.white.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
+              border: isAmoled ? Border.all(color: Colors.white) : null,
             ),
-            child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+            child: Icon(
+              Icons.arrow_back,
+              color: isLight ? Colors.black : Colors.white,
+              size: 20,
+            ),
           ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           _isExpense ? 'Expense Details' : 'Income Details',
-          style: const TextStyle(
-            color: Colors.white, 
+          style: TextStyle(
+            color: isLight ? Colors.black : Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -157,10 +168,23 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: isAmoled
+                    ? Colors.transparent
+                    : (isLight
+                          ? Colors.transparent
+                          : Colors.white.withOpacity(0.1)),
                 borderRadius: BorderRadius.circular(12),
+                border: isAmoled
+                    ? Border.all(color: Colors.white)
+                    : (isLight
+                          ? Border.all(color: Colors.black.withOpacity(0.1))
+                          : null),
               ),
-              child: const Icon(Icons.more_vert, color: Colors.white, size: 20),
+              child: Icon(
+                Icons.more_vert,
+                color: isLight ? Colors.black : Colors.white,
+                size: 20,
+              ),
             ),
             onPressed: () {
               _showOptionsSheet(context, provider);
@@ -184,42 +208,77 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          (_isExpense ? AppTheme.expense : AppTheme.income).withValues(alpha: 0.15),
-                          AppTheme.surface.withValues(alpha: 0.4),
-                          AppTheme.primary.withValues(alpha: 0.1),
-                        ],
-                      ),
+                      color: isAmoled || isLight ? Colors.transparent : null,
+                      gradient: isAmoled || isLight
+                          ? null
+                          : LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                (_isExpense
+                                        ? AppTheme.expense
+                                        : AppTheme.income)
+                                    .withOpacity(0.15),
+                                AppTheme.surface.withOpacity(0.4),
+                                AppTheme.primary.withOpacity(0.1),
+                              ],
+                            ),
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.1),
+                        color: isAmoled
+                            ? Colors.white
+                            : (isLight
+                                  ? Colors.black
+                                  : Colors.white.withOpacity(0.1)),
                       ),
                     ),
                     child: Column(
                       children: [
                         // Transaction Type Indicator
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
-                            color: (_isExpense ? AppTheme.expense : AppTheme.income).withValues(alpha: 0.2),
+                            color: isAmoled || isLight
+                                ? Colors.transparent
+                                : (_isExpense
+                                          ? AppTheme.expense
+                                          : AppTheme.income)
+                                      .withOpacity(0.2),
                             borderRadius: BorderRadius.circular(20),
+                            border: isAmoled
+                                ? Border.all(color: Colors.white)
+                                : (isLight
+                                      ? Border.all(color: Colors.black)
+                                      : null),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                _isExpense ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
-                                color: _isExpense ? AppTheme.expense : AppTheme.income,
+                                _isExpense
+                                    ? Icons.arrow_upward_rounded
+                                    : Icons.arrow_downward_rounded,
+                                color: isAmoled
+                                    ? Colors.white
+                                    : (isLight
+                                          ? Colors.black
+                                          : (_isExpense
+                                                ? AppTheme.expense
+                                                : AppTheme.income)),
                                 size: 16,
                               ),
                               const SizedBox(width: 6),
                               Text(
                                 _isExpense ? 'EXPENSE' : 'INCOME',
                                 style: TextStyle(
-                                  color: _isExpense ? AppTheme.expense : AppTheme.income,
+                                  color: isAmoled
+                                      ? Colors.white
+                                      : (_isExpense
+                                            ? AppTheme.expense
+                                            : AppTheme.income),
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 1,
@@ -228,32 +287,40 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                             ],
                           ),
                         ),
-                        
+
                         const SizedBox(height: 24),
 
                         // Amount
                         Text(
                           '${provider.currencySymbol}${NumberFormat('#,##0').format(widget.transaction.amount)}',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: isLight ? Colors.black : Colors.white,
                             fontSize: 48,
                             fontWeight: FontWeight.bold,
-                            shadows: [
-                              Shadow(
-                                color: (_isExpense ? AppTheme.expense : AppTheme.income).withValues(alpha: 0.5),
-                                blurRadius: 20,
-                              ),
-                            ],
+                            shadows: isAmoled || isLight
+                                ? null
+                                : [
+                                    Shadow(
+                                      color:
+                                          (_isExpense
+                                                  ? AppTheme.expense
+                                                  : AppTheme.income)
+                                              .withOpacity(0.5),
+                                      blurRadius: 20,
+                                    ),
+                                  ],
                           ),
                         ),
 
                         const SizedBox(height: 8),
-                        
+
                         // Payee Name
                         Text(
                           widget.transaction.title,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
+                            color: isLight
+                                ? Colors.black.withOpacity(0.8)
+                                : Colors.white.withOpacity(0.8),
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
                           ),
@@ -268,9 +335,14 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
 
                         // Date & Time
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.05),
+                            color: isLight
+                                ? Colors.black.withOpacity(0.05)
+                                : Colors.white.withOpacity(0.05),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -283,7 +355,9 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                DateFormat('EEE, d MMM yyyy • h:mm a').format(widget.transaction.date),
+                                DateFormat(
+                                  'EEE, d MMM yyyy • h:mm a',
+                                ).format(widget.transaction.date),
                                 style: TextStyle(
                                   color: AppTheme.textSecondary,
                                   fontSize: 13,
@@ -307,17 +381,25 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            AppTheme.primary.withValues(alpha: 0.3),
-                            AppTheme.primary.withValues(alpha: 0.1),
-                          ],
-                        ),
+                        color: isAmoled || isLight ? Colors.transparent : null,
+                        gradient: isAmoled || isLight
+                            ? null
+                            : LinearGradient(
+                                colors: [
+                                  AppTheme.primary.withOpacity(0.3),
+                                  AppTheme.primary.withOpacity(0.1),
+                                ],
+                              ),
                         borderRadius: BorderRadius.circular(14),
+                        border: isAmoled
+                            ? Border.all(color: Colors.white)
+                            : null,
                       ),
                       child: Icon(
                         Icons.account_balance_rounded,
-                        color: AppTheme.primary,
+                        color: isAmoled
+                            ? Colors.white
+                            : (isLight ? Colors.black : AppTheme.primary),
                         size: 22,
                       ),
                     ),
@@ -329,7 +411,9 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                           Text(
                             'Account',
                             style: TextStyle(
-                              color: AppTheme.textSecondary,
+                              color: isLight
+                                  ? Colors.black
+                                  : AppTheme.textSecondary,
                               fontSize: 12,
                             ),
                           ),
@@ -337,25 +421,38 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                           DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               value: _accountId == 'cash' ? 'Cash' : 'Bank',
-                              dropdownColor: AppTheme.surface,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 15,
                               ),
-                              icon: Icon(
-                                Icons.keyboard_arrow_down_rounded,
-                                color: AppTheme.primary,
-                              ),
                               isDense: true,
                               items: [
                                 DropdownMenuItem(
                                   value: 'Bank',
-                                  child: Text('$_bankName ••$_accountLast4'),
+                                  child: Text(
+                                    '$_bankName ••$_accountLast4',
+                                    style: TextStyle(
+                                      color: isAmoled
+                                          ? Colors.white
+                                          : (isLight
+                                                ? Colors.black
+                                                : Colors.white),
+                                    ),
+                                  ),
                                 ),
-                                const DropdownMenuItem(
+                                DropdownMenuItem(
                                   value: 'Cash',
-                                  child: Text('Cash'),
+                                  child: Text(
+                                    'Cash',
+                                    style: TextStyle(
+                                      color: isAmoled
+                                          ? Colors.white
+                                          : (isLight
+                                                ? Colors.black
+                                                : Colors.white),
+                                    ),
+                                  ),
                                 ),
                               ],
                               onChanged: (value) {
@@ -366,6 +463,15 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                                   _updateTransaction();
                                 });
                               },
+                              dropdownColor: isAmoled
+                                  ? Colors.black
+                                  : AppTheme.surface,
+                              icon: Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                color: isAmoled
+                                    ? Colors.white
+                                    : AppTheme.primary,
+                              ),
                             ),
                           ),
                         ],
@@ -377,7 +483,9 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                         Text(
                           !_isExcluded ? 'Included' : 'Excluded',
                           style: TextStyle(
-                            color: !_isExcluded ? AppTheme.income : AppTheme.expense,
+                            color: !_isExcluded
+                                ? AppTheme.income
+                                : AppTheme.expense,
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),
@@ -394,9 +502,11 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                               });
                             },
                             activeColor: AppTheme.income,
-                            activeTrackColor: AppTheme.income.withValues(alpha: 0.3),
+                            activeTrackColor: AppTheme.income.withOpacity(0.3),
                             inactiveThumbColor: AppTheme.expense,
-                            inactiveTrackColor: AppTheme.expense.withValues(alpha: 0.3),
+                            inactiveTrackColor: AppTheme.expense.withOpacity(
+                              0.3,
+                            ),
                           ),
                         ),
                       ],
@@ -416,12 +526,19 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.amber.withValues(alpha: 0.15),
+                          color: isAmoled || isLight
+                              ? Colors.transparent
+                              : Colors.amber.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(14),
+                          border: isAmoled
+                              ? Border.all(color: Colors.white)
+                              : null,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.sticky_note_2_rounded,
-                          color: Colors.amber,
+                          color: isAmoled
+                              ? Colors.white
+                              : (isLight ? Colors.black : Colors.amber),
                           size: 22,
                         ),
                       ),
@@ -430,10 +547,10 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'Notes',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: isLight ? Colors.black : Colors.white,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 15,
                               ),
@@ -445,7 +562,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                                   : 'Tap to add a note...',
                               style: TextStyle(
                                 color: _notes != null && _notes!.isNotEmpty
-                                    ? Colors.white.withValues(alpha: 0.8)
+                                    ? Colors.white.withOpacity(0.8)
                                     : AppTheme.textSecondary,
                                 fontSize: 13,
                               ),
@@ -459,7 +576,11 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                         _notes != null && _notes!.isNotEmpty
                             ? Icons.edit_rounded
                             : Icons.add_rounded,
-                        color: Colors.amber.withValues(alpha: 0.7),
+                        color: isAmoled
+                            ? Colors.white
+                            : (isLight
+                                  ? Colors.black
+                                  : Colors.amber.withOpacity(0.7)),
                         size: 20,
                       ),
                     ],
@@ -482,9 +603,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildReceiptCard(),
-                  ),
+                  Expanded(child: _buildReceiptCard()),
                 ],
               ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.1),
 
@@ -503,21 +622,28 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.pink.withValues(alpha: 0.15),
+                        color: isAmoled || isLight
+                            ? Colors.transparent
+                            : Colors.pink.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(14),
+                        border: isAmoled
+                            ? Border.all(color: Colors.white)
+                            : null,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.label_rounded,
-                        color: Colors.pink,
+                        color: isAmoled
+                            ? Colors.white
+                            : (isLight ? Colors.black : Colors.pink),
                         size: 22,
                       ),
                     ),
                     const SizedBox(width: 16),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'Tags',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: isLight ? Colors.black : Colors.white,
                           fontWeight: FontWeight.w600,
                           fontSize: 15,
                         ),
@@ -526,12 +652,19 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: AppTheme.primary.withValues(alpha: 0.2),
+                        color: isAmoled
+                            ? Colors.transparent
+                            : AppTheme.primary.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(10),
+                        border: isAmoled
+                            ? Border.all(color: Colors.white)
+                            : null,
                       ),
                       child: Icon(
                         Icons.add_rounded,
-                        color: AppTheme.primary,
+                        color: isAmoled
+                            ? Colors.white
+                            : (isLight ? Colors.black : AppTheme.primary),
                         size: 20,
                       ),
                     ),
@@ -551,41 +684,55 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Colors.cyan.withValues(alpha: 0.15),
+                              color: isAmoled || isLight
+                                  ? Colors.transparent
+                                  : Colors.cyan.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(14),
+                              border: isAmoled
+                                  ? Border.all(color: Colors.white)
+                                  : null,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.sms_rounded,
-                              color: Colors.cyan,
+                              color: isAmoled
+                                  ? Colors.white
+                                  : (isLight ? Colors.black : Colors.cyan),
                               size: 22,
                             ),
                           ),
                           const SizedBox(width: 16),
-                          const Text(
+                          Text(
                             'Transaction Details',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: isLight ? Colors.black : Colors.white,
                               fontWeight: FontWeight.w600,
                               fontSize: 15,
                             ),
                           ),
                         ],
                       ),
-                      
+
                       if (widget.transaction.referenceNumber != null) ...[
                         const SizedBox(height: 20),
-                        _buildInfoRow('Reference No.', widget.transaction.referenceNumber!),
+                        _buildInfoRow(
+                          'Reference No.',
+                          widget.transaction.referenceNumber!,
+                        ),
                       ],
-                      
+
                       const SizedBox(height: 16),
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.03),
+                          color: isAmoled
+                              ? Colors.transparent
+                              : Colors.white.withOpacity(0.03),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.05),
+                            color: isAmoled
+                                ? Colors.white.withOpacity(0.2)
+                                : Colors.white.withOpacity(0.05),
                           ),
                         ),
                         child: Column(
@@ -604,7 +751,9 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                             Text(
                               widget.transaction.smsBody!,
                               style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.7),
+                                color: isLight
+                                    ? Colors.black.withOpacity(0.8)
+                                    : Colors.white.withOpacity(0.7),
                                 fontSize: 13,
                                 height: 1.5,
                               ),
@@ -626,6 +775,8 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   }
 
   Widget _buildCategorySelector(MoneyProvider provider) {
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     final categoryObj = provider.categories.firstWhere(
       (c) => c.name == _category,
       orElse: () => Category(
@@ -642,21 +793,31 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: categoryObj.color.withValues(alpha: 0.15),
+          color: isAmoled || isLight
+              ? Colors.transparent
+              : categoryObj.color.withOpacity(0.15),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: categoryObj.color.withValues(alpha: 0.3),
+            color: isAmoled
+                ? Colors.white
+                : (isLight ? Colors.black : categoryObj.color.withOpacity(0.3)),
           ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(categoryObj.icon, color: categoryObj.color, size: 18),
+            Icon(
+              categoryObj.icon,
+              color: isAmoled
+                  ? Colors.white
+                  : (isLight ? Colors.black : categoryObj.color),
+              size: 18,
+            ),
             const SizedBox(width: 10),
             Text(
               _category,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: isLight ? Colors.black : Colors.white,
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
               ),
@@ -664,7 +825,11 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
             const SizedBox(width: 8),
             Icon(
               Icons.edit_rounded,
-              color: categoryObj.color.withValues(alpha: 0.7),
+              color: isAmoled
+                  ? Colors.white70
+                  : (isLight
+                        ? Colors.black
+                        : categoryObj.color.withOpacity(0.7)),
               size: 14,
             ),
           ],
@@ -674,6 +839,12 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   }
 
   Widget _buildGlassCard({required Widget child}) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
@@ -682,10 +853,14 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppTheme.surface.withValues(alpha: 0.3),
+            color: isAmoled || isLight
+                ? Colors.transparent
+                : AppTheme.surface.withOpacity(0.3),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.08),
+              color: isAmoled
+                  ? Colors.white
+                  : (isLight ? Colors.black : Colors.white.withOpacity(0.08)),
             ),
           ),
           child: child,
@@ -701,6 +876,12 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
     required String subtitle,
     required VoidCallback onTap,
   }) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
     return GestureDetector(
       onTap: onTap,
       child: ClipRRect(
@@ -710,10 +891,14 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AppTheme.surface.withValues(alpha: 0.3),
+              color: isAmoled || isLight
+                  ? Colors.transparent
+                  : AppTheme.surface.withOpacity(0.3),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.08),
+                color: isAmoled
+                    ? Colors.white
+                    : (isLight ? Colors.black : Colors.white.withOpacity(0.08)),
               ),
             ),
             child: Column(
@@ -721,16 +906,25 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: iconColor.withValues(alpha: 0.15),
+                    color: isAmoled || isLight
+                        ? Colors.transparent
+                        : iconColor.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(16),
+                    border: isAmoled ? Border.all(color: Colors.white) : null,
                   ),
-                  child: Icon(icon, color: iconColor, size: 28),
+                  child: Icon(
+                    icon,
+                    color: isAmoled
+                        ? Colors.white
+                        : (isLight ? Colors.black : iconColor),
+                    size: 28,
+                  ),
                 ),
                 const SizedBox(height: 14),
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: isLight ? Colors.black : Colors.white,
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
                   ),
@@ -740,7 +934,9 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   subtitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: AppTheme.textSecondary,
+                    color: isLight
+                        ? Colors.black.withOpacity(0.6)
+                        : AppTheme.textSecondary,
                     fontSize: 12,
                   ),
                 ),
@@ -753,20 +949,20 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   }
 
   Widget _buildInfoRow(String label, String value) {
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
-          style: TextStyle(
-            color: AppTheme.textSecondary,
-            fontSize: 13,
-          ),
+          style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
         ),
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: isLight ? Colors.black : Colors.white,
             fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
@@ -776,10 +972,14 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   }
 
   Widget _buildReceiptCard() {
+    final provider = Provider.of<MoneyProvider>(context, listen: false);
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     final hasReceipt = _receiptPath != null && _receiptPath!.isNotEmpty;
-    final isSmsTransaction = widget.transaction.smsBody != null && 
-                             widget.transaction.smsBody!.isNotEmpty;
-    
+    final isSmsTransaction =
+        widget.transaction.smsBody != null &&
+        widget.transaction.smsBody!.isNotEmpty;
+
     return GestureDetector(
       onTap: _isSyncing ? null : () => _showAttachSheet(context),
       child: ClipRRect(
@@ -789,14 +989,20 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: hasReceipt 
-                  ? Colors.teal.withValues(alpha: 0.15)
-                  : AppTheme.surface.withValues(alpha: 0.3),
+              color: isAmoled || isLight
+                  ? Colors.transparent
+                  : (hasReceipt
+                        ? Colors.teal.withOpacity(0.15)
+                        : AppTheme.surface.withOpacity(0.3)),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: hasReceipt
-                    ? Colors.teal.withValues(alpha: 0.3)
-                    : Colors.white.withValues(alpha: 0.08),
+                color: isAmoled
+                    ? Colors.white
+                    : (isLight
+                          ? Colors.black
+                          : (hasReceipt
+                                ? Colors.teal.withOpacity(0.3)
+                                : Colors.white.withOpacity(0.08))),
               ),
             ),
             child: Column(
@@ -804,8 +1010,11 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.teal.withValues(alpha: 0.15),
+                    color: isAmoled || isLight
+                        ? Colors.transparent
+                        : Colors.teal.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(16),
+                    border: isAmoled ? Border.all(color: Colors.white) : null,
                   ),
                   child: _isSyncing
                       ? const SizedBox(
@@ -817,18 +1026,22 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                           ),
                         )
                       : Icon(
-                          hasReceipt ? Icons.receipt_long_rounded : Icons.attach_file_rounded,
-                          color: Colors.teal,
+                          hasReceipt
+                              ? Icons.receipt_long_rounded
+                              : Icons.attach_file_rounded,
+                          color: isAmoled
+                              ? Colors.white
+                              : (isLight ? Colors.black : Colors.teal),
                           size: 28,
                         ),
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  _isSyncing 
-                      ? 'Syncing...' 
+                  _isSyncing
+                      ? 'Syncing...'
                       : (hasReceipt ? 'Receipt' : 'Attach'),
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: isLight ? Colors.black : Colors.white,
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
                   ),
@@ -837,12 +1050,16 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                 Text(
                   _isSyncing
                       ? 'Please wait'
-                      : (hasReceipt 
-                          ? (isSmsTransaction ? 'Tap to view' : 'Synced ✓') 
-                          : 'Add receipt/photo'),
+                      : (hasReceipt
+                            ? (isSmsTransaction ? 'Tap to view' : 'Synced ✓')
+                            : 'Add receipt/photo'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: hasReceipt ? Colors.teal : AppTheme.textSecondary,
+                    color: isAmoled || isLight
+                        ? (isLight
+                              ? Colors.black.withOpacity(0.6)
+                              : Colors.white)
+                        : (hasReceipt ? Colors.teal : AppTheme.textSecondary),
                     fontSize: 12,
                   ),
                 ),
@@ -855,6 +1072,12 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   }
 
   Widget _buildReceiptPreview() {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
     return GestureDetector(
       onTap: () => _showReceiptFullScreen(context),
       child: _buildGlassCard(
@@ -872,12 +1095,17 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     width: 70,
                     height: 70,
                     decoration: BoxDecoration(
-                      color: Colors.teal.withValues(alpha: 0.15),
+                      color: isAmoled
+                          ? Colors.transparent
+                          : Colors.teal.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(12),
+                      border: isAmoled ? Border.all(color: Colors.white) : null,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.broken_image_rounded,
-                      color: Colors.teal,
+                      color: isAmoled
+                          ? Colors.white
+                          : (isLight ? Colors.black : Colors.teal),
                       size: 28,
                     ),
                   );
@@ -889,10 +1117,10 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Receipt Attached',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: isLight ? Colors.black : Colors.white,
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
                     ),
@@ -913,12 +1141,17 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppTheme.expense.withValues(alpha: 0.15),
+                  color: isAmoled
+                      ? Colors.transparent
+                      : AppTheme.expense.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(12),
+                  border: isAmoled ? Border.all(color: Colors.white) : null,
                 ),
                 child: Icon(
                   Icons.delete_rounded,
-                  color: AppTheme.expense,
+                  color: isAmoled
+                      ? Colors.white
+                      : (isLight ? Colors.black : AppTheme.expense),
                   size: 20,
                 ),
               ),
@@ -930,14 +1163,23 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   }
 
   void _showAttachSheet(BuildContext context) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: isAmoled ? Colors.black : AppTheme.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          border: isAmoled
+              ? const Border(top: BorderSide(color: Colors.white))
+              : null,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -946,15 +1188,15 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
+                color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'Attach Receipt',
               style: TextStyle(
-                color: Colors.white,
+                color: isLight ? Colors.black : Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -962,10 +1204,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
             const SizedBox(height: 8),
             Text(
               'Choose how to add your receipt',
-              style: TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
             ),
             const SizedBox(height: 24),
             Row(
@@ -1008,22 +1247,22 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: Colors.white.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
                         Icons.visibility_rounded,
-                        color: Colors.white70,
+                        color: isLight ? Colors.black : Colors.white70,
                         size: 20,
                       ),
                       SizedBox(width: 8),
                       Text(
                         'View Current Receipt',
                         style: TextStyle(
-                          color: Colors.white70,
+                          color: isLight ? Colors.black : Colors.white70,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
@@ -1047,15 +1286,21 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
     required String subtitle,
     required VoidCallback onTap,
   }) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
+          color: isAmoled ? Colors.transparent : color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: color.withValues(alpha: 0.3),
+            color: isAmoled ? Colors.white : color.withOpacity(0.3),
             width: 1,
           ),
         ),
@@ -1064,16 +1309,23 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.15),
+                color: isAmoled ? Colors.transparent : color.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(14),
+                border: isAmoled ? Border.all(color: Colors.white) : null,
               ),
-              child: Icon(icon, color: color, size: 28),
+              child: Icon(
+                icon,
+                color: isAmoled
+                    ? Colors.white
+                    : (isLight ? Colors.black : color),
+                size: 28,
+              ),
             ),
             const SizedBox(height: 12),
             Text(
               title,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: isLight ? Colors.black : Colors.white,
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
               ),
@@ -1081,10 +1333,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
             const SizedBox(height: 4),
             Text(
               subtitle,
-              style: TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
             ),
           ],
         ),
@@ -1093,9 +1342,10 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
-    final isSmsTransaction = widget.transaction.smsBody != null && 
-                             widget.transaction.smsBody!.isNotEmpty;
-    
+    final isSmsTransaction =
+        widget.transaction.smsBody != null &&
+        widget.transaction.smsBody!.isNotEmpty;
+
     try {
       // Request camera or photos permission
       PermissionStatus status;
@@ -1165,7 +1415,8 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
         await receiptsDir.create(recursive: true);
       }
 
-      final fileName = 'receipt_${widget.transaction.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final fileName =
+          'receipt_${widget.transaction.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final savedPath = '${receiptsDir.path}/$fileName';
 
       // Copy file to app storage
@@ -1199,7 +1450,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
         _receiptBase64 = base64Image;
         _isSyncing = false;
       });
-      
+
       // Update and sync immediately
       _updateTransaction();
 
@@ -1210,9 +1461,11 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
               children: [
                 const Icon(Icons.check_circle_rounded, color: Colors.white),
                 const SizedBox(width: 12),
-                Text(isSmsTransaction 
-                    ? 'Receipt attached successfully!' 
-                    : 'Receipt attached and synced!'),
+                Text(
+                  isSmsTransaction
+                      ? 'Receipt attached successfully!'
+                      : 'Receipt attached and synced!',
+                ),
               ],
             ),
             backgroundColor: AppTheme.income,
@@ -1265,17 +1518,14 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
               icon: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: Colors.white.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(Icons.close, color: Colors.white, size: 20),
               ),
               onPressed: () => Navigator.pop(context),
             ),
-            title: const Text(
-              'Receipt',
-              style: TextStyle(color: Colors.white),
-            ),
+            title: const Text('Receipt', style: TextStyle(color: Colors.white)),
           ),
           body: InteractiveViewer(
             minScale: 0.5,
@@ -1313,6 +1563,12 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   }
 
   void _showRemoveReceiptDialog(BuildContext context) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -1320,8 +1576,9 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: AppTheme.surface,
+            color: isAmoled ? Colors.black : AppTheme.surface,
             borderRadius: BorderRadius.circular(24),
+            border: isAmoled ? Border.all(color: Colors.white) : null,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -1329,20 +1586,25 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppTheme.expense.withValues(alpha: 0.15),
+                  color: isAmoled
+                      ? Colors.transparent
+                      : AppTheme.expense.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(20),
+                  border: isAmoled ? Border.all(color: Colors.white) : null,
                 ),
                 child: Icon(
                   Icons.delete_forever_rounded,
-                  color: AppTheme.expense,
+                  color: isAmoled
+                      ? Colors.white
+                      : (isLight ? Colors.black : AppTheme.expense),
                   size: 40,
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 'Remove Receipt?',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isLight ? Colors.black : Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -1352,7 +1614,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                 'Are you sure you want to remove the attached receipt? This action cannot be undone.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: AppTheme.textSecondary,
+                  color: isLight ? Colors.black : AppTheme.textSecondary,
                   fontSize: 14,
                 ),
               ),
@@ -1365,14 +1627,19 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.1),
+                          color: isAmoled
+                              ? Colors.transparent
+                              : Colors.white.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
+                          border: isAmoled
+                              ? Border.all(color: Colors.white)
+                              : null,
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Text(
                             'Cancel',
                             style: TextStyle(
-                              color: Colors.white70,
+                              color: isLight ? Colors.black : Colors.white70,
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
@@ -1391,14 +1658,14 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: AppTheme.expense,
+                          color: isAmoled ? Colors.white : AppTheme.expense,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Text(
                             'Remove',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: isAmoled ? Colors.black : Colors.white,
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
@@ -1432,7 +1699,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
       _receiptPath = null;
       _receiptBase64 = null;
     });
-    
+
     // Update and sync immediately
     _updateTransaction();
 
@@ -1458,13 +1725,16 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   }
 
   Future<bool> _requestPermissions() async {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
     // Request both contacts and SMS permissions
     final contactsStatus = await Permission.contacts.status;
     final smsStatus = await Permission.sms.status;
-    
+
     bool contactsGranted = contactsStatus.isGranted;
     bool smsGranted = smsStatus.isGranted;
-    
+
     if (!contactsGranted || !smsGranted) {
       // Show permission dialog
       final result = await showDialog<bool>(
@@ -1475,10 +1745,12 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: AppTheme.surface,
+              color: isAmoled ? Colors.black : AppTheme.surface,
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: AppTheme.primary.withValues(alpha: 0.3),
+                color: isAmoled
+                    ? Colors.white
+                    : AppTheme.primary.withOpacity(0.3),
                 width: 1,
               ),
             ),
@@ -1488,17 +1760,21 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppTheme.primary.withValues(alpha: 0.2),
-                        AppTheme.primary.withValues(alpha: 0.1),
-                      ],
-                    ),
+                    color: isAmoled ? Colors.transparent : null,
+                    gradient: isAmoled
+                        ? null
+                        : LinearGradient(
+                            colors: [
+                              AppTheme.primary.withOpacity(0.2),
+                              AppTheme.primary.withOpacity(0.1),
+                            ],
+                          ),
                     borderRadius: BorderRadius.circular(20),
+                    border: isAmoled ? Border.all(color: Colors.white) : null,
                   ),
                   child: Icon(
                     Icons.people_alt_rounded,
-                    color: AppTheme.primary,
+                    color: isAmoled ? Colors.white : AppTheme.primary,
                     size: 40,
                   ),
                 ),
@@ -1515,10 +1791,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                 Text(
                   'To split bills with friends, we need access to:',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
                 ),
                 const SizedBox(height: 20),
                 // Permission items
@@ -1544,8 +1817,13 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.1),
+                            color: isAmoled
+                                ? Colors.transparent
+                                : Colors.white.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
+                            border: isAmoled
+                                ? Border.all(color: Colors.white)
+                                : null,
                           ),
                           child: const Center(
                             child: Text(
@@ -1567,26 +1845,31 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                AppTheme.primary,
-                                AppTheme.primary.withValues(alpha: 0.8),
-                              ],
-                            ),
+                            gradient: isAmoled
+                                ? null
+                                : LinearGradient(
+                                    colors: [
+                                      AppTheme.primary,
+                                      AppTheme.primary.withOpacity(0.8),
+                                    ],
+                                  ),
+                            color: isAmoled ? Colors.white : null,
                             borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.primary.withValues(alpha: 0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
+                            boxShadow: isAmoled
+                                ? null
+                                : [
+                                    BoxShadow(
+                                      color: AppTheme.primary.withOpacity(0.3),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Text(
                               'Allow',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: isAmoled ? Colors.black : Colors.white,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -1634,17 +1917,20 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
     required String description,
     required bool isGranted,
   }) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isGranted 
-            ? AppTheme.income.withValues(alpha: 0.1)
-            : AppTheme.background,
+        color: isGranted
+            ? AppTheme.income.withOpacity(0.1)
+            : (isAmoled ? Colors.transparent : AppTheme.background),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isGranted
-              ? AppTheme.income.withValues(alpha: 0.3)
-              : Colors.white.withValues(alpha: 0.1),
+              ? AppTheme.income.withOpacity(0.3)
+              : (isAmoled ? Colors.white : Colors.white.withOpacity(0.1)),
           width: 1,
         ),
       ),
@@ -1654,13 +1940,20 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: isGranted
-                  ? AppTheme.income.withValues(alpha: 0.2)
-                  : AppTheme.primary.withValues(alpha: 0.2),
+                  ? AppTheme.income.withOpacity(0.2)
+                  : (isAmoled
+                        ? Colors.transparent
+                        : AppTheme.primary.withOpacity(0.2)),
               borderRadius: BorderRadius.circular(10),
+              border: !isGranted && isAmoled
+                  ? Border.all(color: Colors.white)
+                  : null,
             ),
             child: Icon(
               icon,
-              color: isGranted ? AppTheme.income : AppTheme.primary,
+              color: isGranted
+                  ? AppTheme.income
+                  : (isAmoled ? Colors.white : AppTheme.primary),
               size: 20,
             ),
           ),
@@ -1679,10 +1972,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                 ),
                 Text(
                   description,
-                  style: TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
                 ),
               ],
             ),
@@ -1698,6 +1988,9 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   }
 
   void _showSettingsDialog(String permission) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -1705,15 +1998,16 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: AppTheme.surface,
+            color: isAmoled ? Colors.black : AppTheme.surface,
             borderRadius: BorderRadius.circular(24),
+            border: isAmoled ? Border.all(color: Colors.white) : null,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 Icons.settings_rounded,
-                color: Colors.amber,
+                color: isAmoled ? Colors.white : Colors.amber,
                 size: 48,
               ),
               const SizedBox(height: 16),
@@ -1729,10 +2023,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
               Text(
                 'Please enable $permission permission in Settings to use this feature.',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppTheme.textSecondary,
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
               ),
               const SizedBox(height: 20),
               GestureDetector(
@@ -1744,19 +2035,22 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppTheme.primary,
-                        AppTheme.primary.withValues(alpha: 0.8),
-                      ],
-                    ),
+                    gradient: isAmoled
+                        ? null
+                        : LinearGradient(
+                            colors: [
+                              AppTheme.primary,
+                              AppTheme.primary.withOpacity(0.8),
+                            ],
+                          ),
+                    color: isAmoled ? Colors.white : null,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Text(
                       'Open Settings',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: isAmoled ? Colors.black : Colors.white,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -1798,6 +2092,10 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
     final searchController = TextEditingController();
     List<Contact> filteredContacts = contacts;
 
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -1807,8 +2105,13 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
           return Container(
             height: MediaQuery.of(context).size.height * 0.85,
             decoration: BoxDecoration(
-              color: AppTheme.surface,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              color: isAmoled ? Colors.black : AppTheme.surface,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
+              border: isAmoled
+                  ? const Border(top: BorderSide(color: Colors.white))
+                  : null,
             ),
             child: Column(
               children: [
@@ -1817,7 +2120,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -1844,12 +2147,15 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: AppTheme.expense.withValues(alpha: 0.2),
+                              color: AppTheme.expense.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
                               NumberFormat.currency(
-                                symbol: Provider.of<MoneyProvider>(context, listen: false).currencySymbol,
+                                symbol: Provider.of<MoneyProvider>(
+                                  context,
+                                  listen: false,
+                                ).currencySymbol,
                                 decimalDigits: 0,
                               ).format(widget.transaction.amount),
                               style: const TextStyle(
@@ -1890,10 +2196,10 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: AppTheme.primary.withValues(alpha: 0.2),
+                            color: AppTheme.primary.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: AppTheme.primary.withValues(alpha: 0.4),
+                              color: AppTheme.primary.withOpacity(0.4),
                               width: 1,
                             ),
                           ),
@@ -1934,10 +2240,14 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
-                      color: AppTheme.background,
+                      color: isAmoled
+                          ? Colors.transparent
+                          : AppTheme.background,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.1),
+                        color: isAmoled
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.1),
                         width: 1,
                       ),
                     ),
@@ -1947,7 +2257,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                       decoration: InputDecoration(
                         hintText: 'Search contacts...',
                         hintStyle: TextStyle(
-                          color: AppTheme.textSecondary.withValues(alpha: 0.5),
+                          color: AppTheme.textSecondary.withOpacity(0.5),
                         ),
                         border: InputBorder.none,
                         icon: Icon(
@@ -2012,10 +2322,12 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                                       (c) => c.phone == phone,
                                     );
                                   } else {
-                                    selectedContacts.add(_SplitContact(
-                                      name: contact.displayName,
-                                      phone: phone,
-                                    ));
+                                    selectedContacts.add(
+                                      _SplitContact(
+                                        name: contact.displayName,
+                                        phone: phone,
+                                      ),
+                                    );
                                   }
                                 });
                               },
@@ -2024,12 +2336,12 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: isSelected
-                                      ? AppTheme.primary.withValues(alpha: 0.15)
+                                      ? AppTheme.primary.withOpacity(0.15)
                                       : AppTheme.background,
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
                                     color: isSelected
-                                        ? AppTheme.primary.withValues(alpha: 0.4)
+                                        ? AppTheme.primary.withOpacity(0.4)
                                         : Colors.transparent,
                                     width: 1,
                                   ),
@@ -2042,8 +2354,8 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                                       decoration: BoxDecoration(
                                         gradient: LinearGradient(
                                           colors: [
-                                            AppTheme.primary.withValues(alpha: 0.3),
-                                            AppTheme.primary.withValues(alpha: 0.1),
+                                            AppTheme.primary.withOpacity(0.3),
+                                            AppTheme.primary.withOpacity(0.1),
                                           ],
                                         ),
                                         borderRadius: BorderRadius.circular(12),
@@ -2051,7 +2363,8 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                                       child: Center(
                                         child: Text(
                                           contact.displayName.isNotEmpty
-                                              ? contact.displayName[0].toUpperCase()
+                                              ? contact.displayName[0]
+                                                    .toUpperCase()
                                               : '?',
                                           style: const TextStyle(
                                             color: Colors.white,
@@ -2119,10 +2432,13 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: AppTheme.background,
+                    color: isAmoled ? Colors.black : AppTheme.background,
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(20),
                     ),
+                    border: isAmoled
+                        ? const Border(top: BorderSide(color: Colors.white))
+                        : null,
                   ),
                   child: Column(
                     children: [
@@ -2153,33 +2469,32 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                         onTap: selectedContacts.isEmpty
                             ? null
                             : () => _sendSplitMessages(
-                                  context,
-                                  selectedContacts,
-                                  widget.transaction.amount /
-                                      (selectedContacts.length + 1),
-                                ),
+                                context,
+                                selectedContacts,
+                                widget.transaction.amount /
+                                    (selectedContacts.length + 1),
+                              ),
                         child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           decoration: BoxDecoration(
-                            gradient: selectedContacts.isEmpty
+                            gradient: (selectedContacts.isEmpty || isAmoled)
                                 ? null
                                 : LinearGradient(
                                     colors: [
                                       AppTheme.primary,
-                                      AppTheme.primary.withValues(alpha: 0.8),
+                                      AppTheme.primary.withOpacity(0.8),
                                     ],
                                   ),
                             color: selectedContacts.isEmpty
-                                ? Colors.white.withValues(alpha: 0.1)
-                                : null,
+                                ? Colors.white.withOpacity(0.1)
+                                : (isAmoled ? Colors.white : null),
                             borderRadius: BorderRadius.circular(14),
-                            boxShadow: selectedContacts.isEmpty
+                            boxShadow: (selectedContacts.isEmpty || isAmoled)
                                 ? null
                                 : [
                                     BoxShadow(
-                                      color:
-                                          AppTheme.primary.withValues(alpha: 0.3),
+                                      color: AppTheme.primary.withOpacity(0.3),
                                       blurRadius: 8,
                                       offset: const Offset(0, 4),
                                     ),
@@ -2230,13 +2545,17 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   ) async {
     Navigator.pop(context); // Close the sheet
 
-    final currencySymbol = Provider.of<MoneyProvider>(context, listen: false).currencySymbol;
+    final currencySymbol = Provider.of<MoneyProvider>(
+      context,
+      listen: false,
+    ).currencySymbol;
     final amountFormatted = NumberFormat.currency(
       symbol: currencySymbol,
       decimalDigits: 0,
     ).format(amountPerPerson);
 
-    final message = 'Hey! We split the bill for "${widget.transaction.title}". '
+    final message =
+        'Hey! We split the bill for "${widget.transaction.title}". '
         'Your share is $amountFormatted. '
         'Please pay when you can. - Sent via PennyWise';
 
@@ -2254,15 +2573,15 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
               ),
             ),
             const SizedBox(width: 12),
-            Text('Sending to ${contacts.length} contact${contacts.length > 1 ? 's' : ''}...'),
+            Text(
+              'Sending to ${contacts.length} contact${contacts.length > 1 ? 's' : ''}...',
+            ),
           ],
         ),
         backgroundColor: AppTheme.primary,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 1),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),
       ),
     );
@@ -2306,12 +2625,12 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
             ),
           ],
         ),
-        backgroundColor: successCount == contacts.length ? AppTheme.income : Colors.amber.shade700,
+        backgroundColor: successCount == contacts.length
+            ? AppTheme.income
+            : Colors.amber.shade700,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 3),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),
       ),
     );
@@ -2319,7 +2638,10 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
 
   void _showNotesSheet(BuildContext context) {
     final controller = TextEditingController(text: _notes ?? '');
-    
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -2331,8 +2653,11 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppTheme.surface,
+            color: isAmoled ? Colors.black : AppTheme.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            border: isAmoled
+                ? const Border(top: BorderSide(color: Colors.white))
+                : null,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -2343,7 +2668,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -2361,10 +2686,12 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppTheme.background,
+                  color: isAmoled ? Colors.transparent : AppTheme.background,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: AppTheme.primary.withValues(alpha: 0.3),
+                    color: isAmoled
+                        ? Colors.white
+                        : AppTheme.primary.withOpacity(0.3),
                     width: 1,
                   ),
                 ),
@@ -2372,14 +2699,11 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   controller: controller,
                   autofocus: true,
                   maxLines: 4,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                  ),
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
                   decoration: InputDecoration(
                     hintText: 'Enter notes about this transaction...',
                     hintStyle: TextStyle(
-                      color: AppTheme.textSecondary.withValues(alpha: 0.5),
+                      color: AppTheme.textSecondary.withOpacity(0.5),
                     ),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.zero,
@@ -2402,10 +2726,10 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           decoration: BoxDecoration(
-                            color: AppTheme.expense.withValues(alpha: 0.2),
+                            color: AppTheme.expense.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: AppTheme.expense.withValues(alpha: 0.4),
+                              color: AppTheme.expense.withOpacity(0.4),
                               width: 1,
                             ),
                           ),
@@ -2440,13 +2764,13 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                           gradient: LinearGradient(
                             colors: [
                               AppTheme.primary,
-                              AppTheme.primary.withValues(alpha: 0.8),
+                              AppTheme.primary.withOpacity(0.8),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: AppTheme.primary.withValues(alpha: 0.3),
+                              color: AppTheme.primary.withOpacity(0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
                             ),
@@ -2476,6 +2800,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   }
 
   void _showCategorySheet(BuildContext context, MoneyProvider provider) {
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -2483,8 +2808,11 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.6,
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: isAmoled ? Colors.black : AppTheme.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          border: isAmoled
+              ? const Border(top: BorderSide(color: Colors.white))
+              : null,
         ),
         child: Column(
           children: [
@@ -2493,7 +2821,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
+                color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -2533,23 +2861,42 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                         Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: isSelected 
-                                ? cat.color.withValues(alpha: 0.3)
-                                : cat.color.withValues(alpha: 0.15),
+                            color: isSelected
+                                ? (isAmoled
+                                      ? Colors.white
+                                      : cat.color.withOpacity(0.3))
+                                : (isAmoled
+                                      ? Colors.transparent
+                                      : cat.color.withOpacity(0.15)),
                             borderRadius: BorderRadius.circular(16),
-                            border: isSelected 
-                                ? Border.all(color: cat.color, width: 2)
-                                : null,
+                            border: Border.all(
+                              color: isAmoled
+                                  ? Colors.white
+                                  : (isSelected
+                                        ? cat.color
+                                        : Colors.transparent),
+                              width: isSelected ? 2 : 1,
+                            ),
                           ),
-                          child: Icon(cat.icon, color: cat.color, size: 26),
+                          child: Icon(
+                            cat.icon,
+                            color: isAmoled
+                                ? (isSelected ? Colors.black : Colors.white)
+                                : cat.color,
+                            size: 26,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           cat.name,
                           style: TextStyle(
-                            color: isSelected ? Colors.white : AppTheme.textSecondary,
+                            color: isSelected
+                                ? Colors.white
+                                : AppTheme.textSecondary,
                             fontSize: 11,
-                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.normal,
                           ),
                           textAlign: TextAlign.center,
                           maxLines: 1,
@@ -2568,14 +2915,18 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   }
 
   void _showOptionsSheet(BuildContext context, MoneyProvider provider) {
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: isAmoled ? Colors.black : AppTheme.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          border: isAmoled
+              ? const Border(top: BorderSide(color: Colors.white))
+              : null,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -2584,7 +2935,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
+                color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -2593,14 +2944,23 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
               leading: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppTheme.expense.withValues(alpha: 0.15),
+                  color: isAmoled
+                      ? Colors.transparent
+                      : AppTheme.expense.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(12),
+                  border: isAmoled ? Border.all(color: Colors.white) : null,
                 ),
-                child: Icon(Icons.delete_rounded, color: AppTheme.expense),
+                child: Icon(
+                  Icons.delete_rounded,
+                  color: isAmoled ? Colors.white : AppTheme.expense,
+                ),
               ),
               title: const Text(
                 'Delete Transaction',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               subtitle: Text(
                 'This action cannot be undone',
@@ -2619,12 +2979,21 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   }
 
   void _showDeleteConfirmation(BuildContext context, MoneyProvider provider) {
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Delete Transaction?', style: TextStyle(color: Colors.white)),
+        backgroundColor: isAmoled ? Colors.black : AppTheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: isAmoled
+              ? const BorderSide(color: Colors.white)
+              : BorderSide.none,
+        ),
+        title: const Text(
+          'Delete Transaction?',
+          style: TextStyle(color: Colors.white),
+        ),
         content: Text(
           'Are you sure you want to delete this transaction?',
           style: TextStyle(color: AppTheme.textSecondary),
@@ -2632,7 +3001,12 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: AppTheme.textSecondary)),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: isAmoled ? Colors.white70 : AppTheme.textSecondary,
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -2641,10 +3015,16 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
               Navigator.pop(context); // Go back
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.expense,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              backgroundColor: isAmoled ? Colors.white : AppTheme.expense,
+              foregroundColor: isAmoled ? Colors.black : Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: const Text(
+              'Delete',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),

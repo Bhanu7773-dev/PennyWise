@@ -38,22 +38,37 @@ class _LoansScreenState extends State<LoansScreen>
     final takenLoans = loans.where((l) => l.type == LoanType.taken).toList();
     final totalLent = provider.totalLent;
     final totalBorrowed = provider.totalBorrowed;
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F111A),
+      backgroundColor: isAmoled
+          ? Colors.black
+          : (isLight ? Colors.white : theme.scaffoldBackgroundColor),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isLight ? Colors.black : Colors.white,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Loans', style: TextStyle(color: Colors.white)),
+        title: Text(
+          'Loans',
+          style: TextStyle(color: isLight ? Colors.black : Colors.white),
+        ),
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppTheme.primary,
-          labelColor: AppTheme.primary,
-          unselectedLabelColor: Colors.white60,
+          indicatorColor: isAmoled || isLight
+              ? (isLight ? Colors.black : Colors.white)
+              : AppTheme.primary,
+          labelColor: isAmoled || isLight
+              ? (isLight ? Colors.black : Colors.white)
+              : AppTheme.primary,
+          unselectedLabelColor: isLight ? Colors.black54 : Colors.white60,
           tabs: const [
             Tab(text: 'Given (Lent)'),
             Tab(text: 'Taken (Borrowed)'),
@@ -76,8 +91,21 @@ class _LoansScreenState extends State<LoansScreen>
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddLoanDialog(context, provider),
-        backgroundColor: AppTheme.primary,
-        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: isAmoled
+            ? Colors.white
+            : (isLight ? Colors.white : AppTheme.primary),
+        shape: isLight
+            ? RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: const BorderSide(color: Colors.black),
+              )
+            : null,
+        child: Icon(
+          Icons.add,
+          color: isAmoled
+              ? Colors.black
+              : (isLight ? Colors.black : Colors.white),
+        ),
       ),
     );
   }
@@ -91,20 +119,30 @@ class _LoansScreenState extends State<LoansScreen>
     final currency = provider.currencySymbol;
     final netBalance = totalLent - totalBorrowed;
 
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppTheme.primary.withValues(alpha: 0.2),
-            const Color(0xFF2D3459).withValues(alpha: 0.2),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: isAmoled || isLight ? Colors.transparent : null,
+        gradient: isAmoled || isLight
+            ? null
+            : LinearGradient(
+                colors: [
+                  AppTheme.primary.withOpacity(0.2),
+                  const Color(0xFF2D3459).withOpacity(0.2),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: isLight
+            ? Border.all(color: Colors.black)
+            : Border.all(
+                color: isAmoled ? Colors.white : Colors.white.withOpacity(0.1),
+              ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -115,7 +153,9 @@ class _LoansScreenState extends State<LoansScreen>
               Text(
                 'Net Balance',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7),
+                  color: isLight
+                      ? Colors.black.withOpacity(0.7)
+                      : Colors.white.withOpacity(0.7),
                   fontSize: 14,
                 ),
               ),
@@ -126,7 +166,14 @@ class _LoansScreenState extends State<LoansScreen>
                   decimalDigits: 0,
                 ).format(netBalance),
                 style: TextStyle(
-                  color: netBalance >= 0 ? AppTheme.income : AppTheme.expense,
+                  color: isLight
+                      ? Colors
+                            .black // Monochrome
+                      : (isAmoled
+                            ? Colors.white
+                            : (netBalance >= 0
+                                  ? AppTheme.income
+                                  : AppTheme.expense)),
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
@@ -142,13 +189,19 @@ class _LoansScreenState extends State<LoansScreen>
                 centerSpaceRadius: 30,
                 sections: [
                   PieChartSectionData(
-                    color: AppTheme.expense,
+                    color: isLight
+                        ? Colors
+                              .black // Monochrome
+                        : (isAmoled ? Colors.white : AppTheme.expense),
                     value: totalLent > 0 ? totalLent : 1,
                     title: '',
                     radius: 15,
                   ),
                   PieChartSectionData(
-                    color: AppTheme.income,
+                    color: isLight
+                        ? Colors
+                              .black26 // Monochrome
+                        : (isAmoled ? Colors.white70 : AppTheme.income),
                     value: totalBorrowed > 0 ? totalBorrowed : 1,
                     title: '',
                     radius: 15,
@@ -176,7 +229,9 @@ class _LoansScreenState extends State<LoansScreen>
             Icon(
               type == LoanType.given ? Icons.outbond : Icons.call_received,
               size: 64,
-              color: Colors.white.withValues(alpha: 0.2),
+              color: provider.appThemeMode == AppThemeMode.light
+                  ? Colors.black26
+                  : Colors.white.withOpacity(0.2),
             ),
             const SizedBox(height: 16),
             Text(
@@ -184,7 +239,9 @@ class _LoansScreenState extends State<LoansScreen>
                   ? 'No loans given yet'
                   : 'No loans taken yet',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.5),
+                color: provider.appThemeMode == AppThemeMode.light
+                    ? Colors.black45
+                    : Colors.white.withOpacity(0.5),
                 fontSize: 16,
               ),
             ),
@@ -208,6 +265,8 @@ class _LoansScreenState extends State<LoansScreen>
     MoneyProvider provider,
     Loan loan,
   ) {
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     final currency = provider.currencySymbol;
     final progress = loan.progress;
     final isCompleted = loan.isCompleted;
@@ -218,13 +277,19 @@ class _LoansScreenState extends State<LoansScreen>
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.05),
+          color: isAmoled || isLight
+              ? Colors.transparent
+              : Colors.white.withOpacity(0.05),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isCompleted
-                ? Colors.green.withValues(alpha: 0.3)
-                : Colors.white.withValues(alpha: 0.05),
-          ),
+          border: isLight
+              ? Border.all(color: Colors.black)
+              : Border.all(
+                  color: isCompleted
+                      ? Colors.green.withOpacity(0.3)
+                      : (isAmoled
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.05)),
+                ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -235,8 +300,8 @@ class _LoansScreenState extends State<LoansScreen>
                 Expanded(
                   child: Text(
                     loan.title,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: isLight ? Colors.black : Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -251,9 +316,14 @@ class _LoansScreenState extends State<LoansScreen>
                         decimalDigits: 0,
                       ).format(loan.totalAmount),
                       style: TextStyle(
-                        color: loan.type == LoanType.given
-                            ? AppTheme.expense
-                            : AppTheme.income,
+                        color: isLight
+                            ? Colors
+                                  .black // Monochrome
+                            : (isAmoled
+                                  ? Colors.white
+                                  : (loan.type == LoanType.given
+                                        ? AppTheme.expense
+                                        : AppTheme.income)),
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -261,16 +331,17 @@ class _LoansScreenState extends State<LoansScreen>
                     const SizedBox(width: 8),
                     // Delete button
                     GestureDetector(
-                      onTap: () => _showDeleteLoanDialog(context, provider, loan),
+                      onTap: () =>
+                          _showDeleteLoanDialog(context, provider, loan),
                       child: Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: Colors.red.withValues(alpha: 0.1),
+                          color: Colors.red.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
                           Icons.delete_outline,
-                          color: Colors.red.withValues(alpha: 0.7),
+                          color: Colors.red.withOpacity(0.7),
                           size: 18,
                         ),
                       ),
@@ -286,14 +357,18 @@ class _LoansScreenState extends State<LoansScreen>
                 Text(
                   'Paid: ${NumberFormat.currency(symbol: currency, decimalDigits: 0).format(loan.paidAmount)}',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: isLight
+                        ? Colors.black.withOpacity(0.7)
+                        : Colors.white.withOpacity(0.7),
                     fontSize: 14,
                   ),
                 ),
                 Text(
                   'Remaining: ${NumberFormat.currency(symbol: currency, decimalDigits: 0).format(loan.remainingAmount)}',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: isLight
+                        ? Colors.black.withOpacity(0.7)
+                        : Colors.white.withOpacity(0.7),
                     fontSize: 14,
                   ),
                 ),
@@ -304,9 +379,15 @@ class _LoansScreenState extends State<LoansScreen>
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
                 value: progress,
-                backgroundColor: Colors.white.withValues(alpha: 0.1),
+                backgroundColor: isLight
+                    ? Colors.black.withOpacity(0.1)
+                    : Colors.white.withOpacity(0.1),
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  isCompleted ? Colors.green : AppTheme.primary,
+                  isCompleted
+                      ? (isLight ? Colors.black : Colors.green) // Monochrome
+                      : (isLight
+                            ? Colors.black54
+                            : (isAmoled ? Colors.white : AppTheme.primary)),
                 ),
                 minHeight: 8,
               ),
@@ -316,7 +397,9 @@ class _LoansScreenState extends State<LoansScreen>
               Text(
                 'Due: ${DateFormat('MMM d, y').format(loan.dueDate!)}',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
+                  color: isLight
+                      ? Colors.black.withOpacity(0.5)
+                      : Colors.white.withOpacity(0.5),
                   fontSize: 12,
                 ),
               ),
@@ -327,23 +410,44 @@ class _LoansScreenState extends State<LoansScreen>
     ).animate().fadeIn().slideX();
   }
 
-  void _showDeleteLoanDialog(BuildContext context, MoneyProvider provider, Loan loan) {
+  void _showDeleteLoanDialog(
+    BuildContext context,
+    MoneyProvider provider,
+    Loan loan,
+  ) {
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
-        title: const Text(
+        backgroundColor: isAmoled
+            ? Colors.black
+            : (isLight ? Colors.white : const Color(0xFF1E293B)),
+        shape: isAmoled || isLight
+            ? RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: isLight ? Colors.black : Colors.white),
+              )
+            : null,
+        title: Text(
           'Delete Loan?',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: isLight ? Colors.black : Colors.white),
         ),
         content: Text(
           'Are you sure you want to delete "${loan.title}"? This action cannot be undone.',
-          style: const TextStyle(color: Colors.white70),
+          style: TextStyle(color: isLight ? Colors.black54 : Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: isLight
+                    ? Colors.black54
+                    : (isAmoled ? Colors.white : null),
+              ),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -356,10 +460,7 @@ class _LoansScreenState extends State<LoansScreen>
                 ),
               );
             },
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -374,23 +475,42 @@ class _LoansScreenState extends State<LoansScreen>
         : LoanType.taken;
     DateTime? selectedDate;
 
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          backgroundColor: const Color(0xFF1E293B),
-          title: const Text('Add Loan', style: TextStyle(color: Colors.white)),
+          backgroundColor: isAmoled
+              ? Colors.black
+              : (isLight ? Colors.white : const Color(0xFF1E293B)),
+          shape: isAmoled || isLight
+              ? RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(
+                    color: isLight ? Colors.black : Colors.white,
+                  ),
+                )
+              : null,
+          title: Text(
+            'Add Loan',
+            style: TextStyle(color: isLight ? Colors.black : Colors.white),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: titleController,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
+                style: TextStyle(color: isLight ? Colors.black : Colors.white),
+                decoration: InputDecoration(
                   labelText: 'Title (e.g., Person Name)',
-                  labelStyle: TextStyle(color: Colors.white70),
+                  labelStyle: TextStyle(
+                    color: isLight ? Colors.black54 : Colors.white70,
+                  ),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white30),
+                    borderSide: BorderSide(
+                      color: isLight ? Colors.black26 : Colors.white30,
+                    ),
                   ),
                 ),
               ),
@@ -398,32 +518,55 @@ class _LoansScreenState extends State<LoansScreen>
               TextField(
                 controller: amountController,
                 keyboardType: TextInputType.number,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
+                style: TextStyle(color: isLight ? Colors.black : Colors.white),
+                decoration: InputDecoration(
                   labelText: 'Amount',
-                  labelStyle: TextStyle(color: Colors.white70),
+                  labelStyle: TextStyle(
+                    color: isLight ? Colors.black54 : Colors.white70,
+                  ),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white30),
+                    borderSide: BorderSide(
+                      color: isLight ? Colors.black26 : Colors.white30,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 16),
               Row(
                 children: [
-                  const Text('Type:', style: TextStyle(color: Colors.white70)),
+                  Text(
+                    'Type:',
+                    style: TextStyle(
+                      color: isLight ? Colors.black54 : Colors.white70,
+                    ),
+                  ),
                   const SizedBox(width: 16),
                   DropdownButton<LoanType>(
                     value: selectedType,
-                    dropdownColor: const Color(0xFF1E293B),
-                    style: const TextStyle(color: Colors.white),
-                    items: const [
+                    dropdownColor: isAmoled
+                        ? Colors.black
+                        : (isLight ? Colors.white : const Color(0xFF1E293B)),
+                    style: TextStyle(
+                      color: isLight ? Colors.black : Colors.white,
+                    ),
+                    items: [
                       DropdownMenuItem(
                         value: LoanType.given,
-                        child: Text('Given (Lent)'),
+                        child: Text(
+                          'Given (Lent)',
+                          style: TextStyle(
+                            color: isLight ? Colors.black : Colors.white,
+                          ),
+                        ),
                       ),
                       DropdownMenuItem(
                         value: LoanType.taken,
-                        child: Text('Taken (Borrowed)'),
+                        child: Text(
+                          'Taken (Borrowed)',
+                          style: TextStyle(
+                            color: isLight ? Colors.black : Colors.white,
+                          ),
+                        ),
                       ),
                     ],
                     onChanged: (val) {
@@ -439,11 +582,13 @@ class _LoansScreenState extends State<LoansScreen>
                   selectedDate == null
                       ? 'Select Due Date (Optional)'
                       : 'Due: ${DateFormat('MMM d, y').format(selectedDate!)}',
-                  style: const TextStyle(color: Colors.white70),
+                  style: TextStyle(
+                    color: isLight ? Colors.black54 : Colors.white70,
+                  ),
                 ),
-                trailing: const Icon(
+                trailing: Icon(
                   Icons.calendar_today,
-                  color: Colors.white70,
+                  color: isLight ? Colors.black54 : Colors.white70,
                 ),
                 onTap: () async {
                   final date = await showDatePicker(
@@ -460,7 +605,14 @@ class _LoansScreenState extends State<LoansScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: isLight
+                      ? Colors.black54
+                      : (isAmoled ? Colors.white : null),
+                ),
+              ),
             ),
             ElevatedButton(
               onPressed: () {
@@ -482,9 +634,18 @@ class _LoansScreenState extends State<LoansScreen>
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
+                backgroundColor: isAmoled || isLight
+                    ? (isLight ? Colors.white : Colors.white)
+                    : AppTheme.primary,
+                foregroundColor: isAmoled || isLight
+                    ? Colors.black
+                    : Colors.white,
+                side: isLight ? const BorderSide(color: Colors.black) : null,
               ),
-              child: const Text('Save', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                'Save',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
@@ -501,31 +662,47 @@ class _LoansScreenState extends State<LoansScreen>
       text: loan.paidAmount.toStringAsFixed(0),
     );
 
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: isAmoled
+            ? Colors.black
+            : (isLight ? Colors.white : const Color(0xFF1E293B)),
+        shape: isAmoled || isLight
+            ? RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: isLight ? Colors.black : Colors.white),
+              )
+            : null,
         title: Text(
           'Update ${loan.title}',
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: isLight ? Colors.black : Colors.white),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               'Total Amount: ${provider.currencySymbol}${loan.totalAmount}',
-              style: const TextStyle(color: Colors.white70),
+              style: TextStyle(
+                color: isLight ? Colors.black54 : Colors.white70,
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: paidController,
               keyboardType: TextInputType.number,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
+              style: TextStyle(color: isLight ? Colors.black : Colors.white),
+              decoration: InputDecoration(
                 labelText: 'Paid Amount',
-                labelStyle: TextStyle(color: Colors.white70),
+                labelStyle: TextStyle(
+                  color: isLight ? Colors.black54 : Colors.white70,
+                ),
                 enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white30),
+                  borderSide: BorderSide(
+                    color: isLight ? Colors.black26 : Colors.white30,
+                  ),
                 ),
               ),
             ),
@@ -534,7 +711,14 @@ class _LoansScreenState extends State<LoansScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: isLight
+                    ? Colors.black54
+                    : (isAmoled ? Colors.white : null),
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -545,8 +729,19 @@ class _LoansScreenState extends State<LoansScreen>
                 Navigator.pop(context);
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary),
-            child: const Text('Update', style: TextStyle(color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isAmoled || isLight
+                  ? (isLight ? Colors.white : Colors.white)
+                  : AppTheme.primary,
+              foregroundColor: isAmoled || isLight
+                  ? Colors.black
+                  : Colors.white,
+              side: isLight ? const BorderSide(color: Colors.black) : null,
+            ),
+            child: const Text(
+              'Update',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),

@@ -36,24 +36,35 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
       }).toList();
     }
 
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0F111A),
+      backgroundColor: isAmoled
+          ? Colors.black
+          : (isLight ? Colors.white : theme.scaffoldBackgroundColor),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isLight ? Colors.black : Colors.white,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: _isSearching
             ? TextField(
                 controller: _searchController,
                 autofocus: true,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: isLight ? Colors.black : Colors.white),
                 decoration: InputDecoration(
                   hintText: 'Search categories...',
                   hintStyle: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.3),
+                    color: isLight
+                        ? Colors.black.withOpacity(0.3)
+                        : Colors.white.withOpacity(0.3),
                   ),
                   border: InputBorder.none,
                 ),
@@ -63,15 +74,15 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                   });
                 },
               )
-            : const Text(
+            : Text(
                 'Manage Categories',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: isLight ? Colors.black : Colors.white),
               ),
         actions: [
           IconButton(
             icon: Icon(
               _isSearching ? Icons.close : Icons.search,
-              color: Colors.white,
+              color: isLight ? Colors.black : Colors.white,
             ),
             onPressed: () {
               setState(() {
@@ -89,15 +100,9 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF0F111A),
-              const Color(0xFF1A1F38),
-              const Color(0xFF0F111A),
-            ],
-          ),
+          color: isAmoled
+              ? Colors.black
+              : (isLight ? Colors.transparent : theme.scaffoldBackgroundColor),
         ),
         child: Column(
           children: [
@@ -190,19 +195,31 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: () => _showAddCategoryDialog(context, provider),
-                  icon: const Icon(Icons.add, color: AppTheme.primary),
-                  label: const Text(
-                    'Add New Category',
-                    style: TextStyle(
-                      color: AppTheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    side: const BorderSide(color: AppTheme.primary, width: 2),
+                    side: BorderSide(
+                      color: isAmoled || isLight
+                          ? (isLight ? Colors.black : Colors.white)
+                          : AppTheme.primary,
+                      width: 2,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  icon: Icon(
+                    Icons.add,
+                    color: isAmoled || isLight
+                        ? (isLight ? Colors.black : Colors.white)
+                        : AppTheme.primary,
+                  ),
+                  label: Text(
+                    'Add New Category',
+                    style: TextStyle(
+                      color: isAmoled || isLight
+                          ? (isLight ? Colors.black : Colors.white)
+                          : AppTheme.primary,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -224,28 +241,45 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
     required VoidCallback onExpand,
     required VoidCallback onAddSubcategory,
   }) {
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isExpanded
-            ? category.color.withValues(alpha: 0.15)
-            : Colors.white.withValues(alpha: 0.05),
+        color: isAmoled || isLight
+            ? Colors.transparent
+            : (isExpanded
+                  ? category.color.withOpacity(0.15)
+                  : Colors.white.withOpacity(0.05)),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isExpanded
-              ? category.color.withValues(alpha: 0.3)
-              : Colors.white.withValues(alpha: 0.1),
-        ),
+        border: isLight
+            ? Border.all(color: Colors.black)
+            : Border.all(
+                color: isAmoled
+                    ? Colors.white
+                    : (isExpanded
+                          ? category.color.withOpacity(0.3)
+                          : Colors.white.withOpacity(0.1)),
+              ),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: category.color.withValues(alpha: 0.2),
+              color: isAmoled || isLight
+                  ? (isLight ? Colors.transparent : Colors.white)
+                  : category.color.withOpacity(0.2),
               shape: BoxShape.circle,
+              border: isLight ? Border.all(color: Colors.black) : null,
             ),
-            child: Icon(category.icon, color: category.color, size: 20),
+            child: Icon(
+              category.icon,
+              color: isLight
+                  ? Colors.black
+                  : (isAmoled ? Colors.black : category.color),
+              size: 20,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -254,8 +288,8 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
               children: [
                 Text(
                   category.name,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: isLight ? Colors.black : Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -264,7 +298,9 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                   Text(
                     '${provider.getSubcategories(category.id).length} subcategories',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.5),
+                      color: isLight
+                          ? Colors.black.withOpacity(0.5)
+                          : Colors.white.withOpacity(0.5),
                       fontSize: 12,
                     ),
                   ),
@@ -275,7 +311,9 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
           IconButton(
             icon: Icon(
               Icons.add_circle_outline,
-              color: category.color.withValues(alpha: 0.7),
+              color: isAmoled || isLight
+                  ? (isLight ? Colors.black : Colors.white70)
+                  : category.color.withOpacity(0.7),
             ),
             onPressed: onAddSubcategory,
             tooltip: 'Add subcategory',
@@ -291,8 +329,10 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                     ? Icons.keyboard_arrow_down
                     : Icons.chevron_right,
                 color: hasSubcategories
-                    ? Colors.white
-                    : Colors.white.withValues(alpha: 0.3),
+                    ? (isLight ? Colors.black : Colors.white)
+                    : (isLight
+                          ? Colors.black.withOpacity(0.3)
+                          : Colors.white.withOpacity(0.3)),
               ),
             ),
           ),
@@ -311,7 +351,9 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
               padding: const EdgeInsets.all(8),
               child: Icon(
                 Icons.drag_handle,
-                color: Colors.white.withValues(alpha: 0.5),
+                color: isLight
+                    ? Colors.black.withOpacity(0.5)
+                    : Colors.white.withOpacity(0.5),
                 size: 24,
               ),
             ),
@@ -327,6 +369,8 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
     required Color parentColor,
     required bool isLast,
   }) {
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     return Container(
       margin: const EdgeInsets.only(left: 24, top: 8),
       child: Row(
@@ -339,7 +383,9 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                 Container(
                   width: 2,
                   height: 28,
-                  color: parentColor.withValues(alpha: 0.3),
+                  color: isAmoled || isLight
+                      ? (isLight ? Colors.black26 : Colors.white24)
+                      : parentColor.withOpacity(0.3),
                 ),
               ],
             ),
@@ -348,21 +394,34 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.03),
+                color: isAmoled || isLight
+                    ? Colors.transparent
+                    : Colors.white.withOpacity(0.03),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                border: isLight
+                    ? Border.all(color: Colors.black)
+                    : Border.all(
+                        color: isAmoled
+                            ? Colors.white30
+                            : Colors.white.withOpacity(0.08),
+                      ),
               ),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: subcategory.color.withValues(alpha: 0.2),
+                      color: isAmoled || isLight
+                          ? (isLight ? Colors.transparent : Colors.white24)
+                          : subcategory.color.withOpacity(0.2),
                       shape: BoxShape.circle,
+                      border: isLight ? Border.all(color: Colors.black) : null,
                     ),
                     child: Icon(
                       subcategory.icon,
-                      color: subcategory.color,
+                      color: isLight
+                          ? Colors.black
+                          : (isAmoled ? Colors.white : subcategory.color),
                       size: 16,
                     ),
                   ),
@@ -370,8 +429,8 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                   Expanded(
                     child: Text(
                       subcategory.name,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: isLight ? Colors.black : Colors.white,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -403,24 +462,45 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
     Category category,
   ) {
     final isParent = category.hasSubcategories;
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
-        title: const Text(
+        backgroundColor: isAmoled
+            ? Colors.black
+            : (isLight ? Colors.white : const Color(0xFF1E293B)),
+        shape: isAmoled || isLight
+            ? RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: isLight ? Colors.black : Colors.white),
+              )
+            : null,
+        title: Text(
           'Delete Category?',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: isLight ? Colors.black : Colors.white),
         ),
         content: Text(
           isParent
               ? 'Are you sure you want to delete "${category.name}" and all its subcategories?'
               : 'Are you sure you want to delete "${category.name}"?',
-          style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+          style: TextStyle(
+            color: isLight
+                ? Colors.black.withOpacity(0.7)
+                : Colors.white.withOpacity(0.7),
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: isLight
+                    ? Colors.black.withOpacity(0.7)
+                    : (isAmoled ? Colors.white70 : null),
+              ),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -596,20 +676,42 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
       Colors.blueGrey,
     ];
 
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
+
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          backgroundColor: const Color(0xFF1E293B),
+          backgroundColor: isAmoled
+              ? Colors.black
+              : (isLight ? Colors.white : const Color(0xFF1E293B)),
+          shape: isAmoled || isLight
+              ? RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(
+                    color: isLight ? Colors.black : Colors.white,
+                  ),
+                )
+              : null,
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: const TextStyle(color: Colors.white)),
+              Text(
+                title,
+                style: TextStyle(color: isLight ? Colors.black : Colors.white),
+              ),
               if (subtitle != null)
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.5),
+                    color: isLight
+                        ? Colors.black.withOpacity(0.5)
+                        : Colors.white.withOpacity(0.5),
                     fontSize: 14,
                     fontWeight: FontWeight.normal,
                   ),
@@ -625,26 +727,38 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                 children: [
                   TextField(
                     controller: nameController,
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(
+                      color: isLight ? Colors.black : Colors.white,
+                    ),
                     decoration: InputDecoration(
                       labelText: 'Category Name',
                       labelStyle: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.5),
+                        color: isLight
+                            ? Colors.black.withOpacity(0.5)
+                            : Colors.white.withOpacity(0.5),
                       ),
                       enabledBorder: UnderlineInputBorder(
                         borderSide: BorderSide(
-                          color: Colors.white.withValues(alpha: 0.3),
+                          color: isLight
+                              ? Colors.black.withOpacity(0.3)
+                              : Colors.white.withOpacity(0.3),
                         ),
                       ),
-                      focusedBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(color: AppTheme.primary),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: isAmoled || isLight
+                              ? (isLight ? Colors.black : Colors.white)
+                              : AppTheme.primary,
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'Select Icon',
-                    style: TextStyle(color: Colors.white70),
+                    style: TextStyle(
+                      color: isLight ? Colors.black54 : Colors.white70,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   SizedBox(
@@ -666,19 +780,27 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? selectedColor
-                                  : Colors.white.withValues(alpha: 0.1),
+                                  : (isLight
+                                        ? Colors.black.withOpacity(0.1)
+                                        : Colors.white.withOpacity(0.1)),
                               shape: BoxShape.circle,
                             ),
-                            child: Icon(icon, color: Colors.white, size: 18),
+                            child: Icon(
+                              icon,
+                              color: isLight ? Colors.black : Colors.white,
+                              size: 18,
+                            ),
                           ),
                         );
                       },
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'Select Color',
-                    style: TextStyle(color: Colors.white70),
+                    style: TextStyle(
+                      color: isLight ? Colors.black54 : Colors.white70,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Wrap(
@@ -695,7 +817,12 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                             color: color,
                             shape: BoxShape.circle,
                             border: isSelected
-                                ? Border.all(color: Colors.white, width: 2)
+                                ? Border.all(
+                                    color: isLight
+                                        ? Colors.black
+                                        : Colors.white,
+                                    width: 2,
+                                  )
                                 : null,
                           ),
                           child: isSelected
@@ -716,7 +843,14 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: isLight
+                      ? Colors.black54
+                      : (isAmoled ? Colors.white70 : null),
+                ),
+              ),
             ),
             ElevatedButton(
               onPressed: () {
@@ -726,9 +860,18 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
+                backgroundColor: isAmoled || isLight
+                    ? (isLight ? Colors.white : Colors.white)
+                    : AppTheme.primary,
+                foregroundColor: isAmoled || isLight
+                    ? Colors.black
+                    : Colors.white,
+                side: isLight ? const BorderSide(color: Colors.black) : null,
               ),
-              child: const Text('Add', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                'Add',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),

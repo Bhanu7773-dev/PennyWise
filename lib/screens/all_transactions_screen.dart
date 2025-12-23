@@ -20,11 +20,17 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<MoneyProvider>(context);
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     final transactions = _getFilteredTransactions(provider.transactions);
     final groupedTransactions = _groupTransactionsByDate(transactions);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F111A),
+      backgroundColor: isAmoled
+          ? Colors.black
+          : (isLight
+                ? Colors.white
+                : Theme.of(context).scaffoldBackgroundColor),
       body: SafeArea(
         child: Column(
           children: [
@@ -54,6 +60,9 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final provider = Provider.of<MoneyProvider>(context, listen: false);
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -63,10 +72,26 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: isAmoled
+                    ? Colors.transparent
+                    : (isLight
+                          ? Colors.transparent
+                          : Theme.of(context).cardColor),
                 borderRadius: BorderRadius.circular(12),
+                border: isAmoled
+                    ? Border.all(color: Colors.white)
+                    : (isLight
+                          ? Border.all(
+                              color: Colors.black.withOpacity(0.1),
+                            )
+                          : null),
               ),
-              child: const Icon(Icons.arrow_back, color: Colors.white),
+              child: Icon(
+                Icons.arrow_back,
+                color: isLight
+                    ? Colors.black
+                    : Theme.of(context).iconTheme.color,
+              ),
             ),
           ),
           const SizedBox(width: 16),
@@ -77,7 +102,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
               child: Text(
                 'History',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).textTheme.titleLarge?.color,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
@@ -90,6 +115,9 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
   }
 
   Widget _buildDateSelector() {
+    final provider = Provider.of<MoneyProvider>(context, listen: false);
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     return Container(
       height: 60,
       margin: const EdgeInsets.only(bottom: 16),
@@ -114,18 +142,30 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? const Color(0xFF6366F1)
-                    : Colors.white.withValues(alpha: 0.05),
+                    ? (isAmoled
+                          ? Colors.white
+                          : (isLight
+                                ? Colors.transparent
+                                : const Color(0xFF6366F1)))
+                    : Colors.white.withOpacity(0.05),
                 borderRadius: BorderRadius.circular(30),
                 border: Border.all(
                   color: isSelected
-                      ? const Color(0xFF6366F1)
-                      : Colors.white.withValues(alpha: 0.1),
+                      ? (isAmoled
+                            ? Colors.white
+                            : (isLight
+                                  ? Colors.black
+                                  : const Color(0xFF6366F1)))
+                      : (isAmoled
+                            ? Colors.white.withOpacity(0.3)
+                            : (isLight
+                                  ? Colors.black.withOpacity(0.1)
+                                  : Colors.white.withOpacity(0.1))),
                 ),
-                boxShadow: isSelected
+                boxShadow: isSelected && !isAmoled && !isLight
                     ? [
                         BoxShadow(
-                          color: const Color(0xFF6366F1).withValues(alpha: 0.4),
+                          color: const Color(0xFF6366F1).withOpacity(0.4),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -137,8 +177,13 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                 DateFormat('MMM yyyy').format(date),
                 style: TextStyle(
                   color: isSelected
-                      ? Colors.white
-                      : Colors.white.withValues(alpha: 0.6),
+                      ? (isAmoled
+                            ? Colors.black
+                            : (isLight ? Colors.black : Colors.white))
+                      : (isAmoled
+                            ? Colors.white70
+                            : Theme.of(context).textTheme.bodyMedium?.color
+                                  ?.withOpacity(0.6)),
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 ),
@@ -163,7 +208,9 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
           child: Text(
             date,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.5),
+              color: Theme.of(
+                context,
+              ).textTheme.bodySmall?.color?.withOpacity(0.5),
               fontSize: 14,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.0,
@@ -193,25 +240,43 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
       ),
     );
 
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1F38),
+        color: isAmoled || isLight
+            ? Colors.transparent
+            : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        border: Border.all(
+          color: isAmoled
+              ? Colors.white
+              : (isLight
+                    ? Colors.black.withOpacity(0.5)
+                    : Theme.of(context).dividerColor.withOpacity(0.05)),
+        ),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Color(category.colorValue).withValues(alpha: 0.1),
+              color: isAmoled
+                  ? Colors.transparent
+                  : Color(category.colorValue).withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
+              border: isAmoled
+                  ? Border.all(color: Colors.white.withOpacity(0.2))
+                  : (isLight
+                        ? Border.all(color: Colors.black.withOpacity(0.1))
+                        : null),
             ),
             child: Icon(
               IconData(category.iconCode, fontFamily: 'MaterialIcons'),
-              color: Color(category.colorValue),
+              color: isAmoled ? Colors.white : Color(category.colorValue),
               size: 24,
             ),
           ),
@@ -222,8 +287,8 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
               children: [
                 Text(
                   category.name,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.titleMedium?.color,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -233,7 +298,9 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
                   Text(
                     '${tx.bankName} • ${tx.accountLast4 ?? "Cash"}',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.5),
+                      color: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.color?.withOpacity(0.5),
                       fontSize: 12,
                     ),
                   ),
@@ -247,7 +314,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
               Text(
                 '${isExpense ? "-" : "+"}${provider.currencySymbol}${NumberFormat('#,##0').format(tx.amount)}',
                 style: TextStyle(
-                  color: color,
+                  color: isAmoled ? Colors.white : color,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -256,7 +323,9 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
               Text(
                 DateFormat('hh:mm a').format(tx.date),
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
+                  color: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.color?.withOpacity(0.5),
                   fontSize: 12,
                 ),
               ),
@@ -275,13 +344,13 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
           Icon(
             Icons.history_toggle_off,
             size: 64,
-            color: Colors.white.withValues(alpha: 0.2),
+            color: Colors.white.withOpacity(0.2),
           ),
           const SizedBox(height: 16),
           Text(
             'No transactions found',
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.5),
+              color: Colors.white.withOpacity(0.5),
               fontSize: 16,
             ),
           ),

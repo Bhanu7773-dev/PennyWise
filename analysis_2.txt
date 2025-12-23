@@ -1,0 +1,11 @@
+Analyzing transaction_detail_screen.dart...                     
+
+   info • 'activeColor' is deprecated and shouldn't be used. Use activeThumbColor instead. This feature was deprecated after v3.31.0-2.0.pre • lib/screens/transaction_detail_screen.dart:469:29 • deprecated_member_use
+   info • 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion • lib/screens/transaction_detail_screen.dart:740:33 • deprecated_member_use
+   info • Don't use 'BuildContext's across async gaps • lib/screens/transaction_detail_screen.dart:1628:9 • use_build_context_synchronously
+   info • Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check • lib/screens/transaction_detail_screen.dart:1968:30 • use_build_context_synchronously
+   info • Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check • lib/screens/transaction_detail_screen.dart:1985:7 • use_build_context_synchronously
+   info • Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check • lib/screens/transaction_detail_screen.dart:2490:26 • use_build_context_synchronously
+   info • Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check • lib/screens/transaction_detail_screen.dart:2491:26 • use_build_context_synchronously
+
+7 issues found. (ran in 4.4s)

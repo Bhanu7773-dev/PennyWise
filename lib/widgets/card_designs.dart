@@ -30,10 +30,10 @@ class GlassmorphismHeader extends StatelessWidget {
               height: 150,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.2),
+                color: Colors.white.withOpacity(0.2),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: Colors.white.withOpacity(0.2),
                     blurRadius: 50,
                     spreadRadius: 20,
                   ),
@@ -49,10 +49,8 @@ class GlassmorphismHeader extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.2),
-                  ),
+                  color: Colors.white.withOpacity(0.1),
+                  border: Border.all(color: Colors.white.withOpacity(0.2)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,7 +63,7 @@ class GlassmorphismHeader extends StatelessWidget {
                         Text(
                           'PREMIUM',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
+                            color: Colors.white.withOpacity(0.8),
                             fontWeight: FontWeight.bold,
                             letterSpacing: 2.0,
                           ),
@@ -78,7 +76,7 @@ class GlassmorphismHeader extends StatelessWidget {
                         Text(
                           'Total Balance',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: Colors.white.withOpacity(0.7),
                             fontSize: 14,
                           ),
                         ),
@@ -153,7 +151,7 @@ class NeoGradientHeader extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFF00CC).withValues(alpha: 0.4),
+            color: const Color(0xFFFF00CC).withOpacity(0.4),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -172,7 +170,7 @@ class NeoGradientHeader extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.2),
+                  color: Colors.black.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Text(
@@ -186,7 +184,7 @@ class NeoGradientHeader extends StatelessWidget {
               ),
               Icon(
                 Icons.blur_on,
-                color: Colors.white.withValues(alpha: 0.8),
+                color: Colors.white.withOpacity(0.8),
                 size: 32,
               ),
             ],
@@ -209,7 +207,7 @@ class NeoGradientHeader extends StatelessWidget {
               Text(
                 'Available Funds',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.8),
+                  color: Colors.white.withOpacity(0.8),
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
@@ -234,7 +232,7 @@ class DigitalWalletHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1E1E1E),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
       ),
       child: Row(
         children: [
@@ -246,7 +244,7 @@ class DigitalWalletHeader extends StatelessWidget {
                 Text(
                   'NET WORTH',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.4),
+                    color: Colors.white.withOpacity(0.4),
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.5,
@@ -278,7 +276,7 @@ class DigitalWalletHeader extends StatelessWidget {
           Container(
             width: 1,
             height: 100,
-            color: Colors.white.withValues(alpha: 0.1),
+            color: Colors.white.withOpacity(0.1),
           ),
           const SizedBox(width: 24),
           Column(
@@ -306,7 +304,7 @@ class DigitalWalletHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
@@ -348,12 +346,10 @@ class CommandCenterHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.black,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          color: const Color(0xFF00FF00).withValues(alpha: 0.5),
-        ),
+        border: Border.all(color: const Color(0xFF00FF00).withOpacity(0.5)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF00FF00).withValues(alpha: 0.1),
+            color: const Color(0xFF00FF00).withOpacity(0.1),
             blurRadius: 10,
           ),
         ],
@@ -396,7 +392,7 @@ class CommandCenterHeader extends StatelessWidget {
                       Text(
                         'CURRENT BALANCE',
                         style: TextStyle(
-                          color: const Color(0xFF00FF00).withValues(alpha: 0.7),
+                          color: const Color(0xFF00FF00).withOpacity(0.7),
                           fontFamily: 'Courier',
                           fontSize: 14,
                           letterSpacing: 2.0,
@@ -443,7 +439,7 @@ class CommandCenterHeader extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: const Color(0xFF00FF00).withValues(alpha: 0.7),
+            color: const Color(0xFF00FF00).withOpacity(0.7),
             fontFamily: 'Courier',
             fontSize: 10,
           ),
@@ -466,7 +462,7 @@ class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF00FF00).withValues(alpha: 0.1)
+      ..color = const Color(0xFF00FF00).withOpacity(0.1)
       ..strokeWidth = 1;
     const step = 20.0;
     for (double x = 0; x < size.width; x += step) {
@@ -500,7 +496,7 @@ class GoldenStandardHeader extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFBF953F).withValues(alpha: 0.4),
+            color: const Color(0xFFBF953F).withOpacity(0.4),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -516,17 +512,13 @@ class GoldenStandardHeader extends StatelessWidget {
               Text(
                 'ROYAL CARD',
                 style: TextStyle(
-                  color: Colors.black.withValues(alpha: 0.6),
+                  color: Colors.black.withOpacity(0.6),
                   fontWeight: FontWeight.bold,
                   letterSpacing: 2.0,
                   fontSize: 12,
                 ),
               ),
-              Icon(
-                Icons.stars,
-                color: Colors.black.withValues(alpha: 0.6),
-                size: 24,
-              ),
+              Icon(Icons.stars, color: Colors.black.withOpacity(0.6), size: 24),
             ],
           ),
           Center(
@@ -587,12 +579,12 @@ class CyberpunkNeonHeader extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.cyanAccent.withValues(alpha: 0.2),
+            color: Colors.cyanAccent.withOpacity(0.2),
             blurRadius: 15,
             offset: const Offset(0, -5),
           ),
           BoxShadow(
-            color: Colors.purpleAccent.withValues(alpha: 0.2),
+            color: Colors.purpleAccent.withOpacity(0.2),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -606,14 +598,14 @@ class CyberpunkNeonHeader extends StatelessWidget {
             left: 0,
             right: 0,
             height: 1,
-            child: Container(color: Colors.white.withValues(alpha: 0.1)),
+            child: Container(color: Colors.white.withOpacity(0.1)),
           ),
           Positioned(
             bottom: 60,
             left: 0,
             right: 0,
             height: 1,
-            child: Container(color: Colors.white.withValues(alpha: 0.1)),
+            child: Container(color: Colors.white.withOpacity(0.1)),
           ),
           Padding(
             padding: const EdgeInsets.all(24),
@@ -728,7 +720,7 @@ class NatureWalletHeader extends StatelessWidget {
             child: Icon(
               Icons.eco,
               size: 200,
-              color: Colors.white.withValues(alpha: 0.1),
+              color: Colors.white.withOpacity(0.1),
             ),
           ),
           Padding(
@@ -741,13 +733,13 @@ class NatureWalletHeader extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.water_drop,
-                      color: Colors.white.withValues(alpha: 0.8),
+                      color: Colors.white.withOpacity(0.8),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'EcoBalance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
+                        color: Colors.white.withOpacity(0.9),
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -771,7 +763,7 @@ class NatureWalletHeader extends StatelessWidget {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Text(
@@ -805,7 +797,7 @@ class FuturisticCircuitHeader extends StatelessWidget {
         color: const Color(0xFF0F2027),
         boxShadow: [
           BoxShadow(
-            color: Colors.blueAccent.withValues(alpha: 0.2),
+            color: Colors.blueAccent.withOpacity(0.2),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -823,7 +815,7 @@ class FuturisticCircuitHeader extends StatelessWidget {
                 Text(
                   'FUTURISTIC',
                   style: TextStyle(
-                    color: Colors.cyanAccent.withValues(alpha: 0.8),
+                    color: Colors.cyanAccent.withOpacity(0.8),
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                     letterSpacing: 2.0,
@@ -854,7 +846,7 @@ class CircuitPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.cyanAccent.withValues(alpha: 0.4)
+      ..color = Colors.cyanAccent.withOpacity(0.4)
       ..strokeWidth = 2;
     // Draw some circuit lines
     for (double y = 20; y < size.height; y += 40) {
@@ -901,12 +893,12 @@ class MetallicPlatinumHeader extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
+            color: Colors.black.withOpacity(0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
           BoxShadow(
-            color: Colors.white.withValues(alpha: 0.5),
+            color: Colors.white.withOpacity(0.5),
             blurRadius: 10,
             offset: const Offset(-5, -5),
           ),
@@ -942,7 +934,7 @@ class MetallicPlatinumHeader extends StatelessWidget {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.3),
+                            color: Colors.black.withOpacity(0.3),
                             blurRadius: 4,
                             offset: const Offset(2, 2),
                           ),
@@ -973,7 +965,7 @@ class MetallicPlatinumHeader extends StatelessWidget {
                     Text(
                       'BALANCE',
                       style: TextStyle(
-                        color: Colors.black.withValues(alpha: 0.5),
+                        color: Colors.black.withOpacity(0.5),
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
@@ -1039,7 +1031,7 @@ class BrushedMetalPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.03)
+      ..color = Colors.white.withOpacity(0.03)
       ..strokeWidth = 0.5;
 
     for (double y = 0; y < size.height; y += 2) {
@@ -1078,7 +1070,7 @@ class HolographicAuroraHeader extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF667eea).withValues(alpha: 0.5),
+            color: const Color(0xFF667eea).withOpacity(0.5),
             blurRadius: 30,
             offset: const Offset(0, 15),
           ),
@@ -1100,9 +1092,7 @@ class HolographicAuroraHeader extends StatelessWidget {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
               child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
-                ),
+                decoration: BoxDecoration(color: Colors.white.withOpacity(0.1)),
               ),
             ),
           ),
@@ -1121,7 +1111,7 @@ class HolographicAuroraHeader extends StatelessWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Row(
@@ -1145,7 +1135,7 @@ class HolographicAuroraHeader extends StatelessWidget {
                     ),
                     Icon(
                       Icons.nfc,
-                      color: Colors.white.withValues(alpha: 0.8),
+                      color: Colors.white.withOpacity(0.8),
                       size: 28,
                     ),
                   ],
@@ -1175,7 +1165,7 @@ class HolographicAuroraHeader extends StatelessWidget {
                     Text(
                       'Available Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: Colors.white.withOpacity(0.8),
                         fontSize: 14,
                       ),
                     ),
@@ -1205,9 +1195,9 @@ class HolographicPainter extends CustomPainter {
     final paint = Paint()
       ..shader = LinearGradient(
         colors: [
-          Colors.white.withValues(alpha: 0.0),
-          Colors.white.withValues(alpha: 0.3),
-          Colors.white.withValues(alpha: 0.0),
+          Colors.white.withOpacity(0.0),
+          Colors.white.withOpacity(0.3),
+          Colors.white.withOpacity(0.0),
         ],
         stops: const [0.0, 0.5, 1.0],
         begin: Alignment.topLeft,
@@ -1239,12 +1229,12 @@ class MatteBlackLuxuryHeader extends StatelessWidget {
           end: Alignment.bottomCenter,
         ),
         border: Border.all(
-          color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
+          color: const Color(0xFFD4AF37).withOpacity(0.3),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.5),
+            color: Colors.black.withOpacity(0.5),
             blurRadius: 30,
             offset: const Offset(0, 15),
           ),
@@ -1299,7 +1289,7 @@ class MatteBlackLuxuryHeader extends StatelessWidget {
                     Text(
                       'Total Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.5),
+                        color: Colors.white.withOpacity(0.5),
                         fontSize: 12,
                         letterSpacing: 1.0,
                       ),
@@ -1325,7 +1315,7 @@ class MatteBlackLuxuryHeader extends StatelessWidget {
                     Text(
                       provider.userName.toUpperCase(),
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         letterSpacing: 2.0,
@@ -1340,9 +1330,7 @@ class MatteBlackLuxuryHeader extends StatelessWidget {
                           margin: const EdgeInsets.only(left: 4),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: const Color(
-                              0xFFD4AF37,
-                            ).withValues(alpha: 0.6),
+                            color: const Color(0xFFD4AF37).withOpacity(0.6),
                           ),
                         ),
                       ),
@@ -1413,7 +1401,7 @@ class RoseGoldEliteHeader extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFB76E79).withValues(alpha: 0.4),
+            color: const Color(0xFFB76E79).withOpacity(0.4),
             blurRadius: 25,
             offset: const Offset(0, 12),
           ),
@@ -1428,7 +1416,7 @@ class RoseGoldEliteHeader extends StatelessWidget {
             child: Icon(
               Icons.spa,
               size: 180,
-              color: Colors.white.withValues(alpha: 0.1),
+              color: Colors.white.withOpacity(0.1),
             ),
           ),
           Padding(
@@ -1456,7 +1444,7 @@ class RoseGoldEliteHeader extends StatelessWidget {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
+                            color: Colors.black.withOpacity(0.2),
                             blurRadius: 4,
                             offset: const Offset(1, 2),
                           ),
@@ -1487,7 +1475,7 @@ class RoseGoldEliteHeader extends StatelessWidget {
                     Text(
                       'Your Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: Colors.white.withOpacity(0.8),
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1522,7 +1510,7 @@ class RoseGoldEliteHeader extends StatelessWidget {
                         Text(
                           'CARD HOLDER',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.6),
+                            color: Colors.white.withOpacity(0.6),
                             fontSize: 9,
                             letterSpacing: 1.0,
                           ),
@@ -1566,7 +1554,7 @@ class CarbonFiberProHeader extends StatelessWidget {
         color: const Color(0xFF1C1C1E),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.5),
+            color: Colors.black.withOpacity(0.5),
             blurRadius: 25,
             offset: const Offset(0, 12),
           ),
@@ -1662,7 +1650,7 @@ class CarbonFiberProHeader extends StatelessWidget {
                     Text(
                       'BALANCE',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.4),
+                        color: Colors.white.withOpacity(0.4),
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
@@ -1689,7 +1677,7 @@ class CarbonFiberProHeader extends StatelessWidget {
                     Text(
                       provider.userName.toUpperCase(),
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 1.5,
@@ -1724,7 +1712,7 @@ class CarbonFiberProHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
+        color: color.withOpacity(0.15),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
@@ -1796,8 +1784,8 @@ class GradientMeshFluidHeader extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFFFF6B6B).withValues(alpha: 0.8),
-                    const Color(0xFFFF6B6B).withValues(alpha: 0.0),
+                    const Color(0xFFFF6B6B).withOpacity(0.8),
+                    const Color(0xFFFF6B6B).withOpacity(0.0),
                   ],
                 ),
               ),
@@ -1813,8 +1801,8 @@ class GradientMeshFluidHeader extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFF4ECDC4).withValues(alpha: 0.8),
-                    const Color(0xFF4ECDC4).withValues(alpha: 0.0),
+                    const Color(0xFF4ECDC4).withOpacity(0.8),
+                    const Color(0xFF4ECDC4).withOpacity(0.0),
                   ],
                 ),
               ),
@@ -1830,8 +1818,8 @@ class GradientMeshFluidHeader extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFFA855F7).withValues(alpha: 0.7),
-                    const Color(0xFFA855F7).withValues(alpha: 0.0),
+                    const Color(0xFFA855F7).withOpacity(0.7),
+                    const Color(0xFFA855F7).withOpacity(0.0),
                   ],
                 ),
               ),
@@ -1847,8 +1835,8 @@ class GradientMeshFluidHeader extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFF3B82F6).withValues(alpha: 0.6),
-                    const Color(0xFF3B82F6).withValues(alpha: 0.0),
+                    const Color(0xFF3B82F6).withOpacity(0.6),
+                    const Color(0xFF3B82F6).withOpacity(0.0),
                   ],
                 ),
               ),
@@ -1861,10 +1849,8 @@ class GradientMeshFluidHeader extends StatelessWidget {
               filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
-                  ),
+                  color: Colors.white.withOpacity(0.05),
+                  border: Border.all(color: Colors.white.withOpacity(0.1)),
                   borderRadius: BorderRadius.circular(28),
                 ),
               ),
@@ -1892,7 +1878,7 @@ class GradientMeshFluidHeader extends StatelessWidget {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withValues(alpha: 0.1),
+                        color: Colors.white.withOpacity(0.1),
                       ),
                       child: const Icon(
                         Icons.blur_on,
@@ -1921,7 +1907,7 @@ class GradientMeshFluidHeader extends StatelessWidget {
                     Text(
                       'Total Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: Colors.white.withOpacity(0.6),
                         fontSize: 14,
                       ),
                     ),
@@ -1930,7 +1916,7 @@ class GradientMeshFluidHeader extends StatelessWidget {
                 Text(
                   provider.userName,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: Colors.white.withOpacity(0.8),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -1960,12 +1946,12 @@ class NeonGlowEdgeHeader extends StatelessWidget {
         border: Border.all(color: const Color(0xFF00D9FF), width: 2),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF00D9FF).withValues(alpha: 0.5),
+            color: const Color(0xFF00D9FF).withOpacity(0.5),
             blurRadius: 20,
             spreadRadius: -5,
           ),
           BoxShadow(
-            color: const Color(0xFFFF00FF).withValues(alpha: 0.3),
+            color: const Color(0xFFFF00FF).withOpacity(0.3),
             blurRadius: 30,
             spreadRadius: -10,
             offset: const Offset(10, 10),
@@ -1984,7 +1970,7 @@ class NeonGlowEdgeHeader extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFF00D9FF).withValues(alpha: 0.8),
+                    const Color(0xFF00D9FF).withOpacity(0.8),
                     Colors.transparent,
                   ],
                 ),
@@ -2000,7 +1986,7 @@ class NeonGlowEdgeHeader extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFFFF00FF).withValues(alpha: 0.8),
+                    const Color(0xFFFF00FF).withOpacity(0.8),
                     Colors.transparent,
                   ],
                 ),
@@ -2072,7 +2058,7 @@ class NeonGlowEdgeHeader extends StatelessWidget {
                     Text(
                       provider.userName.toUpperCase(),
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: Colors.white.withOpacity(0.8),
                         fontSize: 14,
                         letterSpacing: 2.0,
                       ),
@@ -2128,7 +2114,7 @@ class DiamondPatternHeader extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1E3A5F).withValues(alpha: 0.4),
+            color: const Color(0xFF1E3A5F).withOpacity(0.4),
             blurRadius: 25,
             offset: const Offset(0, 12),
           ),
@@ -2155,7 +2141,7 @@ class DiamondPatternHeader extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: [
                     Colors.transparent,
-                    Colors.white.withValues(alpha: 0.3),
+                    Colors.white.withOpacity(0.3),
                     Colors.transparent,
                   ],
                 ),
@@ -2180,9 +2166,9 @@ class DiamondPatternHeader extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                             gradient: LinearGradient(
                               colors: [
-                                Colors.white.withValues(alpha: 0.9),
-                                Colors.white.withValues(alpha: 0.6),
-                                Colors.white.withValues(alpha: 0.9),
+                                Colors.white.withOpacity(0.9),
+                                Colors.white.withOpacity(0.6),
+                                Colors.white.withOpacity(0.9),
                               ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
@@ -2208,7 +2194,7 @@ class DiamondPatternHeader extends StatelessWidget {
                     Text(
                       'Available Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.5),
+                        color: Colors.white.withOpacity(0.5),
                         fontSize: 12,
                       ),
                     ),
@@ -2224,7 +2210,7 @@ class DiamondPatternHeader extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         shadows: [
                           Shadow(
-                            color: Colors.white.withValues(alpha: 0.3),
+                            color: Colors.white.withOpacity(0.3),
                             blurRadius: 10,
                           ),
                         ],
@@ -2270,7 +2256,7 @@ class DiamondPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.03)
+      ..color = Colors.white.withOpacity(0.03)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
@@ -2327,10 +2313,7 @@ class AmexPlatinumGlassHeader extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [
-                    Colors.white.withValues(alpha: 0.6),
-                    Colors.transparent,
-                  ],
+                  colors: [Colors.white.withOpacity(0.6), Colors.transparent],
                 ),
               ),
             ),
@@ -2342,10 +2325,8 @@ class AmexPlatinumGlassHeader extends StatelessWidget {
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.15),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.3),
-                  ),
+                  color: Colors.white.withOpacity(0.15),
+                  border: Border.all(color: Colors.white.withOpacity(0.3)),
                 ),
                 padding: const EdgeInsets.all(24),
                 child: Column(
@@ -2389,7 +2370,7 @@ class AmexPlatinumGlassHeader extends StatelessWidget {
                         Text(
                           'Total Balance',
                           style: TextStyle(
-                            color: Colors.black.withValues(alpha: 0.5),
+                            color: Colors.black.withOpacity(0.5),
                             fontSize: 12,
                           ),
                         ),
@@ -2416,7 +2397,7 @@ class AmexPlatinumGlassHeader extends StatelessWidget {
                             Text(
                               'MEMBER SINCE',
                               style: TextStyle(
-                                color: Colors.black.withValues(alpha: 0.4),
+                                color: Colors.black.withOpacity(0.4),
                                 fontSize: 8,
                                 letterSpacing: 1.0,
                               ),
@@ -2424,7 +2405,7 @@ class AmexPlatinumGlassHeader extends StatelessWidget {
                             Text(
                               '2024',
                               style: TextStyle(
-                                color: Colors.black.withValues(alpha: 0.7),
+                                color: Colors.black.withOpacity(0.7),
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -2478,7 +2459,7 @@ class AmexGoldFrostedHeader extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFD4AF37).withValues(alpha: 0.4),
+            color: const Color(0xFFD4AF37).withOpacity(0.4),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -2496,10 +2477,7 @@ class AmexGoldFrostedHeader extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [
-                    Colors.white.withValues(alpha: 0.5),
-                    Colors.transparent,
-                  ],
+                  colors: [Colors.white.withOpacity(0.5), Colors.transparent],
                 ),
               ),
             ),
@@ -2511,10 +2489,8 @@ class AmexGoldFrostedHeader extends StatelessWidget {
               filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.3),
-                  ),
+                  color: Colors.white.withOpacity(0.1),
+                  border: Border.all(color: Colors.white.withOpacity(0.3)),
                 ),
                 padding: const EdgeInsets.all(24),
                 child: Column(
@@ -2578,9 +2554,7 @@ class AmexGoldFrostedHeader extends StatelessWidget {
                         Text(
                           'Available Credit',
                           style: TextStyle(
-                            color: const Color(
-                              0xFF1A1F71,
-                            ).withValues(alpha: 0.7),
+                            color: const Color(0xFF1A1F71).withOpacity(0.7),
                             fontSize: 13,
                           ),
                         ),
@@ -2648,7 +2622,7 @@ class AmexCenturionHeader extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.6),
+            color: Colors.black.withOpacity(0.6),
             blurRadius: 30,
             offset: const Offset(0, 15),
           ),
@@ -2667,7 +2641,7 @@ class AmexCenturionHeader extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    Colors.white.withValues(alpha: 0.08),
+                    Colors.white.withOpacity(0.08),
                     Colors.transparent,
                   ],
                 ),
@@ -2681,7 +2655,7 @@ class AmexCenturionHeader extends StatelessWidget {
             child: Icon(
               Icons.shield,
               size: 100,
-              color: Colors.white.withValues(alpha: 0.05),
+              color: Colors.white.withOpacity(0.05),
             ),
           ),
           // Glass overlay
@@ -2691,10 +2665,8 @@ class AmexCenturionHeader extends StatelessWidget {
               filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.03),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
-                  ),
+                  color: Colors.white.withOpacity(0.03),
+                  border: Border.all(color: Colors.white.withOpacity(0.1)),
                 ),
                 padding: const EdgeInsets.all(24),
                 child: Column(
@@ -2737,7 +2709,7 @@ class AmexCenturionHeader extends StatelessWidget {
                               colors: [Color(0xFF4A4A4A), Color(0xFF2A2A2A)],
                             ),
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.2),
+                              color: Colors.white.withOpacity(0.2),
                             ),
                           ),
                         ),
@@ -2766,7 +2738,7 @@ class AmexCenturionHeader extends StatelessWidget {
                         Text(
                           provider.userName.toUpperCase(),
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: Colors.white.withOpacity(0.7),
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                             letterSpacing: 2.0,
@@ -2813,7 +2785,7 @@ class VisaInfiniteGlassHeader extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1A1F71).withValues(alpha: 0.5),
+            color: const Color(0xFF1A1F71).withOpacity(0.5),
             blurRadius: 25,
             offset: const Offset(0, 12),
           ),
@@ -2831,10 +2803,7 @@ class VisaInfiniteGlassHeader extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [
-                    Colors.white.withValues(alpha: 0.2),
-                    Colors.transparent,
-                  ],
+                  colors: [Colors.white.withOpacity(0.2), Colors.transparent],
                 ),
               ),
             ),
@@ -2849,7 +2818,7 @@ class VisaInfiniteGlassHeader extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFFFFD700).withValues(alpha: 0.15),
+                    const Color(0xFFFFD700).withOpacity(0.15),
                     Colors.transparent,
                   ],
                 ),
@@ -2863,10 +2832,8 @@ class VisaInfiniteGlassHeader extends StatelessWidget {
               filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.2),
-                  ),
+                  color: Colors.white.withOpacity(0.1),
+                  border: Border.all(color: Colors.white.withOpacity(0.2)),
                 ),
                 padding: const EdgeInsets.all(24),
                 child: Column(
@@ -2910,7 +2877,7 @@ class VisaInfiniteGlassHeader extends StatelessWidget {
                         Text(
                           'BALANCE',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.6),
+                            color: Colors.white.withOpacity(0.6),
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 2.0,
@@ -2990,7 +2957,7 @@ class MastercardWorldEliteHeader extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.4),
+            color: Colors.black.withOpacity(0.4),
             blurRadius: 25,
             offset: const Offset(0, 12),
           ),
@@ -3009,7 +2976,7 @@ class MastercardWorldEliteHeader extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFFEB001B).withValues(alpha: 0.3),
+                    const Color(0xFFEB001B).withOpacity(0.3),
                     Colors.transparent,
                   ],
                 ),
@@ -3026,7 +2993,7 @@ class MastercardWorldEliteHeader extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFFF79E1B).withValues(alpha: 0.3),
+                    const Color(0xFFF79E1B).withOpacity(0.3),
                     Colors.transparent,
                   ],
                 ),
@@ -3040,9 +3007,9 @@ class MastercardWorldEliteHeader extends StatelessWidget {
               filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.08),
+                  color: Colors.white.withOpacity(0.08),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.15),
+                    color: Colors.white.withOpacity(0.15),
                   ),
                 ),
                 padding: const EdgeInsets.all(24),
@@ -3077,9 +3044,7 @@ class MastercardWorldEliteHeader extends StatelessWidget {
                               height: 30,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: const Color(
-                                  0xFFEB001B,
-                                ).withValues(alpha: 0.9),
+                                color: const Color(0xFFEB001B).withOpacity(0.9),
                               ),
                             ),
                             Transform.translate(
@@ -3091,7 +3056,7 @@ class MastercardWorldEliteHeader extends StatelessWidget {
                                   shape: BoxShape.circle,
                                   color: const Color(
                                     0xFFF79E1B,
-                                  ).withValues(alpha: 0.9),
+                                  ).withOpacity(0.9),
                                 ),
                               ),
                             ),
@@ -3117,7 +3082,7 @@ class MastercardWorldEliteHeader extends StatelessWidget {
                         Text(
                           'Current Balance',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.6),
+                            color: Colors.white.withOpacity(0.6),
                             fontSize: 13,
                           ),
                         ),
@@ -3176,7 +3141,7 @@ class FrostedOceanGlassHeader extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0077B6).withValues(alpha: 0.4),
+            color: const Color(0xFF0077B6).withOpacity(0.4),
             blurRadius: 25,
             offset: const Offset(0, 12),
           ),
@@ -3207,10 +3172,8 @@ class FrostedOceanGlassHeader extends StatelessWidget {
               filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.15),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.3),
-                  ),
+                  color: Colors.white.withOpacity(0.15),
+                  border: Border.all(color: Colors.white.withOpacity(0.3)),
                 ),
                 padding: const EdgeInsets.all(24),
                 child: Column(
@@ -3224,7 +3187,7 @@ class FrostedOceanGlassHeader extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.waves,
-                              color: Colors.white.withValues(alpha: 0.9),
+                              color: Colors.white.withOpacity(0.9),
                               size: 28,
                             ),
                             const SizedBox(width: 8),
@@ -3241,7 +3204,7 @@ class FrostedOceanGlassHeader extends StatelessWidget {
                         ),
                         Icon(
                           Icons.nfc,
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: Colors.white.withOpacity(0.8),
                           size: 24,
                         ),
                       ],
@@ -3272,7 +3235,7 @@ class FrostedOceanGlassHeader extends StatelessWidget {
                     Text(
                       provider.userName.toUpperCase(),
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
+                        color: Colors.white.withOpacity(0.9),
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 2.0,
@@ -3293,7 +3256,7 @@ class WavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.1)
+      ..color = Colors.white.withOpacity(0.1)
       ..style = PaintingStyle.fill;
 
     final path = Path();
@@ -3357,9 +3320,9 @@ class AuroraBorealisGlassHeader extends StatelessWidget {
                 ),
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFF00FF87).withValues(alpha: 0.3),
-                    const Color(0xFF60EFFF).withValues(alpha: 0.2),
-                    const Color(0xFFB388FF).withValues(alpha: 0.3),
+                    const Color(0xFF00FF87).withOpacity(0.3),
+                    const Color(0xFF60EFFF).withOpacity(0.2),
+                    const Color(0xFFB388FF).withOpacity(0.3),
                     Colors.transparent,
                   ],
                   stops: const [0.0, 0.3, 0.6, 1.0],
@@ -3379,7 +3342,7 @@ class AuroraBorealisGlassHeader extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFF00FF87).withValues(alpha: 0.4),
+                    const Color(0xFF00FF87).withOpacity(0.4),
                     Colors.transparent,
                   ],
                   begin: Alignment.topCenter,
@@ -3395,10 +3358,8 @@ class AuroraBorealisGlassHeader extends StatelessWidget {
               filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
-                  ),
+                  color: Colors.white.withOpacity(0.05),
+                  border: Border.all(color: Colors.white.withOpacity(0.1)),
                   borderRadius: BorderRadius.circular(24),
                 ),
               ),
@@ -3432,12 +3393,12 @@ class AuroraBorealisGlassHeader extends StatelessWidget {
                         borderRadius: BorderRadius.circular(6),
                         gradient: LinearGradient(
                           colors: [
-                            Colors.white.withValues(alpha: 0.3),
-                            Colors.white.withValues(alpha: 0.1),
+                            Colors.white.withOpacity(0.3),
+                            Colors.white.withOpacity(0.1),
                           ],
                         ),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: Colors.white.withOpacity(0.2),
                         ),
                       ),
                     ),
@@ -3449,7 +3410,7 @@ class AuroraBorealisGlassHeader extends StatelessWidget {
                     Text(
                       'Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.5),
+                        color: Colors.white.withOpacity(0.5),
                         fontSize: 12,
                       ),
                     ),
@@ -3476,7 +3437,7 @@ class AuroraBorealisGlassHeader extends StatelessWidget {
                     Text(
                       provider.userName.toUpperCase(),
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                         letterSpacing: 2.0,
@@ -3560,7 +3521,7 @@ class SapphireReserveGlassHeader extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF2C5364).withValues(alpha: 0.5),
+            color: const Color(0xFF2C5364).withOpacity(0.5),
             blurRadius: 25,
             offset: const Offset(0, 12),
           ),
@@ -3579,7 +3540,7 @@ class SapphireReserveGlassHeader extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFF0F52BA).withValues(alpha: 0.4),
+                    const Color(0xFF0F52BA).withOpacity(0.4),
                     Colors.transparent,
                   ],
                 ),
@@ -3596,7 +3557,7 @@ class SapphireReserveGlassHeader extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFF0F52BA).withValues(alpha: 0.3),
+                    const Color(0xFF0F52BA).withOpacity(0.3),
                     Colors.transparent,
                   ],
                 ),
@@ -3610,9 +3571,9 @@ class SapphireReserveGlassHeader extends StatelessWidget {
               filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.08),
+                  color: Colors.white.withOpacity(0.08),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.15),
+                    color: Colors.white.withOpacity(0.15),
                   ),
                 ),
                 padding: const EdgeInsets.all(24),
@@ -3665,7 +3626,7 @@ class SapphireReserveGlassHeader extends StatelessWidget {
                             Text(
                               'RESERVE',
                               style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.6),
+                                color: Colors.white.withOpacity(0.6),
                                 fontSize: 10,
                                 fontWeight: FontWeight.w500,
                                 letterSpacing: 4.0,
@@ -3699,9 +3660,7 @@ class SapphireReserveGlassHeader extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(
-                              0xFF0F52BA,
-                            ).withValues(alpha: 0.3),
+                            color: const Color(0xFF0F52BA).withOpacity(0.3),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Text(
@@ -3779,7 +3738,7 @@ class OceanWaveHeader extends StatelessWidget {
                     Text(
                       'OCEAN BALANCE',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: Colors.white.withOpacity(0.8),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
                       ),
@@ -3792,7 +3751,7 @@ class OceanWaveHeader extends StatelessWidget {
                     Text(
                       'Total Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -3871,7 +3830,7 @@ class ForestGreenHeader extends StatelessWidget {
             right: 20,
             child: Icon(
               Icons.nature,
-              color: Colors.white.withValues(alpha: 0.3),
+              color: Colors.white.withOpacity(0.3),
               size: 60,
             ),
           ),
@@ -3880,7 +3839,7 @@ class ForestGreenHeader extends StatelessWidget {
             left: 20,
             child: Icon(
               Icons.grass,
-              color: Colors.white.withValues(alpha: 0.2),
+              color: Colors.white.withOpacity(0.2),
               size: 40,
             ),
           ),
@@ -3897,7 +3856,7 @@ class ForestGreenHeader extends StatelessWidget {
                     Text(
                       'FOREST FUND',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: Colors.white.withOpacity(0.8),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
                       ),
@@ -3910,7 +3869,7 @@ class ForestGreenHeader extends StatelessWidget {
                     Text(
                       'Total Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -3992,7 +3951,7 @@ class SunsetOrangeHeader extends StatelessWidget {
               height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.3),
+                color: Colors.white.withOpacity(0.3),
               ),
             ),
           ),
@@ -4009,7 +3968,7 @@ class SunsetOrangeHeader extends StatelessWidget {
                     Text(
                       'SUNSET SAVINGS',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: Colors.white.withOpacity(0.8),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
                       ),
@@ -4022,7 +3981,7 @@ class SunsetOrangeHeader extends StatelessWidget {
                     Text(
                       'Total Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -4101,7 +4060,7 @@ class MidnightBlueHeader extends StatelessWidget {
             left: 30,
             child: Icon(
               Icons.star,
-              color: Colors.white.withValues(alpha: 0.5),
+              color: Colors.white.withOpacity(0.5),
               size: 20,
             ),
           ),
@@ -4110,7 +4069,7 @@ class MidnightBlueHeader extends StatelessWidget {
             right: 60,
             child: Icon(
               Icons.star,
-              color: Colors.white.withValues(alpha: 0.3),
+              color: Colors.white.withOpacity(0.3),
               size: 15,
             ),
           ),
@@ -4131,7 +4090,7 @@ class MidnightBlueHeader extends StatelessWidget {
                     Text(
                       'MIDNIGHT MONEY',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: Colors.white.withOpacity(0.8),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
                       ),
@@ -4144,7 +4103,7 @@ class MidnightBlueHeader extends StatelessWidget {
                     Text(
                       'Total Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -4223,7 +4182,7 @@ class LavenderDreamHeader extends StatelessWidget {
             right: 20,
             child: Icon(
               Icons.local_florist,
-              color: Colors.white.withValues(alpha: 0.4),
+              color: Colors.white.withOpacity(0.4),
               size: 50,
             ),
           ),
@@ -4244,7 +4203,7 @@ class LavenderDreamHeader extends StatelessWidget {
                     Text(
                       'LAVENDER BALANCE',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: Colors.white.withOpacity(0.8),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
                       ),
@@ -4257,7 +4216,7 @@ class LavenderDreamHeader extends StatelessWidget {
                     Text(
                       'Total Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -4340,10 +4299,7 @@ class CrimsonRedHeader extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [
-                    Colors.orange.withValues(alpha: 0.3),
-                    Colors.transparent,
-                  ],
+                  colors: [Colors.orange.withOpacity(0.3), Colors.transparent],
                 ),
               ),
             ),
@@ -4365,7 +4321,7 @@ class CrimsonRedHeader extends StatelessWidget {
                     Text(
                       'CRIMSON CASH',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: Colors.white.withOpacity(0.8),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
                       ),
@@ -4378,7 +4334,7 @@ class CrimsonRedHeader extends StatelessWidget {
                     Text(
                       'Total Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -4446,7 +4402,7 @@ class ArcticWhiteHeader extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -4460,7 +4416,7 @@ class ArcticWhiteHeader extends StatelessWidget {
             left: 30,
             child: Icon(
               Icons.ac_unit,
-              color: Colors.blue.withValues(alpha: 0.3),
+              color: Colors.blue.withOpacity(0.3),
               size: 30,
             ),
           ),
@@ -4469,7 +4425,7 @@ class ArcticWhiteHeader extends StatelessWidget {
             right: 30,
             child: Icon(
               Icons.ac_unit,
-              color: Colors.blue.withValues(alpha: 0.2),
+              color: Colors.blue.withOpacity(0.2),
               size: 20,
             ),
           ),
@@ -4486,7 +4442,7 @@ class ArcticWhiteHeader extends StatelessWidget {
                     Text(
                       'ARCTIC ASSETS',
                       style: TextStyle(
-                        color: Colors.blue.withValues(alpha: 0.7),
+                        color: Colors.blue.withOpacity(0.7),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
                       ),
@@ -4577,7 +4533,7 @@ class DesertSandHeader extends StatelessWidget {
                     Text(
                       'DESERT DOLLARS',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: Colors.white.withOpacity(0.8),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
                       ),
@@ -4590,7 +4546,7 @@ class DesertSandHeader extends StatelessWidget {
                     Text(
                       'Total Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -4642,7 +4598,7 @@ class DunePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.1)
+      ..color = Colors.white.withOpacity(0.1)
       ..style = PaintingStyle.fill;
 
     final path = Path();
@@ -4705,7 +4661,7 @@ class GalaxyPurpleHeader extends StatelessWidget {
                     Text(
                       'GALAXY GOLD',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: Colors.white.withOpacity(0.8),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
                       ),
@@ -4718,7 +4674,7 @@ class GalaxyPurpleHeader extends StatelessWidget {
                     Text(
                       'Total Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -4770,12 +4726,12 @@ class NebulaPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.pink.withValues(alpha: 0.2)
+      ..color = Colors.pink.withOpacity(0.2)
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(Offset(size.width * 0.7, size.height * 0.3), 60, paint);
 
-    paint.color = Colors.blue.withValues(alpha: 0.15);
+    paint.color = Colors.blue.withOpacity(0.15);
     canvas.drawCircle(Offset(size.width * 0.3, size.height * 0.7), 40, paint);
   }
 
@@ -4810,7 +4766,7 @@ class EmeraldGreenHeader extends StatelessWidget {
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.2),
+                color: Colors.white.withOpacity(0.2),
               ),
             ),
           ),
@@ -4827,7 +4783,7 @@ class EmeraldGreenHeader extends StatelessWidget {
                     Text(
                       'EMERALD FORTUNE',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: Colors.white.withOpacity(0.8),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
                       ),
@@ -4840,7 +4796,7 @@ class EmeraldGreenHeader extends StatelessWidget {
                     Text(
                       'Total Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -4922,7 +4878,7 @@ class CosmicNebulaHeader extends StatelessWidget {
                     Text(
                       'COSMIC NEBULA',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
+                        color: Colors.white.withOpacity(0.9),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
                       ),
@@ -4935,7 +4891,7 @@ class CosmicNebulaHeader extends StatelessWidget {
                     Text(
                       'Total Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -4987,7 +4943,7 @@ class CosmicParticlesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.3)
+      ..color = Colors.white.withOpacity(0.3)
       ..style = PaintingStyle.fill;
 
     // Simple stars
@@ -5047,7 +5003,7 @@ class QuantumDotHeader extends StatelessWidget {
                     Text(
                       'Total Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -5098,7 +5054,7 @@ class QuantumDotHeader extends StatelessWidget {
 class GridDotPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.cyanAccent.withValues(alpha: 0.2);
+    final paint = Paint()..color = Colors.cyanAccent.withOpacity(0.2);
     final spacing = 20.0;
     for (var x = 0.0; x < size.width; x += spacing) {
       for (var y = 0.0; y < size.height; y += spacing) {
@@ -5134,10 +5090,7 @@ class LiquidGoldHeader extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
               gradient: LinearGradient(
-                colors: [
-                  Colors.white.withValues(alpha: 0.1),
-                  Colors.transparent,
-                ],
+                colors: [Colors.white.withOpacity(0.1), Colors.transparent],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -5156,7 +5109,7 @@ class LiquidGoldHeader extends StatelessWidget {
                     Text(
                       'LIQUID GOLD',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
+                        color: Colors.white.withOpacity(0.9),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
                       ),
@@ -5169,7 +5122,7 @@ class LiquidGoldHeader extends StatelessWidget {
                     Text(
                       'Total Balance',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: Colors.white.withOpacity(0.8),
                         fontSize: 14,
                       ),
                     ),
@@ -5235,10 +5188,7 @@ class CyberGlitchHeader extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         color: const Color(0xFF121212),
-        border: Border.all(
-          color: Colors.redAccent.withValues(alpha: 0.5),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.redAccent.withOpacity(0.5), width: 1),
       ),
       child: Stack(
         children: [
@@ -5249,7 +5199,7 @@ class CyberGlitchHeader extends StatelessWidget {
             right: 0,
             child: Container(
               height: 2,
-              color: Colors.cyanAccent.withValues(alpha: 0.5),
+              color: Colors.cyanAccent.withOpacity(0.5),
             ),
           ),
           Positioned(
@@ -5258,7 +5208,7 @@ class CyberGlitchHeader extends StatelessWidget {
             right: 0,
             child: Container(
               height: 5,
-              color: Colors.redAccent.withValues(alpha: 0.3),
+              color: Colors.redAccent.withOpacity(0.3),
             ),
           ),
           Padding(
@@ -5435,7 +5385,7 @@ class RakedSandPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.grey.withValues(alpha: 0.2)
+      ..color = Colors.grey.withOpacity(0.2)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
 
@@ -5472,7 +5422,7 @@ class RetroVaporwaveHeader extends StatelessWidget {
             bottom: 60,
             child: CircleAvatar(
               radius: 20,
-              backgroundColor: Colors.yellowAccent.withValues(alpha: 0.8),
+              backgroundColor: Colors.yellowAccent.withOpacity(0.8),
             ),
           ),
           Padding(
@@ -5552,7 +5502,7 @@ class VaporGridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.cyanAccent.withValues(alpha: 0.3)
+      ..color = Colors.cyanAccent.withOpacity(0.3)
       ..strokeWidth = 1;
 
     // Perspective grid simulation needs complex math, doing simple bottom grid
@@ -5735,9 +5685,9 @@ class PrismRefractionHeader extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Colors.red.withValues(alpha: 0.2),
-                    Colors.orange.withValues(alpha: 0.2),
-                    Colors.blue.withValues(alpha: 0.2),
+                    Colors.red.withOpacity(0.2),
+                    Colors.orange.withOpacity(0.2),
+                    Colors.blue.withOpacity(0.2),
                   ],
                   transform: GradientRotation(0.5),
                 ),
@@ -5910,7 +5860,7 @@ class ShardPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     // Glossy overlay
-    final glossPaint = Paint()..color = Colors.white.withValues(alpha: 0.05);
+    final glossPaint = Paint()..color = Colors.white.withOpacity(0.05);
 
     final path = Path();
     path.moveTo(size.width * 0.5, 0);
@@ -6019,7 +5969,7 @@ class BioGlowPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.tealAccent.withValues(alpha: 0.15)
+      ..color = Colors.tealAccent.withOpacity(0.15)
       ..maskFilter = MaskFilter.blur(BlurStyle.normal, 20);
 
     canvas.drawCircle(Offset(size.width * 0.8, size.height * 0.8), 50, paint);
@@ -6028,4 +5978,164 @@ class BioGlowPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// --- Option 65: AMOLED Pitch Black ---
+class AmoledPitchBlackHeader extends StatelessWidget {
+  final MoneyProvider provider;
+  const AmoledPitchBlackHeader({required this.provider, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 220,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white, width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Icon(Icons.nfc, color: Colors.white, size: 32),
+              GestureDetector(
+                onTap: () {}, // Handled by BalanceCard
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        (provider.activeAccount?.name ?? 'Personal')
+                            .toUpperCase(),
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      provider.cardName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        fontStyle: FontStyle.italic,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Total Balance',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.7),
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                NumberFormat.currency(
+                  symbol: provider.currencySymbol,
+                  decimalDigits: 0,
+                ).format(provider.totalBalance),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 34,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'CARD HOLDER',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.4),
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    provider.userName.toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  _buildAmoledPill(
+                    provider.totalIncome,
+                    Icons.arrow_downward,
+                    provider.currencySymbol,
+                  ),
+                  const SizedBox(width: 8),
+                  _buildAmoledPill(
+                    provider.totalExpense,
+                    Icons.arrow_upward,
+                    provider.currencySymbol,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAmoledPill(double amount, IconData icon, String symbol) {
+    final format = NumberFormat.compactCurrency(symbol: symbol);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.black, size: 14),
+          const SizedBox(width: 4),
+          Text(
+            format.format(amount),
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

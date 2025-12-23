@@ -9,6 +9,8 @@ class SmsTrackingScreen extends StatelessWidget {
   const SmsTrackingScreen({super.key});
 
   void _showClearBlocklistDialog(BuildContext context, MoneyProvider provider) {
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -16,12 +18,18 @@ class SmsTrackingScreen extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: AppTheme.surface,
+            color: isAmoled
+                ? Colors.black
+                : (isLight ? Colors.white : AppTheme.surface),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: Colors.amber.withValues(alpha: 0.3),
-              width: 1,
-            ),
+            border: isLight
+                ? Border.all(color: Colors.black)
+                : Border.all(
+                    color: isAmoled
+                        ? Colors.white
+                        : Colors.amber.withOpacity(0.3),
+                    width: 1,
+                  ),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -29,20 +37,27 @@ class SmsTrackingScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.amber.withValues(alpha: 0.1),
+                  color: isAmoled
+                      ? Colors.white
+                      : (isLight
+                            ? Colors.transparent
+                            : Colors.amber.withOpacity(0.1)),
                   borderRadius: BorderRadius.circular(20),
+                  border: isLight ? Border.all(color: Colors.black) : null,
                 ),
                 child: Icon(
                   Icons.restore_rounded,
-                  color: Colors.amber,
+                  color: isLight
+                      ? Colors.black
+                      : (isAmoled ? Colors.black : Colors.amber),
                   size: 40,
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 'Restore Blocked Transactions?',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isLight ? Colors.black : Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -52,7 +67,12 @@ class SmsTrackingScreen extends StatelessWidget {
               Text(
                 'This will clear the blocklist and allow ${provider.blockedSmsCount} previously deleted SMS transaction${provider.blockedSmsCount > 1 ? 's' : ''} to be imported again on next sync.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
+                style: TextStyle(
+                  color: isLight
+                      ? Colors.black.withOpacity(0.7)
+                      : Colors.white.withOpacity(0.7),
+                  fontSize: 14,
+                ),
               ),
               const SizedBox(height: 24),
               Row(
@@ -63,14 +83,21 @@ class SmsTrackingScreen extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.1),
+                          color: isLight
+                              ? Colors.transparent
+                              : Colors.white.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
+                          border: isAmoled || isLight
+                              ? Border.all(
+                                  color: isLight ? Colors.black : Colors.white,
+                                )
+                              : null,
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Text(
                             'Cancel',
                             style: TextStyle(
-                              color: Colors.white70,
+                              color: isLight ? Colors.black : Colors.white,
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
@@ -89,17 +116,25 @@ class SmsTrackingScreen extends StatelessWidget {
                           SnackBar(
                             content: Row(
                               children: [
-                                Icon(Icons.check_circle, color: Colors.white),
+                                Icon(
+                                  Icons.check_circle,
+                                  color: isLight ? Colors.white : Colors.white,
+                                ),
                                 const SizedBox(width: 12),
                                 const Text(
                                   'Blocklist cleared! Sync to restore.',
                                 ),
                               ],
                             ),
-                            backgroundColor: AppTheme.income,
+                            backgroundColor: isAmoled
+                                ? Colors.black
+                                : (isLight ? Colors.black : AppTheme.income),
                             behavior: SnackBarBehavior.floating,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
+                              side: isAmoled || isLight
+                                  ? const BorderSide(color: Colors.white)
+                                  : BorderSide.none,
                             ),
                           ),
                         );
@@ -107,14 +142,21 @@ class SmsTrackingScreen extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: Colors.amber,
+                          color: isAmoled
+                              ? Colors.white
+                              : (isLight ? Colors.white : Colors.amber),
                           borderRadius: BorderRadius.circular(12),
+                          border: isLight
+                              ? Border.all(color: Colors.black)
+                              : null,
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Text(
                             'Restore',
                             style: TextStyle(
-                              color: Colors.black87,
+                              color: isAmoled
+                                  ? Colors.black
+                                  : (isLight ? Colors.black : Colors.black87),
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
@@ -134,31 +176,35 @@ class SmsTrackingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<MoneyProvider>(context);
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0F111A),
+      backgroundColor: isAmoled
+          ? Colors.black
+          : (isLight ? Colors.white : theme.scaffoldBackgroundColor),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isLight ? Colors.black : Colors.white,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'SMS Tracking',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: isLight ? Colors.black : Colors.white),
         ),
       ),
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF0F111A),
-              const Color(0xFF1A1F38),
-              const Color(0xFF0F111A),
-            ],
-          ),
+          color: isAmoled
+              ? Colors.black
+              : (isLight ? Colors.transparent : theme.scaffoldBackgroundColor),
         ),
         child: Consumer<MoneyProvider>(
           builder: (context, provider, _) {
@@ -172,30 +218,42 @@ class SmsTrackingScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(32),
                       decoration: BoxDecoration(
-                        color: isEnabled
-                            ? AppTheme.primary.withValues(alpha: 0.1)
-                            : Colors.white.withValues(alpha: 0.05),
+                        color: isAmoled || isLight
+                            ? Colors.transparent
+                            : (isEnabled
+                                  ? AppTheme.primary.withOpacity(0.1)
+                                  : Colors.white.withOpacity(0.05)),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: isEnabled
-                              ? AppTheme.primary.withValues(alpha: 0.3)
-                              : Colors.white.withValues(alpha: 0.1),
+                          color: isLight
+                              ? Colors.black
+                              : (isAmoled
+                                    ? Colors.white
+                                    : (isEnabled
+                                          ? AppTheme.primary.withOpacity(0.3)
+                                          : Colors.white.withOpacity(0.1))),
                           width: 2,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: isEnabled
-                                ? AppTheme.primary.withValues(alpha: 0.2)
-                                : Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 30,
-                            spreadRadius: 5,
-                          ),
-                        ],
+                        boxShadow: isAmoled || isLight
+                            ? null
+                            : [
+                                BoxShadow(
+                                  color: isEnabled
+                                      ? AppTheme.primary.withOpacity(0.2)
+                                      : Colors.black.withOpacity(0.2),
+                                  blurRadius: 30,
+                                  spreadRadius: 5,
+                                ),
+                              ],
                       ),
                       child: Icon(
                         Icons.sms_outlined,
                         size: 64,
-                        color: isEnabled ? AppTheme.primary : Colors.white54,
+                        color: isLight
+                            ? Colors.black
+                            : (isEnabled || isAmoled
+                                  ? Colors.white
+                                  : Colors.white54),
                       ),
                     ).animate().scale(
                       duration: 400.ms,
@@ -206,10 +264,10 @@ class SmsTrackingScreen extends StatelessWidget {
 
                     Text(
                       'SMS Transaction Tracking',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: isLight ? Colors.black : Colors.white,
                       ),
                       textAlign: TextAlign.center,
                     ).animate().fadeIn().slideY(begin: 0.3),
@@ -220,7 +278,9 @@ class SmsTrackingScreen extends StatelessWidget {
                       'Automatically read transaction SMS messages from banks and add them to your expenses. This feature requires SMS read permission.',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: isLight
+                            ? Colors.black.withOpacity(0.6)
+                            : Colors.white.withOpacity(0.6),
                         height: 1.5,
                       ),
                       textAlign: TextAlign.center,
@@ -235,13 +295,23 @@ class SmsTrackingScreen extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: isEnabled
-                            ? AppTheme.income.withValues(alpha: 0.1)
-                            : AppTheme.expense.withValues(alpha: 0.1),
+                            ? (isAmoled || isLight
+                                  ? Colors.transparent
+                                  : AppTheme.income.withOpacity(0.1))
+                            : (isAmoled || isLight
+                                  ? Colors.transparent
+                                  : AppTheme.expense.withOpacity(0.1)),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: isEnabled
-                              ? AppTheme.income.withValues(alpha: 0.3)
-                              : AppTheme.expense.withValues(alpha: 0.3),
+                          color: isLight
+                              ? Colors.black
+                              : (isEnabled
+                                    ? (isAmoled
+                                          ? Colors.white
+                                          : AppTheme.income.withOpacity(0.3))
+                                    : (isAmoled
+                                          ? Colors.white
+                                          : AppTheme.expense.withOpacity(0.3))),
                         ),
                       ),
                       child: Row(
@@ -252,8 +322,16 @@ class SmsTrackingScreen extends StatelessWidget {
                             height: 8,
                             decoration: BoxDecoration(
                               color: isEnabled
-                                  ? AppTheme.income
-                                  : AppTheme.expense,
+                                  ? (isAmoled || isLight
+                                        ? (isLight
+                                              ? AppTheme.income
+                                              : Colors.white)
+                                        : AppTheme.income)
+                                  : (isAmoled || isLight
+                                        ? (isLight
+                                              ? AppTheme.expense
+                                              : Colors.white54)
+                                        : AppTheme.expense),
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -261,9 +339,15 @@ class SmsTrackingScreen extends StatelessWidget {
                           Text(
                             isEnabled ? 'Active' : 'Inactive',
                             style: TextStyle(
-                              color: isEnabled
-                                  ? AppTheme.income
-                                  : AppTheme.expense,
+                              color: isLight
+                                  ? Colors.black
+                                  : (isEnabled
+                                        ? (isAmoled
+                                              ? Colors.white
+                                              : AppTheme.income)
+                                        : (isAmoled
+                                              ? Colors.white54
+                                              : AppTheme.expense)),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -283,25 +367,37 @@ class SmsTrackingScreen extends StatelessWidget {
                             vertical: 12,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.amber.withValues(alpha: 0.1),
+                            color: isAmoled || isLight
+                                ? Colors.transparent
+                                : Colors.amber.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.amber.withValues(alpha: 0.3),
-                            ),
+                            border: isLight
+                                ? Border.all(color: Colors.black)
+                                : Border.all(
+                                    color: isAmoled
+                                        ? Colors.white
+                                        : Colors.amber.withOpacity(0.3),
+                                  ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
                                 Icons.restore_rounded,
-                                color: Colors.amber,
+                                color: isLight
+                                    ? Colors.black
+                                    : (isAmoled ? Colors.white : Colors.amber),
                                 size: 20,
                               ),
                               const SizedBox(width: 8),
                               Text(
                                 'Restore ${provider.blockedSmsCount} blocked transaction${provider.blockedSmsCount > 1 ? 's' : ''}',
                                 style: TextStyle(
-                                  color: Colors.amber,
+                                  color: isLight
+                                      ? Colors.black
+                                      : (isAmoled
+                                            ? Colors.white
+                                            : Colors.amber),
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
                                 ),
@@ -331,11 +427,18 @@ class SmsTrackingScreen extends StatelessWidget {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: isEnabled
-                              ? AppTheme.expense
-                              : AppTheme.primary,
+                          backgroundColor: isAmoled || isLight
+                              ? Colors.white
+                              : (isEnabled
+                                    ? AppTheme.expense
+                                    : AppTheme.primary),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
+                            side: isAmoled || isLight
+                                ? (isLight
+                                      ? const BorderSide(color: Colors.black)
+                                      : const BorderSide(color: Colors.white))
+                                : BorderSide.none,
                           ),
                           elevation: 0,
                         ),
@@ -344,7 +447,9 @@ class SmsTrackingScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: isEnabled ? Colors.white : Colors.white,
+                            color: isAmoled || isLight
+                                ? Colors.black
+                                : Colors.white,
                             letterSpacing: 1.0,
                           ),
                         ),

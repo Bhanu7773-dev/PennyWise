@@ -1,0 +1,8 @@
+Analyzing transaction_list.dart...                              
+
+   info • Don't invoke 'print' in production code • lib/widgets/transaction_list.dart:245:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/widgets/transaction_list.dart:246:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/widgets/transaction_list.dart:247:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/widgets/transaction_list.dart:248:9 • avoid_print
+
+4 issues found. (ran in 4.8s)

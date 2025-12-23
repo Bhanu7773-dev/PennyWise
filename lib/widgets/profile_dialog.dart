@@ -13,6 +13,9 @@ class ProfileDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = Provider.of<MoneyProvider>(context);
 
+    final theme = Theme.of(context);
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Stack(
@@ -21,12 +24,12 @@ class ProfileDialog extends StatelessWidget {
           Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-              child: Container(color: Colors.black.withValues(alpha: 0.2)),
+              child: Container(color: Colors.black.withOpacity(0.2)),
             ),
           ),
           Center(
             child: Material(
-              color: const Color(0xFF1A1F38),
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(32),
               elevation: 20,
               child: Container(
@@ -35,16 +38,9 @@ class ProfileDialog extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(32),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: theme.dividerColor,
                     width: 1,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.5),
-                      blurRadius: 30,
-                      spreadRadius: 10,
-                    ),
-                  ],
                 ),
                 child: Stack(
                   clipBehavior: Clip.none,
@@ -52,32 +48,61 @@ class ProfileDialog extends StatelessWidget {
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Avatar
+                        // Avatar with edit button
                         Hero(
                           tag: 'profile_ring',
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: AppTheme.primary,
-                                width: 3,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: AppTheme.primary,
+                                    width: 3,
+                                  ),
+                                ),
+                                child: CircleAvatar(
+                                  radius: 50,
+                                  backgroundColor:
+                                      isAmoled ? AppTheme.amoledSurface : theme.cardColor,
+                                  backgroundImage: provider.photoURL != null
+                                      ? NetworkImage(provider.photoURL!)
+                                      : null,
+                                  child: provider.photoURL == null
+                                      ? Icon(
+                                          Icons.person,
+                                          size: 50,
+                                          color: theme.iconTheme.color,
+                                        )
+                                      : null,
+                                ),
                               ),
-                            ),
-                            child: CircleAvatar(
-                              radius: 50,
-                              backgroundColor: const Color(0xFF2D3459),
-                              backgroundImage: provider.photoURL != null
-                                  ? NetworkImage(provider.photoURL!)
-                                  : null,
-                              child: provider.photoURL == null
-                                  ? const Icon(
-                                      Icons.person,
-                                      size: 50,
-                                      color: Colors.white,
-                                    )
-                                  : null,
-                            ),
+                              // Pencil button
+                              Positioned(
+                                right: -4,
+                                bottom: -4,
+                                child: Material(
+                                  color: theme.cardColor,
+                                  shape: const CircleBorder(),
+                                  elevation: 4,
+                                  child: InkWell(
+                                    customBorder: const CircleBorder(),
+                                    onTap: () => _showChangePhotoDialog(context, provider),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Icon(
+                                        Icons.edit,
+                                        size: 18,
+                                        color: theme.iconTheme.color,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -86,10 +111,10 @@ class ProfileDialog extends StatelessWidget {
                         Text(
                           provider.userName,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: theme.textTheme.titleLarge?.color,
                             letterSpacing: 0.5,
                           ),
                         ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2),
@@ -107,7 +132,7 @@ class ProfileDialog extends StatelessWidget {
                               : 'Guest Account',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.white.withValues(alpha: 0.5),
+                            color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
                           ),
                         ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.2),
 
@@ -134,16 +159,16 @@ class ProfileDialog extends StatelessWidget {
                                 }
                               }
                             },
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.logout_rounded,
-                              color: Colors.white,
+                              color: theme.colorScheme.onError,
                             ),
-                            label: const Text(
+                            label: Text(
                               'LOGOUT',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: theme.colorScheme.onError,
                                 letterSpacing: 1.0,
                               ),
                             ),
@@ -166,7 +191,7 @@ class ProfileDialog extends StatelessWidget {
                       right: -16,
                       child: IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close, color: Colors.white54),
+                        icon: Icon(Icons.close, color: theme.iconTheme.color?.withOpacity(0.6)),
                         splashRadius: 20,
                       ),
                     ),
@@ -175,6 +200,47 @@ class ProfileDialog extends StatelessWidget {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  void _showChangePhotoDialog(BuildContext context, MoneyProvider provider) {
+    final controller = TextEditingController(text: provider.photoURL ?? '');
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Change profile picture'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            hintText: 'Enter image URL',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('CANCEL'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final url = controller.text.trim();
+              await provider.setPhotoURL(url.isEmpty ? null : url);
+              if (context.mounted) Navigator.pop(context);
+            },
+            child: const Text('SAVE'),
+          ),
+          if (provider.photoURL != null) ...[
+            TextButton(
+              onPressed: () async {
+                await provider.setPhotoURL(null);
+                if (context.mounted) Navigator.pop(context);
+              },
+              child: const Text('REMOVE'),
+            ),
+          ],
         ],
       ),
     );

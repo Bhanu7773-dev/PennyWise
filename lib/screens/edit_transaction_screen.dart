@@ -104,18 +104,27 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<MoneyProvider>(context);
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: isAmoled
+          ? Colors.black
+          : (isLight ? Colors.white : AppTheme.background),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isLight ? Colors.black : Colors.white,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Edit Transaction',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: isLight ? Colors.black : Colors.white),
         ),
         actions: [
           Switch(
@@ -150,10 +159,12 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
                     const SizedBox(height: 8),
                     Text(
                       '${provider.currencySymbol}${_amount.isEmpty ? "0" : _amount}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 48,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: isAmoled
+                            ? Colors.white
+                            : (isLight ? Colors.black : Colors.white),
                       ),
                     ).animate(key: ValueKey(_amount)).fadeIn(duration: 100.ms),
                   ],
@@ -167,7 +178,9 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
                     Text(
                       'Category',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.5),
+                        color: isLight
+                            ? Colors.black.withOpacity(0.5)
+                            : Colors.white.withOpacity(0.5),
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -214,13 +227,25 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
                               ),
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? category.color
-                                    : AppTheme.surface,
+                                    ? (isLight
+                                        ? Colors.transparent
+                                        : (isAmoled ? Colors.white : category.color))
+                                    : (isAmoled || isLight
+                                        ? Colors.transparent
+                                        : AppTheme.surface),
                                 borderRadius: BorderRadius.circular(25),
                                 border: Border.all(
-                                  color: isSelected
-                                      ? Colors.transparent
-                                      : category.color.withValues(alpha: 0.3),
+                            color: isSelected
+                                ? (isAmoled
+                                    ? Colors.white
+                                    : (isLight
+                                        ? Colors.black
+                                        : Colors.transparent))
+                                : (isAmoled
+                                    ? Colors.white.withOpacity(0.3)
+                                    : (isLight
+                                        ? Colors.black.withOpacity(0.2)
+                                        : category.color.withOpacity(0.3))),
                                 ),
                               ),
                               child: Row(
@@ -229,16 +254,28 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
                                     category.icon,
                                     size: 18,
                                     color: isSelected
-                                        ? Colors.white
-                                        : category.color,
+                                        ? (isAmoled
+                                              ? Colors.black
+                                              : (isLight
+                                                    ? Colors.black
+                                                    : Colors.white))
+                                        : (isAmoled
+                                              ? Colors.white
+                                              : (isLight
+                                                  ? Colors.black
+                                                  : category.color)),
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
                                     category.name,
                                     style: TextStyle(
                                       color: isSelected
-                                          ? Colors.white
-                                          : Colors.white,
+                                          ? (isAmoled || isLight
+                                                ? Colors.black
+                                                : Colors.white)
+                                          : (isLight
+                                                ? Colors.black
+                                                : Colors.white),
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -256,14 +293,20 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
                 // Notes Input
                 TextField(
                   controller: _notesController,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(
+                    color: isLight ? Colors.black : Colors.white,
+                  ),
                   decoration: InputDecoration(
                     hintText: 'Add notes',
                     hintStyle: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.5),
+                      color: isLight
+                          ? Colors.black.withOpacity(0.5)
+                          : Colors.white.withOpacity(0.5),
                     ),
                     filled: true,
-                    fillColor: AppTheme.surface,
+                    fillColor: isLight
+                        ? Colors.black.withOpacity(0.05)
+                        : AppTheme.surface,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -284,6 +327,12 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
   }
 
   Widget _buildKeypad() {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -302,18 +351,22 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
             child: ElevatedButton(
               onPressed: _saveTransaction,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
+                backgroundColor: isAmoled
+                    ? Colors.white
+                    : (isLight ? Colors.black : AppTheme.primary),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
                 elevation: 0,
               ),
-              child: const Text(
+              child: Text(
                 'UPDATE TRANSACTION',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: isAmoled
+                      ? Colors.black
+                      : (isLight ? Colors.white : Colors.black),
                   letterSpacing: 1.0,
                 ),
               ),
@@ -325,6 +378,13 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
   }
 
   Widget _buildKeyRow(List<String> keys) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
+
     return Row(
       children: keys.map((key) {
         return Expanded(
@@ -340,16 +400,24 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    color: AppTheme.surface.withValues(alpha: 0.3),
+                    color: isAmoled
+                        ? Colors.transparent
+                        : (isLight
+                              ? Colors.transparent
+                              : AppTheme.surface.withOpacity(0.3)),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.05),
+                      color: isAmoled
+                          ? Colors.white
+                          : (isLight
+                                ? Colors.black.withOpacity(0.1)
+                                : Colors.white.withOpacity(0.05)),
                     ),
                   ),
                   child: Text(
                     key,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 24,
-                      color: Colors.white,
+                      color: isLight ? Colors.black : Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

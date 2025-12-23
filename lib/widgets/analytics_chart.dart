@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/money_provider.dart';
+import '../utils/app_theme.dart';
 
 class AnalyticsChart extends StatefulWidget {
   const AnalyticsChart({super.key});
@@ -20,14 +21,16 @@ class _AnalyticsChartState extends State<AnalyticsChart> {
     final transactions = provider.transactions
         .where((t) => t.isExpense)
         .toList();
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
 
     if (transactions.isEmpty) {
       return Center(
         child: Text(
           'No expenses to show',
-          style: Theme.of(
-            context,
-          ).textTheme.bodyLarge?.copyWith(color: Colors.white54),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            color: isLight ? Colors.black54 : Colors.white54,
+          ),
         ),
       );
     }
@@ -44,7 +47,20 @@ class _AnalyticsChartState extends State<AnalyticsChart> {
       final isTouched = index == _touchedIndex;
       final fontSize = isTouched ? 18.0 : 14.0;
       final radius = isTouched ? 110.0 : 100.0;
-      final color = Colors.primaries[index % Colors.primaries.length];
+
+      final color = isAmoled
+          ? (index == 0
+                ? Colors.white
+                : Colors.white.withOpacity(
+                    1.0 - (index * 0.15).clamp(0.0, 0.7),
+                  ))
+          : (isLight
+                ? (index == 0
+                      ? Colors.black
+                      : Colors.black.withOpacity(
+                          1.0 - (index * 0.15).clamp(0.0, 0.7),
+                        ))
+                : Colors.primaries[index % Colors.primaries.length]);
 
       sections.add(
         PieChartSectionData(
@@ -135,7 +151,7 @@ class _Badge extends StatelessWidget {
         border: Border.all(color: borderColor, width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+            color: Colors.black.withOpacity(0.2),
             offset: const Offset(3, 3),
             blurRadius: 3,
           ),

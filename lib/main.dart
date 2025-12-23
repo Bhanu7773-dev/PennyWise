@@ -26,7 +26,9 @@ void main() async {
   Hive.registerAdapter(GoalAdapter());
   Hive.registerAdapter(AccountAdapter());
   await Hive.openBox<Transaction>('transactions');
-  await Hive.openBox<String>('deletedSmsIds'); // Blocklist for deleted SMS transactions
+  await Hive.openBox<String>(
+    'deletedSmsIds',
+  ); // Blocklist for deleted SMS transactions
   final settingsBox = await Hive.openBox('settings');
   final userName = settingsBox.get('userName');
 
@@ -51,11 +53,11 @@ class PennyWiseApp extends StatelessWidget {
         return MaterialApp(
           title: 'PennyWise',
           debugShowCheckedModeBanner: false,
-          theme: AppTheme.darkTheme,
+          theme: AppTheme.getTheme(provider.appThemeMode),
           home: LockScreen(
             isEnabled: provider.biometricLockEnabled && initialRoute == '/home',
-            child: initialRoute == '/home' 
-                ? const HomeScreen() 
+            child: initialRoute == '/home'
+                ? const HomeScreen()
                 : const OnboardingScreen(),
           ),
           routes: {

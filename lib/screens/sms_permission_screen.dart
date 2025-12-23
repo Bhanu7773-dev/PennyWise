@@ -10,20 +10,16 @@ class SmsPermissionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<MoneyProvider>(context);
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0F111A),
+      backgroundColor: isAmoled ? Colors.black : theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                const Color(0xFF0F111A),
-                const Color(0xFF1A1F38),
-                const Color(0xFF0F111A),
-              ],
-            ),
+            color: isAmoled ? Colors.black : theme.scaffoldBackgroundColor,
           ),
           child: Column(
             children: [
@@ -50,24 +46,30 @@ class SmsPermissionScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(32),
                         decoration: BoxDecoration(
-                          color: AppTheme.primary.withValues(alpha: 0.1),
+                          color: isAmoled
+                              ? Colors.transparent
+                              : AppTheme.primary.withOpacity(0.1),
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: AppTheme.primary.withValues(alpha: 0.3),
+                            color: isAmoled
+                                ? Colors.white
+                                : AppTheme.primary.withOpacity(0.3),
                             width: 2,
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.primary.withValues(alpha: 0.2),
-                              blurRadius: 40,
-                              spreadRadius: 10,
-                            ),
-                          ],
+                          boxShadow: isAmoled
+                              ? null
+                              : [
+                                  BoxShadow(
+                                    color: AppTheme.primary.withOpacity(0.2),
+                                    blurRadius: 40,
+                                    spreadRadius: 10,
+                                  ),
+                                ],
                         ),
                         child: Icon(
                           Icons.security,
                           size: 64,
-                          color: AppTheme.primary,
+                          color: isAmoled ? Colors.white : AppTheme.primary,
                         ),
                       ).animate().scale(
                         duration: 500.ms,
@@ -95,7 +97,7 @@ class SmsPermissionScreen extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.white.withValues(alpha: 0.7),
+                          color: Colors.white.withOpacity(0.7),
                           height: 1.5,
                         ),
                       ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.3),
@@ -104,6 +106,7 @@ class SmsPermissionScreen extends StatelessWidget {
 
                       // Features List
                       _buildFeatureRow(
+                        context,
                         Icons.lock_outline,
                         'Private & Secure',
                         'Your data never leaves your device',
@@ -112,6 +115,7 @@ class SmsPermissionScreen extends StatelessWidget {
                       const SizedBox(height: 24),
 
                       _buildFeatureRow(
+                        context,
                         Icons.notifications_off_outlined,
                         'No Spam',
                         'We only read transactional messages',
@@ -120,6 +124,7 @@ class SmsPermissionScreen extends StatelessWidget {
                       const SizedBox(height: 24),
 
                       _buildFeatureRow(
+                        context,
                         Icons.battery_charging_full,
                         'Battery Efficient',
                         'Optimized for minimal battery usage',
@@ -141,6 +146,8 @@ class SmsPermissionScreen extends StatelessWidget {
                       height: 56,
                       child: Consumer<MoneyProvider>(
                         builder: (context, provider, _) {
+                          final isAmoled =
+                              provider.appThemeMode == AppThemeMode.amoled;
                           return ElevatedButton(
                             onPressed: () async {
                               final status = await Permission.sms.request();
@@ -161,7 +168,18 @@ class SmsPermissionScreen extends StatelessWidget {
                                   showDialog(
                                     context: context,
                                     builder: (context) => AlertDialog(
-                                      backgroundColor: AppTheme.surface,
+                                      backgroundColor: isAmoled
+                                          ? Colors.black
+                                          : AppTheme.surface,
+                                      shape: isAmoled
+                                          ? RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              side: const BorderSide(
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : null,
                                       title: const Text(
                                         'Permission Required',
                                         style: TextStyle(color: Colors.white),
@@ -190,15 +208,22 @@ class SmsPermissionScreen extends StatelessWidget {
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.primary,
-                              foregroundColor: Colors.white,
+                              backgroundColor: isAmoled
+                                  ? Colors.white
+                                  : AppTheme.primary,
+                              foregroundColor: isAmoled
+                                  ? Colors.black
+                                  : Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
+                                side: isAmoled
+                                    ? const BorderSide(color: Colors.white)
+                                    : BorderSide.none,
                               ),
-                              elevation: 8,
-                              shadowColor: AppTheme.primary.withValues(
-                                alpha: 0.5,
-                              ),
+                              elevation: isAmoled ? 0 : 8,
+                              shadowColor: isAmoled
+                                  ? Colors.transparent
+                                  : AppTheme.primary.withOpacity(0.5),
                             ),
                             child: const Text(
                               'GRANT PERMISSION',
@@ -220,7 +245,7 @@ class SmsPermissionScreen extends StatelessWidget {
                       'You can revoke this permission at any time in settings.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.4),
+                        color: Colors.white.withOpacity(0.4),
                         fontSize: 12,
                       ),
                     ),
@@ -234,16 +259,29 @@ class SmsPermissionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureRow(IconData icon, String title, String subtitle) {
+  Widget _buildFeatureRow(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String subtitle,
+  ) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
+            color: Colors.white.withOpacity(0.05),
             borderRadius: BorderRadius.circular(12),
+            border: isAmoled ? Border.all(color: Colors.white24) : null,
           ),
-          child: Icon(icon, color: AppTheme.primary, size: 24),
+          child: Icon(
+            icon,
+            color: isAmoled ? Colors.white : AppTheme.primary,
+            size: 24,
+          ),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -262,7 +300,7 @@ class SmsPermissionScreen extends StatelessWidget {
               Text(
                 subtitle,
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
+                  color: Colors.white.withOpacity(0.5),
                   fontSize: 14,
                 ),
               ),

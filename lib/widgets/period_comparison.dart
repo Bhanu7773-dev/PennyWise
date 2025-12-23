@@ -19,15 +19,21 @@ class _PeriodComparisonState extends State<PeriodComparison> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<MoneyProvider>(context);
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: isAmoled || isLight
+            ? Colors.transparent
+            : Colors.white.withOpacity(0.05),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-        ),
+        border: isLight
+            ? Border.all(color: Colors.black)
+            : Border.all(
+                color: isAmoled ? Colors.white : Colors.white.withOpacity(0.1),
+              ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,19 +41,19 @@ class _PeriodComparisonState extends State<PeriodComparison> {
           // Toggle Header
           _buildToggleHeader(),
           const SizedBox(height: 20),
-          
+
           // Chart
           SizedBox(
             height: 220,
-            child: _isWeekly 
+            child: _isWeekly
                 ? _buildWeeklyChart(provider)
                 : _buildMonthlyChart(provider),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Stats Summary
-          _isWeekly 
+          _isWeekly
               ? _buildWeeklySummary(provider)
               : _buildMonthlySummary(provider),
         ],
@@ -56,11 +62,24 @@ class _PeriodComparisonState extends State<PeriodComparison> {
   }
 
   Widget _buildToggleHeader() {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context).appThemeMode == AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context).appThemeMode == AppThemeMode.light;
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
+        color: isAmoled || isLight
+            ? (isLight
+                  ? Colors.black.withOpacity(0.05)
+                  : Colors.white.withOpacity(0.1))
+            : Colors.white.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
+        border: isAmoled || isLight
+            ? Border.all(
+                color: isLight ? Colors.black : Colors.white.withOpacity(0.2),
+              )
+            : null,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -77,19 +96,31 @@ class _PeriodComparisonState extends State<PeriodComparison> {
   }
 
   Widget _buildToggleButton(String text, bool isSelected, VoidCallback onTap) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context).appThemeMode == AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context).appThemeMode == AppThemeMode.light;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primary : Colors.transparent,
+          color: isSelected
+              ? (isAmoled
+                    ? Colors.white
+                    : (isLight ? Colors.black : AppTheme.primary))
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Text(
           text,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.white54,
+            color: isSelected
+                ? (isAmoled || isLight
+                      ? (isLight ? Colors.white : Colors.black)
+                      : Colors.white)
+                : (isLight ? Colors.black54 : Colors.white54),
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 14,
           ),
@@ -101,14 +132,23 @@ class _PeriodComparisonState extends State<PeriodComparison> {
   /// Calculate a nice round interval for the Y axis based on max value
   double _calculateNiceInterval(double maxValue) {
     if (maxValue <= 0) return 100;
-    
+
     // Find the order of magnitude
     final magnitude = maxValue.toString().split('.')[0].length;
-    final base = [1, 10, 100, 1000, 10000, 100000, 1000000, 10000000][magnitude.clamp(0, 7)];
-    
+    final base = [
+      1,
+      10,
+      100,
+      1000,
+      10000,
+      100000,
+      1000000,
+      10000000,
+    ][magnitude.clamp(0, 7)];
+
     // Calculate rough interval (aim for 4-6 grid lines)
     final roughInterval = maxValue / 4;
-    
+
     // Round to a nice number
     if (roughInterval <= base * 0.1) return base * 0.1;
     if (roughInterval <= base * 0.2) return base * 0.2;
@@ -122,17 +162,23 @@ class _PeriodComparisonState extends State<PeriodComparison> {
   }
 
   Widget _buildWeeklyChart(MoneyProvider provider) {
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     final weeklyData = _getWeeklyData(provider);
-    
+
     // Get max value from both expense and income
-    final allValues = weeklyData.expand((e) => [e['expense'] as double, e['income'] as double]);
-    double maxY = allValues.isEmpty ? 100.0 : allValues.reduce((a, b) => a > b ? a : b);
+    final allValues = weeklyData.expand(
+      (e) => [e['expense'] as double, e['income'] as double],
+    );
+    double maxY = allValues.isEmpty
+        ? 100.0
+        : allValues.reduce((a, b) => a > b ? a : b);
     if (maxY == 0) maxY = 100.0;
-    
+
     // Calculate nice interval for Y axis
     final interval = _calculateNiceInterval(maxY);
     final adjustedMaxY = (maxY / interval).ceil() * interval * 1.1;
-    
+
     return BarChart(
       BarChartData(
         alignment: BarChartAlignment.spaceAround,
@@ -168,12 +214,12 @@ class _PeriodComparisonState extends State<PeriodComparison> {
                     child: Text(
                       weeklyData[index]['label'] as String,
                       style: TextStyle(
-                        color: index == weeklyData.length - 1 
-                            ? Colors.white 
-                            : Colors.white54,
+                        color: index == weeklyData.length - 1
+                            ? (isLight ? Colors.black : Colors.white)
+                            : (isLight ? Colors.black54 : Colors.white54),
                         fontSize: 11,
-                        fontWeight: index == weeklyData.length - 1 
-                            ? FontWeight.bold 
+                        fontWeight: index == weeklyData.length - 1
+                            ? FontWeight.bold
                             : FontWeight.normal,
                       ),
                     ),
@@ -194,16 +240,20 @@ class _PeriodComparisonState extends State<PeriodComparison> {
                 if (value > adjustedMaxY) return const SizedBox();
                 return Text(
                   NumberFormat.compact().format(value),
-                  style: const TextStyle(
-                    color: Colors.white38,
+                  style: TextStyle(
+                    color: isLight ? Colors.black38 : Colors.white38,
                     fontSize: 10,
                   ),
                 );
               },
             ),
           ),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
         ),
         gridData: FlGridData(
           show: true,
@@ -211,7 +261,9 @@ class _PeriodComparisonState extends State<PeriodComparison> {
           horizontalInterval: interval,
           getDrawingHorizontalLine: (value) {
             return FlLine(
-              color: Colors.white.withValues(alpha: 0.05),
+              color: isLight
+                  ? Colors.black.withOpacity(0.05)
+                  : Colors.white.withOpacity(0.05),
               strokeWidth: 1,
             );
           },
@@ -225,24 +277,40 @@ class _PeriodComparisonState extends State<PeriodComparison> {
             barRods: [
               BarChartRodData(
                 toY: data['expense'] as double,
-                color: isCurrentWeek 
-                    ? AppTheme.expense 
-                    : AppTheme.expense.withValues(alpha: 0.5),
+                color: isCurrentWeek
+                    ? (isAmoled
+                          ? Colors.white
+                          : (isLight ? Colors.black : AppTheme.expense))
+                    : (isAmoled
+                          ? Colors.white60
+                          : (isLight
+                                ? Colors.black54
+                                : AppTheme.expense.withOpacity(0.5))),
                 width: 12,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(6),
+                ),
                 backDrawRodData: BackgroundBarChartRodData(
                   show: true,
                   toY: adjustedMaxY,
-                  color: Colors.white.withValues(alpha: 0.02),
+                  color: Colors.white.withOpacity(0.02),
                 ),
               ),
               BarChartRodData(
                 toY: data['income'] as double,
-                color: isCurrentWeek 
-                    ? AppTheme.income 
-                    : AppTheme.income.withValues(alpha: 0.5),
+                color: isCurrentWeek
+                    ? (isAmoled
+                          ? Colors.white.withOpacity(0.3)
+                          : (isLight ? Colors.black38 : AppTheme.income))
+                    : (isAmoled
+                          ? Colors.white38
+                          : (isLight
+                                ? Colors.black26
+                                : AppTheme.income.withOpacity(0.5))),
                 width: 12,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(6),
+                ),
               ),
             ],
           );
@@ -252,11 +320,17 @@ class _PeriodComparisonState extends State<PeriodComparison> {
   }
 
   Widget _buildMonthlyChart(MoneyProvider provider) {
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     final monthlyData = _getMonthlyData(provider);
-    final allValues = monthlyData.expand((e) => [e['expense'] as double, e['income'] as double]);
-    double maxY = allValues.isEmpty ? 100.0 : allValues.reduce((a, b) => a > b ? a : b);
+    final allValues = monthlyData.expand(
+      (e) => [e['expense'] as double, e['income'] as double],
+    );
+    double maxY = allValues.isEmpty
+        ? 100.0
+        : allValues.reduce((a, b) => a > b ? a : b);
     if (maxY == 0) maxY = 100.0;
-    
+
     // Calculate nice interval for Y axis
     final interval = _calculateNiceInterval(maxY);
     final adjustedMaxY = (maxY / interval).ceil() * interval * 1.1;
@@ -296,12 +370,12 @@ class _PeriodComparisonState extends State<PeriodComparison> {
                     child: Text(
                       monthlyData[index]['label'] as String,
                       style: TextStyle(
-                        color: index == monthlyData.length - 1 
-                            ? Colors.white 
-                            : Colors.white54,
+                        color: index == monthlyData.length - 1
+                            ? (isLight ? Colors.black : Colors.white)
+                            : (isLight ? Colors.black54 : Colors.white54),
                         fontSize: 11,
-                        fontWeight: index == monthlyData.length - 1 
-                            ? FontWeight.bold 
+                        fontWeight: index == monthlyData.length - 1
+                            ? FontWeight.bold
                             : FontWeight.normal,
                       ),
                     ),
@@ -322,16 +396,20 @@ class _PeriodComparisonState extends State<PeriodComparison> {
                 if (value > adjustedMaxY) return const SizedBox();
                 return Text(
                   NumberFormat.compact().format(value),
-                  style: const TextStyle(
-                    color: Colors.white38,
+                  style: TextStyle(
+                    color: isLight ? Colors.black38 : Colors.white38,
                     fontSize: 10,
                   ),
                 );
               },
             ),
           ),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
         ),
         gridData: FlGridData(
           show: true,
@@ -339,7 +417,9 @@ class _PeriodComparisonState extends State<PeriodComparison> {
           horizontalInterval: interval,
           getDrawingHorizontalLine: (value) {
             return FlLine(
-              color: Colors.white.withValues(alpha: 0.05),
+              color: isLight
+                  ? Colors.black.withOpacity(0.05)
+                  : Colors.white.withOpacity(0.05),
               strokeWidth: 1,
             );
           },
@@ -353,24 +433,40 @@ class _PeriodComparisonState extends State<PeriodComparison> {
             barRods: [
               BarChartRodData(
                 toY: data['expense'] as double,
-                color: isCurrentMonth 
-                    ? AppTheme.expense 
-                    : AppTheme.expense.withValues(alpha: 0.5),
+                color: isCurrentMonth
+                    ? (isAmoled
+                          ? Colors.white
+                          : (isLight ? Colors.black : AppTheme.expense))
+                    : (isAmoled
+                          ? Colors.white60
+                          : (isLight
+                                ? Colors.black54
+                                : AppTheme.expense.withOpacity(0.5))),
                 width: 16,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(6),
+                ),
                 backDrawRodData: BackgroundBarChartRodData(
                   show: true,
                   toY: adjustedMaxY,
-                  color: Colors.white.withValues(alpha: 0.02),
+                  color: Colors.white.withOpacity(0.02),
                 ),
               ),
               BarChartRodData(
                 toY: data['income'] as double,
-                color: isCurrentMonth 
-                    ? AppTheme.income 
-                    : AppTheme.income.withValues(alpha: 0.5),
+                color: isCurrentMonth
+                    ? (isAmoled
+                          ? Colors.white.withOpacity(0.3)
+                          : (isLight ? Colors.black38 : AppTheme.income))
+                    : (isAmoled
+                          ? Colors.white38
+                          : (isLight
+                                ? Colors.black26
+                                : AppTheme.income.withOpacity(0.5))),
                 width: 16,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(6),
+                ),
               ),
             ],
           );
@@ -385,10 +481,11 @@ class _PeriodComparisonState extends State<PeriodComparison> {
 
     final thisWeek = weeklyData.last;
     final lastWeek = weeklyData[weeklyData.length - 2];
-    
-    final expenseChange = (thisWeek['expense'] as double) - (lastWeek['expense'] as double);
-    final expenseChangePercent = (lastWeek['expense'] as double) > 0 
-        ? (expenseChange / (lastWeek['expense'] as double)) * 100 
+
+    final expenseChange =
+        (thisWeek['expense'] as double) - (lastWeek['expense'] as double);
+    final expenseChangePercent = (lastWeek['expense'] as double) > 0
+        ? (expenseChange / (lastWeek['expense'] as double)) * 100
         : 0.0;
 
     return _buildSummaryCard(
@@ -407,10 +504,11 @@ class _PeriodComparisonState extends State<PeriodComparison> {
 
     final thisMonth = monthlyData.last;
     final lastMonth = monthlyData[monthlyData.length - 2];
-    
-    final expenseChange = (thisMonth['expense'] as double) - (lastMonth['expense'] as double);
-    final expenseChangePercent = (lastMonth['expense'] as double) > 0 
-        ? (expenseChange / (lastMonth['expense'] as double)) * 100 
+
+    final expenseChange =
+        (thisMonth['expense'] as double) - (lastMonth['expense'] as double);
+    final expenseChangePercent = (lastMonth['expense'] as double) > 0
+        ? (expenseChange / (lastMonth['expense'] as double)) * 100
         : 0.0;
 
     return _buildSummaryCard(
@@ -431,22 +529,31 @@ class _PeriodComparisonState extends State<PeriodComparison> {
     required double changePercent,
     required MoneyProvider provider,
   }) {
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
     final isIncrease = change > 0;
     final changeColor = isIncrease ? AppTheme.expense : AppTheme.income;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            changeColor.withValues(alpha: 0.15),
-            changeColor.withValues(alpha: 0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: isAmoled || isLight ? Colors.transparent : null,
+        gradient: isAmoled
+            ? null
+            : LinearGradient(
+                colors: [
+                  changeColor.withOpacity(0.15),
+                  changeColor.withOpacity(0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: changeColor.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: isLight
+              ? Colors.black
+              : (isAmoled ? Colors.white : changeColor.withOpacity(0.3)),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -454,7 +561,9 @@ class _PeriodComparisonState extends State<PeriodComparison> {
           Text(
             title,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.7),
+              color: isLight
+                  ? Colors.black.withOpacity(0.7)
+                  : Colors.white.withOpacity(0.7),
               fontSize: 13,
             ),
           ),
@@ -468,14 +577,16 @@ class _PeriodComparisonState extends State<PeriodComparison> {
                   Text(
                     'Current',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.5),
+                      color: isLight
+                          ? Colors.black.withOpacity(0.5)
+                          : Colors.white.withOpacity(0.5),
                       fontSize: 11,
                     ),
                   ),
                   Text(
                     '${provider.currencySymbol}${NumberFormat('#,##0').format(currentAmount)}',
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: isLight ? Colors.black : Colors.white,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -488,14 +599,18 @@ class _PeriodComparisonState extends State<PeriodComparison> {
                   Text(
                     'Previous',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.5),
+                      color: isLight
+                          ? Colors.black.withOpacity(0.5)
+                          : Colors.white.withOpacity(0.5),
                       fontSize: 11,
                     ),
                   ),
                   Text(
                     '${provider.currencySymbol}${NumberFormat('#,##0').format(previousAmount)}',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: isLight
+                          ? Colors.black.withOpacity(0.7)
+                          : Colors.white.withOpacity(0.7),
                       fontSize: 16,
                     ),
                   ),
@@ -524,7 +639,7 @@ class _PeriodComparisonState extends State<PeriodComparison> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: changeColor.withValues(alpha: 0.2),
+                  color: changeColor.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -540,7 +655,9 @@ class _PeriodComparisonState extends State<PeriodComparison> {
               Text(
                 isIncrease ? 'Spending up ⚠️' : 'Spending down 🎉',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.6),
+                  color: isLight
+                      ? Colors.black.withOpacity(0.6)
+                      : Colors.white.withOpacity(0.6),
                   fontSize: 12,
                 ),
               ),
@@ -554,19 +671,19 @@ class _PeriodComparisonState extends State<PeriodComparison> {
   List<Map<String, dynamic>> _getWeeklyData(MoneyProvider provider) {
     final List<Map<String, dynamic>> weeklyData = [];
     final now = DateTime.now();
-    
+
     // Get last 4 weeks
     for (int i = 3; i >= 0; i--) {
       final weekEnd = now.subtract(Duration(days: now.weekday - 7 + (i * 7)));
       final weekStart = weekEnd.subtract(const Duration(days: 6));
-      
+
       double expense = 0;
       double income = 0;
-      
+
       for (var t in provider.transactions) {
         if (t.isExcluded) continue;
         final tDate = DateTime(t.date.year, t.date.month, t.date.day);
-        if (tDate.isAfter(weekStart.subtract(const Duration(days: 1))) && 
+        if (tDate.isAfter(weekStart.subtract(const Duration(days: 1))) &&
             tDate.isBefore(weekEnd.add(const Duration(days: 1)))) {
           if (t.isExpense) {
             expense += t.amount;
@@ -575,7 +692,7 @@ class _PeriodComparisonState extends State<PeriodComparison> {
           }
         }
       }
-      
+
       String label;
       if (i == 0) {
         label = 'This\nWeek';
@@ -584,7 +701,7 @@ class _PeriodComparisonState extends State<PeriodComparison> {
       } else {
         label = '${i}W\nAgo';
       }
-      
+
       weeklyData.add({
         'label': label,
         'expense': expense,
@@ -593,21 +710,21 @@ class _PeriodComparisonState extends State<PeriodComparison> {
         'end': weekEnd,
       });
     }
-    
+
     return weeklyData;
   }
 
   List<Map<String, dynamic>> _getMonthlyData(MoneyProvider provider) {
     final List<Map<String, dynamic>> monthlyData = [];
     final now = DateTime.now();
-    
+
     // Get last 6 months
     for (int i = 5; i >= 0; i--) {
       final month = DateTime(now.year, now.month - i, 1);
-      
+
       double expense = 0;
       double income = 0;
-      
+
       for (var t in provider.transactions) {
         if (t.isExcluded) continue;
         if (t.date.month == month.month && t.date.year == month.year) {
@@ -618,7 +735,7 @@ class _PeriodComparisonState extends State<PeriodComparison> {
           }
         }
       }
-      
+
       monthlyData.add({
         'label': DateFormat('MMM').format(month),
         'expense': expense,
@@ -626,7 +743,7 @@ class _PeriodComparisonState extends State<PeriodComparison> {
         'month': month,
       });
     }
-    
+
     return monthlyData;
   }
 }

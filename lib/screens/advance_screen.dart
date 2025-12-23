@@ -15,28 +15,26 @@ class AdvanceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<MoneyProvider>(context);
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+    final isHighContrast = isAmoled || isLight;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0F111A),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'Advanced Features',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Theme.of(context).textTheme.titleLarge?.color,
+          ),
         ),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF0F111A),
-              const Color(0xFF1A1F38),
-              const Color(0xFF0F111A),
-            ],
-          ),
-        ),
+        color: isHighContrast
+            ? Theme.of(context).scaffoldBackgroundColor
+            : null,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
           children: [
@@ -51,7 +49,7 @@ class AdvanceScreen extends StatelessWidget {
                   builder: (context) => const SmsTrackingScreen(),
                 ),
               ),
-              isEnabled: Provider.of<MoneyProvider>(context).smsTrackingEnabled,
+              isEnabled: provider.smsTrackingEnabled,
             ),
             _buildFeatureTile(
               context,
@@ -114,7 +112,9 @@ class AdvanceScreen extends StatelessWidget {
               Icons.currency_exchange_rounded,
               () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const CurrencyConverterScreen()),
+                MaterialPageRoute(
+                  builder: (context) => const CurrencyConverterScreen(),
+                ),
               ),
             ),
             // Add more advanced features here in the future
@@ -132,40 +132,71 @@ class AdvanceScreen extends StatelessWidget {
     VoidCallback onTap, {
     bool? isEnabled,
   }) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
+    final isHighContrast = isAmoled || isLight;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: isHighContrast
+              ? Colors.transparent
+              : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isEnabled == true
-                ? AppTheme.primary.withValues(alpha: 0.3)
-                : Colors.white.withValues(alpha: 0.05),
+            color: isHighContrast
+                ? Theme.of(context).iconTheme.color!.withOpacity(0.2)
+                : (isEnabled == true
+                      ? Theme.of(context).primaryColor.withOpacity(0.3)
+                      : Theme.of(context).dividerColor),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          boxShadow: isHighContrast
+              ? null
+              : [
+                  BoxShadow(
+                    color: Theme.of(context).shadowColor.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isEnabled == true
-                    ? AppTheme.primary.withValues(alpha: 0.1)
-                    : Colors.white.withValues(alpha: 0.05),
+                color: isHighContrast
+                    ? Colors.transparent
+                    : (isEnabled == true
+                          ? Theme.of(
+                              context,
+                            ).primaryColor.withOpacity(0.1)
+                          : Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest),
                 shape: BoxShape.circle,
+                border: isHighContrast
+                    ? Border.all(
+                        color: Theme.of(
+                          context,
+                        ).iconTheme.color!.withOpacity(0.2),
+                      )
+                    : null,
               ),
               child: Icon(
                 icon,
-                color: isEnabled == true ? AppTheme.primary : Colors.white54,
+                color: isHighContrast
+                    ? Theme.of(context).iconTheme.color
+                    : (isEnabled == true
+                          ? Theme.of(context).primaryColor
+                          : Theme.of(context).textTheme.bodySmall?.color
+                                ?.withOpacity(0.5)),
                 size: 24,
               ),
             ),
@@ -176,8 +207,8 @@ class AdvanceScreen extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).textTheme.titleMedium?.color,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -186,7 +217,9 @@ class AdvanceScreen extends StatelessWidget {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.color?.withOpacity(0.6),
                       fontSize: 12,
                     ),
                   ),
@@ -199,14 +232,14 @@ class AdvanceScreen extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: isEnabled
-                            ? AppTheme.income.withValues(alpha: 0.1)
-                            : AppTheme.expense.withValues(alpha: 0.1),
+                            ? Colors.green.withOpacity(0.1)
+                            : Colors.red.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         isEnabled ? 'Active' : 'Inactive',
                         style: TextStyle(
-                          color: isEnabled ? AppTheme.income : AppTheme.expense,
+                          color: isEnabled ? Colors.green : Colors.red,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
@@ -218,7 +251,9 @@ class AdvanceScreen extends StatelessWidget {
             ),
             Icon(
               Icons.chevron_right,
-              color: Colors.white.withValues(alpha: 0.3),
+              color: Theme.of(
+                context,
+              ).textTheme.bodySmall?.color?.withOpacity(0.3),
             ),
           ],
         ),

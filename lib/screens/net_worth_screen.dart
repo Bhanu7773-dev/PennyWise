@@ -172,32 +172,34 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
     final provider = Provider.of<MoneyProvider>(context);
     final totalNetWorth = provider.totalBalance;
     final currency = provider.currencySymbol;
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F111A),
+      backgroundColor: isAmoled
+          ? Colors.black
+          : (isLight ? Colors.white : theme.scaffoldBackgroundColor),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isLight ? Colors.black : Colors.white,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Net Worth Analysis',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: isLight ? Colors.black : Colors.white),
         ),
       ),
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF0F111A),
-              const Color(0xFF1A1F38),
-              const Color(0xFF0F111A),
-            ],
-          ),
+          color: isAmoled
+              ? Colors.black
+              : (isLight ? Colors.transparent : theme.scaffoldBackgroundColor),
         ),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -208,18 +210,25 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppTheme.primary.withValues(alpha: 0.2),
-                      const Color(0xFF2D3459).withValues(alpha: 0.2),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: isAmoled || isLight ? Colors.transparent : null,
+                  gradient: isAmoled || isLight
+                      ? null
+                      : LinearGradient(
+                          colors: [
+                            AppTheme.primary.withOpacity(0.2),
+                            const Color(0xFF2D3459).withOpacity(0.2),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
-                  ),
+                  border: isLight
+                      ? Border.all(color: Colors.black)
+                      : Border.all(
+                          color: isAmoled
+                              ? Colors.white
+                              : Colors.white.withOpacity(0.1),
+                        ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -230,7 +239,9 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
                         Text(
                           'Current Net Worth',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: isLight
+                                ? Colors.black.withOpacity(0.7)
+                                : Colors.white.withOpacity(0.7),
                             fontSize: 14,
                           ),
                         ),
@@ -241,8 +252,8 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: _monthlyChange >= 0
-                                ? AppTheme.income.withValues(alpha: 0.2)
-                                : AppTheme.expense.withValues(alpha: 0.2),
+                                ? AppTheme.income.withOpacity(0.2)
+                                : AppTheme.expense.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
@@ -251,18 +262,22 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
                                 _monthlyChange >= 0
                                     ? Icons.arrow_upward
                                     : Icons.arrow_downward,
-                                color: _monthlyChange >= 0
-                                    ? AppTheme.income
-                                    : AppTheme.expense,
+                                color: isAmoled
+                                    ? Colors.white
+                                    : (_monthlyChange >= 0
+                                          ? AppTheme.income
+                                          : AppTheme.expense),
                                 size: 12,
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 '${_monthlyChangePercent.abs().toStringAsFixed(1)}%',
                                 style: TextStyle(
-                                  color: _monthlyChange >= 0
-                                      ? AppTheme.income
-                                      : AppTheme.expense,
+                                  color: isAmoled
+                                      ? Colors.white
+                                      : (_monthlyChange >= 0
+                                            ? AppTheme.income
+                                            : AppTheme.expense),
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -278,8 +293,8 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
                         symbol: currency,
                         decimalDigits: 0,
                       ).format(totalNetWorth),
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: isLight ? Colors.black : Colors.white,
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
                       ),
@@ -288,7 +303,9 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
                     Text(
                       '${_monthlyChange >= 0 ? '+' : ''}${NumberFormat.currency(symbol: currency, decimalDigits: 0).format(_monthlyChange)} this month',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.5),
+                        color: isLight
+                            ? Colors.black.withOpacity(0.5)
+                            : Colors.white.withOpacity(0.5),
                         fontSize: 12,
                       ),
                     ),
@@ -340,21 +357,39 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? AppTheme.primary
-                                : Colors.white.withValues(alpha: 0.05),
+                                ? (isAmoled
+                                      ? Colors.white
+                                      : (isLight
+                                            ? Colors.black
+                                            : AppTheme.primary))
+                                : (isLight
+                                      ? Colors.transparent
+                                      : Colors.white.withOpacity(0.05)),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color: isSelected
-                                  ? AppTheme.primary
-                                  : Colors.white.withValues(alpha: 0.1),
+                                  ? (isAmoled
+                                        ? Colors.white
+                                        : (isLight
+                                              ? Colors.black
+                                              : AppTheme.primary))
+                                  : (isLight
+                                        ? Colors.black.withOpacity(0.3)
+                                        : Colors.white.withOpacity(0.1)),
                             ),
                           ),
                           child: Text(
                             label,
                             style: TextStyle(
                               color: isSelected
-                                  ? Colors.white
-                                  : Colors.white.withValues(alpha: 0.7),
+                                  ? (isAmoled || isLight
+                                        ? (isLight
+                                              ? Colors.white
+                                              : Colors.black)
+                                        : Colors.white)
+                                  : (isLight
+                                        ? Colors.black.withOpacity(0.7)
+                                        : Colors.white.withOpacity(0.7)),
                               fontWeight: isSelected
                                   ? FontWeight.bold
                                   : FontWeight.normal,
@@ -377,7 +412,9 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
                         child: Text(
                           'Not enough data for chart',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.5),
+                            color: isLight
+                                ? Colors.black.withOpacity(0.5)
+                                : Colors.white.withOpacity(0.5),
                           ),
                         ),
                       )
@@ -389,11 +426,17 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
                           bottom: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1F38).withValues(alpha: 0.3),
+                          color: isAmoled || isLight
+                              ? Colors.transparent
+                              : const Color(0xFF1A1F38).withOpacity(0.3),
                           borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.05),
-                          ),
+                          border: isLight
+                              ? Border.all(color: Colors.black)
+                              : Border.all(
+                                  color: isAmoled
+                                      ? Colors.white
+                                      : Colors.white.withOpacity(0.05),
+                                ),
                         ),
                         child: LineChart(
                           LineChartData(
@@ -403,7 +446,9 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
                               horizontalInterval: (_maxY - _minY) / 5,
                               getDrawingHorizontalLine: (value) {
                                 return FlLine(
-                                  color: Colors.white.withValues(alpha: 0.05),
+                                  color: isLight
+                                      ? Colors.black.withOpacity(0.05)
+                                      : Colors.white.withOpacity(0.05),
                                   strokeWidth: 1,
                                 );
                               },
@@ -433,9 +478,9 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
                                             'MMM d',
                                           ).format(_dates[index]),
                                           style: TextStyle(
-                                            color: Colors.white.withValues(
-                                              alpha: 0.5,
-                                            ),
+                                            color: isLight
+                                                ? Colors.black.withOpacity(0.5)
+                                                : Colors.white.withOpacity(0.5),
                                             fontSize: 10,
                                           ),
                                         ),
@@ -453,9 +498,9 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
                                     return Text(
                                       NumberFormat.compact().format(value),
                                       style: TextStyle(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.5,
-                                        ),
+                                        color: isLight
+                                            ? Colors.black.withOpacity(0.5)
+                                            : Colors.white.withOpacity(0.5),
                                         fontSize: 10,
                                       ),
                                       textAlign: TextAlign.left,
@@ -475,10 +520,14 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
                                 spots: _spots,
                                 isCurved: true,
                                 gradient: LinearGradient(
-                                  colors: [
-                                    AppTheme.primary,
-                                    const Color(0xFF6366F1),
-                                  ],
+                                  colors: isAmoled
+                                      ? [Colors.white, Colors.white70]
+                                      : (isLight
+                                            ? [Colors.black, Colors.black54]
+                                            : [
+                                                AppTheme.primary,
+                                                const Color(0xFF6366F1),
+                                              ]),
                                 ),
                                 barWidth: 3,
                                 isStrokeCapRound: true,
@@ -486,10 +535,24 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
                                 belowBarData: BarAreaData(
                                   show: true,
                                   gradient: LinearGradient(
-                                    colors: [
-                                      AppTheme.primary.withValues(alpha: 0.3),
-                                      AppTheme.primary.withValues(alpha: 0.0),
-                                    ],
+                                    colors: isAmoled
+                                        ? [
+                                            Colors.white.withOpacity(0.2),
+                                            Colors.white.withOpacity(0.0),
+                                          ]
+                                        : (isLight
+                                              ? [
+                                                  Colors.black.withOpacity(0.1),
+                                                  Colors.black.withOpacity(0.0),
+                                                ]
+                                              : [
+                                                  AppTheme.primary.withOpacity(
+                                                    0.3,
+                                                  ),
+                                                  AppTheme.primary.withOpacity(
+                                                    0.0,
+                                                  ),
+                                                ]),
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter,
                                   ),
@@ -498,8 +561,18 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
                             ],
                             lineTouchData: LineTouchData(
                               touchTooltipData: LineTouchTooltipData(
-                                getTooltipColor: (touchedSpot) =>
-                                    const Color(0xFF2D3459),
+                                getTooltipColor: (touchedSpot) => isAmoled
+                                    ? Colors.black
+                                    : (isLight
+                                          ? Colors.white
+                                          : const Color(0xFF2D3459)),
+                                tooltipBorder: isLight
+                                    ? const BorderSide(color: Colors.black)
+                                    : (isAmoled
+                                          ? const BorderSide(
+                                              color: Colors.white,
+                                            )
+                                          : BorderSide.none),
                                 tooltipPadding: const EdgeInsets.all(12),
                                 tooltipMargin: 16,
                                 getTooltipItems: (touchedSpots) {
@@ -507,16 +580,18 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
                                     LineBarSpot touchedSpot,
                                   ) {
                                     final textStyle = TextStyle(
-                                      color: Colors.white,
+                                      color: isLight
+                                          ? Colors.black
+                                          : Colors.white,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
                                     );
                                     return LineTooltipItem(
                                       '${DateFormat('MMM d').format(_dates[touchedSpot.x.toInt()])}\n',
                                       textStyle.copyWith(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.7,
-                                        ),
+                                        color: isLight
+                                            ? Colors.black.withOpacity(0.7)
+                                            : Colors.white.withOpacity(0.7),
                                         fontSize: 12,
                                         fontWeight: FontWeight.normal,
                                       ),
@@ -545,7 +620,9 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
               Text(
                 'Statistics',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: isLight
+                      ? Colors.black.withOpacity(0.9)
+                      : Colors.white.withOpacity(0.9),
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -601,12 +678,24 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
     Color color,
     int delay,
   ) {
+    final isAmoled =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.amoled;
+    final isLight =
+        Provider.of<MoneyProvider>(context, listen: false).appThemeMode ==
+        AppThemeMode.light;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: isAmoled || isLight
+            ? Colors.transparent
+            : Colors.white.withOpacity(0.05),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        border: isLight
+            ? Border.all(color: Colors.black)
+            : Border.all(
+                color: isAmoled ? Colors.white : Colors.white.withOpacity(0.05),
+              ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -616,16 +705,27 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.2),
+                  color: isAmoled || isLight
+                      ? (isLight ? Colors.transparent : Colors.white)
+                      : color.withOpacity(0.2),
                   shape: BoxShape.circle,
+                  border: isLight ? Border.all(color: Colors.black) : null,
                 ),
-                child: Icon(icon, color: color, size: 16),
+                child: Icon(
+                  icon,
+                  color: isLight
+                      ? Colors.black
+                      : (isAmoled ? Colors.black : color),
+                  size: 16,
+                ),
               ),
               const SizedBox(width: 8),
               Text(
                 title,
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.6),
+                  color: isLight
+                      ? Colors.black.withOpacity(0.6)
+                      : Colors.white.withOpacity(0.6),
                   fontSize: 12,
                 ),
               ),
@@ -634,8 +734,8 @@ class _NetWorthScreenState extends State<NetWorthScreen> {
           const SizedBox(height: 12),
           Text(
             NumberFormat.compactCurrency(symbol: currency).format(value),
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: isLight ? Colors.black : Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),

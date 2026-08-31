@@ -37,10 +37,7 @@ class ProfileDialog extends StatelessWidget {
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(32),
-                  border: Border.all(
-                    color: theme.dividerColor,
-                    width: 1,
-                  ),
+                  border: Border.all(color: theme.dividerColor, width: 1),
                 ),
                 child: Stack(
                   clipBehavior: Clip.none,
@@ -66,8 +63,9 @@ class ProfileDialog extends StatelessWidget {
                                 ),
                                 child: CircleAvatar(
                                   radius: 50,
-                                  backgroundColor:
-                                      isAmoled ? AppTheme.amoledSurface : theme.cardColor,
+                                  backgroundColor: isAmoled
+                                      ? AppTheme.amoledSurface
+                                      : theme.cardColor,
                                   backgroundImage: provider.photoURL != null
                                       ? NetworkImage(provider.photoURL!)
                                       : null,
@@ -90,7 +88,10 @@ class ProfileDialog extends StatelessWidget {
                                   elevation: 4,
                                   child: InkWell(
                                     customBorder: const CircleBorder(),
-                                    onTap: () => _showChangePhotoDialog(context, provider),
+                                    onTap: () => _showChangePhotoDialog(
+                                      context,
+                                      provider,
+                                    ),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Icon(
@@ -132,11 +133,12 @@ class ProfileDialog extends StatelessWidget {
                               : 'Guest Account',
                           style: TextStyle(
                             fontSize: 14,
-                            color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
+                            color: theme.textTheme.bodySmall?.color
+                                ?.withOpacity(0.6),
                           ),
                         ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.2),
 
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 32),
 
                         // Logout Button
                         SizedBox(
@@ -166,7 +168,7 @@ class ProfileDialog extends StatelessWidget {
                             label: Text(
                               'LOGOUT',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 color: theme.colorScheme.onError,
                                 letterSpacing: 1.0,
@@ -174,7 +176,7 @@ class ProfileDialog extends StatelessWidget {
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppTheme.expense,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),
@@ -182,6 +184,44 @@ class ProfileDialog extends StatelessWidget {
                             ),
                           ),
                         ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2),
+
+                        const SizedBox(height: 12),
+
+                        // Delete Main Account Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: () =>
+                                _showDeleteAccountConfirmationDialog(
+                                  context,
+                                  provider,
+                                ),
+                            icon: const Icon(
+                              Icons.delete_forever_rounded,
+                              color: Colors.red,
+                              size: 20,
+                            ),
+                            label: const Text(
+                              'DELETE ACCOUNT & DATA',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(
+                                color: Colors.red.withOpacity(0.5),
+                                width: 1.5,
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                          ),
+                        ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.2),
                       ],
                     ),
 
@@ -191,7 +231,10 @@ class ProfileDialog extends StatelessWidget {
                       right: -16,
                       child: IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: Icon(Icons.close, color: theme.iconTheme.color?.withOpacity(0.6)),
+                        icon: Icon(
+                          Icons.close,
+                          color: theme.iconTheme.color?.withOpacity(0.6),
+                        ),
                         splashRadius: 20,
                       ),
                     ),
@@ -213,9 +256,7 @@ class ProfileDialog extends StatelessWidget {
         title: const Text('Change profile picture'),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            hintText: 'Enter image URL',
-          ),
+          decoration: const InputDecoration(hintText: 'Enter image URL'),
         ),
         actions: [
           TextButton(
@@ -241,6 +282,186 @@ class ProfileDialog extends StatelessWidget {
               child: const Text('REMOVE'),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteAccountConfirmationDialog(
+    BuildContext context,
+    MoneyProvider provider,
+  ) {
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: isAmoled
+            ? Colors.black
+            : (isLight ? Colors.white : const Color(0xFF1E293B)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: isLight
+              ? const BorderSide(color: Colors.black12)
+              : (isAmoled
+                    ? const BorderSide(color: Colors.white24)
+                    : BorderSide.none),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.red,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Delete Account?',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: isLight ? Colors.black : Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'This will permanently delete your user profile, accounts, transactions, budgets, goals, and all cloud database records.',
+              style: TextStyle(
+                color: isLight
+                    ? Colors.black87
+                    : (isAmoled ? Colors.white70 : Colors.white70),
+                fontSize: 14,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.red.withOpacity(0.3)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.info_outline, color: Colors.red, size: 18),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'This action cannot be undone.',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(
+              'CANCEL',
+              style: TextStyle(
+                color: isLight ? Colors.black54 : Colors.white60,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          ElevatedButton.icon(
+            onPressed: () async {
+              Navigator.pop(dialogContext); // close alert dialog
+              Navigator.pop(context); // close profile dialog
+
+              // Show loading overlay
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (loadingCtx) => Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: isAmoled
+                          ? Colors.black
+                          : (isLight ? Colors.white : const Color(0xFF1E293B)),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isLight ? Colors.black12 : Colors.white12,
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const CircularProgressIndicator(color: Colors.red),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Deleting all account data...',
+                          style: TextStyle(
+                            color: isLight ? Colors.black : Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+
+              try {
+                await provider.permanentlyDeleteUserAccount();
+              } catch (e) {
+                debugPrint('Error during account deletion: $e');
+              }
+
+              if (context.mounted) {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/onboarding',
+                  (route) => false,
+                );
+              }
+            },
+            icon: const Icon(
+              Icons.delete_forever,
+              size: 18,
+              color: Colors.white,
+            ),
+            label: const Text(
+              'DELETE PERMANENTLY',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
         ],
       ),
     );

@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../providers/money_provider.dart';
 import '../models/loan.dart';
+import '../models/transaction.dart';
 import '../utils/app_theme.dart';
 
 class LoansScreen extends StatefulWidget {
@@ -474,6 +475,7 @@ class _LoansScreenState extends State<LoansScreen>
         ? LoanType.given
         : LoanType.taken;
     DateTime? selectedDate;
+    bool recordAsTransaction = false;
 
     final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
     final isLight = provider.appThemeMode == AppThemeMode.light;
@@ -496,111 +498,164 @@ class _LoansScreenState extends State<LoansScreen>
             'Add Loan',
             style: TextStyle(color: isLight ? Colors.black : Colors.white),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                style: TextStyle(color: isLight ? Colors.black : Colors.white),
-                decoration: InputDecoration(
-                  labelText: 'Title (e.g., Person Name)',
-                  labelStyle: TextStyle(
-                    color: isLight ? Colors.black54 : Colors.white70,
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  style: TextStyle(
+                    color: isLight ? Colors.black : Colors.white,
                   ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: isLight ? Colors.black26 : Colors.white30,
+                  decoration: InputDecoration(
+                    labelText: 'Title (e.g., Person Name)',
+                    labelStyle: TextStyle(
+                      color: isLight ? Colors.black54 : Colors.white70,
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        color: isLight ? Colors.black26 : Colors.white30,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: amountController,
-                keyboardType: TextInputType.number,
-                style: TextStyle(color: isLight ? Colors.black : Colors.white),
-                decoration: InputDecoration(
-                  labelText: 'Amount',
-                  labelStyle: TextStyle(
-                    color: isLight ? Colors.black54 : Colors.white70,
+                const SizedBox(height: 16),
+                TextField(
+                  controller: amountController,
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(
+                    color: isLight ? Colors.black : Colors.white,
                   ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: isLight ? Colors.black26 : Colors.white30,
+                  decoration: InputDecoration(
+                    labelText: 'Amount',
+                    labelStyle: TextStyle(
+                      color: isLight ? Colors.black54 : Colors.white70,
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        color: isLight ? Colors.black26 : Colors.white30,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Text(
-                    'Type:',
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Text(
+                      'Type:',
+                      style: TextStyle(
+                        color: isLight ? Colors.black54 : Colors.white70,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    DropdownButton<LoanType>(
+                      value: selectedType,
+                      dropdownColor: isAmoled
+                          ? Colors.black
+                          : (isLight ? Colors.white : const Color(0xFF1E293B)),
+                      style: TextStyle(
+                        color: isLight ? Colors.black : Colors.white,
+                      ),
+                      items: [
+                        DropdownMenuItem(
+                          value: LoanType.given,
+                          child: Text(
+                            'Given (Lent)',
+                            style: TextStyle(
+                              color: isLight ? Colors.black : Colors.white,
+                            ),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: LoanType.taken,
+                          child: Text(
+                            'Taken (Borrowed)',
+                            style: TextStyle(
+                              color: isLight ? Colors.black : Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) setState(() => selectedType = val);
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(
+                    selectedDate == null
+                        ? 'Select Due Date (Optional)'
+                        : 'Due: ${DateFormat('MMM d, y').format(selectedDate!)}',
                     style: TextStyle(
                       color: isLight ? Colors.black54 : Colors.white70,
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  DropdownButton<LoanType>(
-                    value: selectedType,
-                    dropdownColor: isAmoled
-                        ? Colors.black
-                        : (isLight ? Colors.white : const Color(0xFF1E293B)),
-                    style: TextStyle(
-                      color: isLight ? Colors.black : Colors.white,
-                    ),
-                    items: [
-                      DropdownMenuItem(
-                        value: LoanType.given,
-                        child: Text(
-                          'Given (Lent)',
-                          style: TextStyle(
-                            color: isLight ? Colors.black : Colors.white,
-                          ),
-                        ),
-                      ),
-                      DropdownMenuItem(
-                        value: LoanType.taken,
-                        child: Text(
-                          'Taken (Borrowed)',
-                          style: TextStyle(
-                            color: isLight ? Colors.black : Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                    onChanged: (val) {
-                      if (val != null) setState(() => selectedType = val);
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  selectedDate == null
-                      ? 'Select Due Date (Optional)'
-                      : 'Due: ${DateFormat('MMM d, y').format(selectedDate!)}',
-                  style: TextStyle(
+                  trailing: Icon(
+                    Icons.calendar_today,
                     color: isLight ? Colors.black54 : Colors.white70,
                   ),
+                  onTap: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime.now().add(
+                        const Duration(days: 365 * 5),
+                      ),
+                    );
+                    if (date != null) setState(() => selectedDate = date);
+                  },
                 ),
-                trailing: Icon(
-                  Icons.calendar_today,
-                  color: isLight ? Colors.black54 : Colors.white70,
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isAmoled || isLight
+                        ? Colors.transparent
+                        : Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isLight
+                          ? Colors.black12
+                          : (isAmoled ? Colors.white24 : Colors.white10),
+                    ),
+                  ),
+                  child: SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    title: Text(
+                      'Record in Income / Expense',
+                      style: TextStyle(
+                        color: isLight ? Colors.black : Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    subtitle: Text(
+                      selectedType == LoanType.given
+                          ? 'Add loan as an Expense transaction'
+                          : 'Add loan as an Income transaction',
+                      style: TextStyle(
+                        color: isLight ? Colors.black54 : Colors.white54,
+                        fontSize: 11,
+                      ),
+                    ),
+                    value: recordAsTransaction,
+                    activeThumbColor: isAmoled || isLight
+                        ? (isLight ? Colors.black : Colors.white)
+                        : AppTheme.primary,
+                    onChanged: (val) =>
+                        setState(() => recordAsTransaction = val),
+                  ),
                 ),
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
-                  );
-                  if (date != null) setState(() => selectedDate = date);
-                },
-              ),
-            ],
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -622,13 +677,32 @@ class _LoansScreenState extends State<LoansScreen>
                   if (amount > 0) {
                     final newLoan = Loan(
                       id: DateTime.now().millisecondsSinceEpoch.toString(),
-                      title: titleController.text,
+                      title: titleController.text.trim(),
                       totalAmount: amount,
                       type: selectedType,
                       startDate: DateTime.now(),
                       dueDate: selectedDate,
                     );
                     provider.addLoan(newLoan);
+
+                    if (recordAsTransaction) {
+                      final isGiven = selectedType == LoanType.given;
+                      provider.addTransaction(
+                        Transaction(
+                          id: DateTime.now().millisecondsSinceEpoch.toString(),
+                          title: isGiven
+                              ? 'Loan Given: ${titleController.text.trim()}'
+                              : 'Loan Borrowed: ${titleController.text.trim()}',
+                          amount: amount,
+                          date: DateTime.now(),
+                          isExpense: isGiven,
+                          category: isGiven ? 'Financial & Taxes' : 'Income',
+                          notes:
+                              'Auto-created from Loan: ${titleController.text.trim()}',
+                        ),
+                      );
+                    }
+
                     Navigator.pop(context);
                   }
                 }
@@ -661,89 +735,166 @@ class _LoansScreenState extends State<LoansScreen>
     final paidController = TextEditingController(
       text: loan.paidAmount.toStringAsFixed(0),
     );
+    bool recordPaymentAsTransaction = false;
 
     final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
     final isLight = provider.appThemeMode == AppThemeMode.light;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: isAmoled
-            ? Colors.black
-            : (isLight ? Colors.white : const Color(0xFF1E293B)),
-        shape: isAmoled || isLight
-            ? RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: BorderSide(color: isLight ? Colors.black : Colors.white),
-              )
-            : null,
-        title: Text(
-          'Update ${loan.title}',
-          style: TextStyle(color: isLight ? Colors.black : Colors.white),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Total Amount: ${provider.currencySymbol}${loan.totalAmount}',
-              style: TextStyle(
-                color: isLight ? Colors.black54 : Colors.white70,
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: paidController,
-              keyboardType: TextInputType.number,
-              style: TextStyle(color: isLight ? Colors.black : Colors.white),
-              decoration: InputDecoration(
-                labelText: 'Paid Amount',
-                labelStyle: TextStyle(
-                  color: isLight ? Colors.black54 : Colors.white70,
-                ),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(
-                    color: isLight ? Colors.black26 : Colors.white30,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          backgroundColor: isAmoled
+              ? Colors.black
+              : (isLight ? Colors.white : const Color(0xFF1E293B)),
+          shape: isAmoled || isLight
+              ? RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(
+                    color: isLight ? Colors.black : Colors.white,
+                  ),
+                )
+              : null,
+          title: Text(
+            'Update ${loan.title}',
+            style: TextStyle(color: isLight ? Colors.black : Colors.white),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Total Amount: ${provider.currencySymbol}${loan.totalAmount}',
+                  style: TextStyle(
+                    color: isLight ? Colors.black54 : Colors.white70,
                   ),
                 ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: paidController,
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(
+                    color: isLight ? Colors.black : Colors.white,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'Paid Amount',
+                    labelStyle: TextStyle(
+                      color: isLight ? Colors.black54 : Colors.white70,
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        color: isLight ? Colors.black26 : Colors.white30,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isAmoled || isLight
+                        ? Colors.transparent
+                        : Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isLight
+                          ? Colors.black12
+                          : (isAmoled ? Colors.white24 : Colors.white10),
+                    ),
+                  ),
+                  child: SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    title: Text(
+                      'Record in Income / Expense',
+                      style: TextStyle(
+                        color: isLight ? Colors.black : Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    subtitle: Text(
+                      loan.type == LoanType.given
+                          ? 'Add repayment received as Income'
+                          : 'Add repayment made as Expense',
+                      style: TextStyle(
+                        color: isLight ? Colors.black54 : Colors.white54,
+                        fontSize: 11,
+                      ),
+                    ),
+                    value: recordPaymentAsTransaction,
+                    activeThumbColor: isAmoled || isLight
+                        ? (isLight ? Colors.black : Colors.white)
+                        : AppTheme.primary,
+                    onChanged: (val) =>
+                        setState(() => recordPaymentAsTransaction = val),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: isLight
+                      ? Colors.black54
+                      : (isAmoled ? Colors.white : null),
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final oldPaid = loan.paidAmount;
+                final paid = double.tryParse(paidController.text) ?? 0;
+                if (paid >= 0 && paid <= loan.totalAmount) {
+                  final diff = paid - oldPaid;
+                  loan.paidAmount = paid;
+                  provider.updateLoan(loan);
+
+                  if (recordPaymentAsTransaction && diff > 0) {
+                    final isRepaymentReceived = loan.type == LoanType.given;
+                    provider.addTransaction(
+                      Transaction(
+                        id: DateTime.now().millisecondsSinceEpoch.toString(),
+                        title: isRepaymentReceived
+                            ? 'Loan Repaid by: ${loan.title}'
+                            : 'Loan Repayment to: ${loan.title}',
+                        amount: diff,
+                        date: DateTime.now(),
+                        isExpense: !isRepaymentReceived,
+                        category: isRepaymentReceived
+                            ? 'Income'
+                            : 'Financial & Taxes',
+                        notes:
+                            'Auto-created from Loan repayment: ${loan.title}',
+                      ),
+                    );
+                  }
+
+                  Navigator.pop(context);
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isAmoled || isLight
+                    ? (isLight ? Colors.white : Colors.white)
+                    : AppTheme.primary,
+                foregroundColor: isAmoled || isLight
+                    ? Colors.black
+                    : Colors.white,
+                side: isLight ? const BorderSide(color: Colors.black) : null,
+              ),
+              child: const Text(
+                'Update',
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: TextStyle(
-                color: isLight
-                    ? Colors.black54
-                    : (isAmoled ? Colors.white : null),
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final paid = double.tryParse(paidController.text) ?? 0;
-              if (paid >= 0 && paid <= loan.totalAmount) {
-                loan.paidAmount = paid;
-                provider.updateLoan(loan);
-                Navigator.pop(context);
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isAmoled || isLight
-                  ? (isLight ? Colors.white : Colors.white)
-                  : AppTheme.primary,
-              foregroundColor: isAmoled || isLight
-                  ? Colors.black
-                  : Colors.white,
-              side: isLight ? const BorderSide(color: Colors.black) : null,
-            ),
-            child: const Text(
-              'Update',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
       ),
     );
   }

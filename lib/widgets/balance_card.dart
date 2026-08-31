@@ -14,14 +14,17 @@ class HomeBalanceCard extends StatefulWidget {
   final VoidCallback? onBudgetTap;
   final bool shouldAnimate;
 
-  const HomeBalanceCard({super.key, this.onBudgetTap, this.shouldAnimate = true});
+  const HomeBalanceCard({
+    super.key,
+    this.onBudgetTap,
+    this.shouldAnimate = true,
+  });
 
   @override
   State<HomeBalanceCard> createState() => _HomeBalanceCardState();
 }
 
 class _HomeBalanceCardState extends State<HomeBalanceCard> {
-
   @override
   void dispose() {
     super.dispose();
@@ -221,28 +224,52 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
     final provider = Provider.of<MoneyProvider>(context, listen: false);
     bool showSmsTransactions = false;
 
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          backgroundColor: AppTheme.surface,
+          backgroundColor: isAmoled
+              ? Colors.black
+              : (isLight ? Colors.white : AppTheme.surface),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
+            side: isLight
+                ? const BorderSide(color: Colors.black12)
+                : (isAmoled
+                      ? const BorderSide(color: Colors.white24)
+                      : BorderSide.none),
           ),
           title: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppTheme.primary.withOpacity(0.2),
+                  color: isAmoled || isLight
+                      ? (isLight
+                            ? Colors.black.withOpacity(0.08)
+                            : Colors.white24)
+                      : AppTheme.primary.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.add_card, color: AppTheme.primary, size: 20),
+                child: Icon(
+                  Icons.add_card,
+                  color: isLight
+                      ? Colors.black
+                      : (isAmoled ? Colors.white : AppTheme.primary),
+                  size: 20,
+                ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Create Account',
-                style: TextStyle(color: Colors.white, fontSize: 18),
+                style: TextStyle(
+                  color: isLight ? Colors.black : Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -252,28 +279,48 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
               TextField(
                 controller: nameController,
                 autofocus: true,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: isLight ? Colors.black : Colors.white),
                 textCapitalization: TextCapitalization.words,
                 maxLength: 20,
                 decoration: InputDecoration(
                   labelText: 'Account Name',
-                  labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+                  labelStyle: TextStyle(
+                    color: isLight
+                        ? Colors.black54
+                        : Colors.white.withOpacity(0.7),
+                  ),
                   hintText: 'e.g., Business, Family, Savings',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.4)),
-                  counterStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                  hintStyle: TextStyle(
+                    color: isLight
+                        ? Colors.black26
+                        : Colors.white.withOpacity(0.4),
+                  ),
+                  counterStyle: TextStyle(
+                    color: isLight
+                        ? Colors.black38
+                        : Colors.white.withOpacity(0.5),
+                  ),
                   prefixIcon: Icon(
                     Icons.account_balance_wallet,
-                    color: AppTheme.primary,
+                    color: isLight
+                        ? Colors.black87
+                        : (isAmoled ? Colors.white : AppTheme.primary),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: Colors.white.withOpacity(0.2),
+                      color: isLight
+                          ? Colors.black26
+                          : Colors.white.withOpacity(0.2),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: AppTheme.primary),
+                    borderSide: BorderSide(
+                      color: isLight
+                          ? Colors.black
+                          : (isAmoled ? Colors.white : AppTheme.primary),
+                    ),
                   ),
                 ),
               ),
@@ -282,12 +329,16 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: isAmoled || isLight
+                      ? Colors.transparent
+                      : Colors.white.withOpacity(0.05),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: showSmsTransactions
-                        ? AppTheme.primary.withOpacity(0.5)
-                        : Colors.white.withOpacity(0.1),
+                    color: isLight
+                        ? Colors.black12
+                        : (isAmoled
+                              ? Colors.white24
+                              : Colors.white.withOpacity(0.1)),
                   ),
                 ),
                 child: Row(
@@ -295,16 +346,18 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: showSmsTransactions
-                            ? AppTheme.primary.withOpacity(0.2)
-                            : Colors.white.withOpacity(0.1),
+                        color: isAmoled || isLight
+                            ? (isLight ? Colors.black12 : Colors.white24)
+                            : (showSmsTransactions
+                                  ? AppTheme.primary.withOpacity(0.2)
+                                  : Colors.white.withOpacity(0.1)),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
                         Icons.sms_outlined,
-                        color: showSmsTransactions
-                            ? AppTheme.primary
-                            : Colors.white54,
+                        color: isLight
+                            ? Colors.black
+                            : (isAmoled ? Colors.white : AppTheme.primary),
                         size: 20,
                       ),
                     ),
@@ -313,10 +366,10 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'SMS Transactions',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: isLight ? Colors.black : Colors.white,
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
@@ -324,7 +377,9 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
                           Text(
                             'Show bank SMS in this account',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.5),
+                              color: isLight
+                                  ? Colors.black54
+                                  : Colors.white.withOpacity(0.5),
                               fontSize: 12,
                             ),
                           ),
@@ -338,7 +393,9 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
                           showSmsTransactions = value;
                         });
                       },
-                      activeThumbColor: AppTheme.primary,
+                      activeThumbColor: isAmoled || isLight
+                          ? (isLight ? Colors.black : Colors.white)
+                          : AppTheme.primary,
                     ),
                   ],
                 ),
@@ -350,7 +407,10 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
               onPressed: () => Navigator.pop(context),
               child: Text(
                 'Cancel',
-                style: TextStyle(color: Colors.white.withOpacity(0.6)),
+                style: TextStyle(
+                  color: isLight ? Colors.black54 : Colors.white70,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             ElevatedButton(
@@ -378,12 +438,31 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
+                backgroundColor: isAmoled || isLight
+                    ? (isLight ? Colors.black : Colors.white)
+                    : AppTheme.primary,
+                foregroundColor: isAmoled || isLight
+                    ? (isLight ? Colors.white : Colors.black)
+                    : Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
+                elevation: 0,
               ),
-              child: const Text('Create'),
+              child: Text(
+                'Create',
+                style: TextStyle(
+                  color: isAmoled || isLight
+                      ? (isLight ? Colors.white : Colors.black)
+                      : Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
             ),
           ],
         ),
@@ -448,46 +527,52 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
       mainAxisSize: MainAxisSize.min,
       children: [
         ClipRRect(
-              borderRadius: BorderRadius.circular(24),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                child: Container(
-                  width: double.infinity,
-                  height: 200,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: isHighContrast ? Colors.transparent : null,
-                    gradient: isHighContrast
-                        ? null
-                        : LinearGradient(
-                            colors: [
-                              const Color(0xFF6C5CE7).withOpacity(0.3),
-                              const Color(0xFF1A1F38).withOpacity(0.6),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: isHighContrast
-                          ? Theme.of(context).iconTheme.color!.withOpacity(0.5)
-                          : Colors.white.withOpacity(0.15),
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+            child: Container(
+              width: double.infinity,
+              height: 200,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: isHighContrast ? Colors.transparent : null,
+                gradient: isHighContrast
+                    ? null
+                    : LinearGradient(
+                        colors: [
+                          const Color(0xFF6C5CE7).withOpacity(0.3),
+                          const Color(0xFF1A1F38).withOpacity(0.6),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: isHighContrast
+                      ? Theme.of(context).iconTheme.color!.withOpacity(0.5)
+                      : Colors.white.withOpacity(0.15),
+                  width: 1.5,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildChip(),
-                          GestureDetector(
-                            onTap: () => _showCardNameDialog(context, provider),
-                            child: Row(
-                              children: [
-                                Text(
+                      _buildChip(),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: GestureDetector(
+                          onTap: () => _showCardNameDialog(context, provider),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Flexible(
+                                child: Text(
                                   provider.cardName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     color: isHighContrast
                                         ? Theme.of(
@@ -500,119 +585,123 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
                                     letterSpacing: 1.5,
                                   ),
                                 ),
-                                const SizedBox(width: 6),
-                                Icon(
-                                  Icons.edit,
-                                  color: isHighContrast
-                                      ? Theme.of(
-                                          context,
-                                        ).iconTheme.color!.withOpacity(0.5)
-                                      : Colors.white.withOpacity(0.5),
-                                  size: 16,
-                                ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(width: 6),
+                              Icon(
+                                Icons.edit,
+                                color: isHighContrast
+                                    ? Theme.of(
+                                        context,
+                                      ).iconTheme.color!.withOpacity(0.5)
+                                    : Colors.white.withOpacity(0.5),
+                                size: 16,
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                      const Spacer(),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Total Balance',
-                            style: TextStyle(
-                              color: isHighContrast
-                                  ? Theme.of(context).textTheme.bodySmall?.color
-                                  : Colors.white.withOpacity(0.6),
-                              fontSize: 13,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          AnimatedDigitText(
-                            value: NumberFormat.currency(
-                              symbol: provider.currencySymbol,
-                              decimalDigits: 0,
-                            ).format(provider.totalBalance),
-                            style: TextStyle(
-                              fontSize: 34,
-                              fontWeight: FontWeight.bold,
-                              color: isHighContrast
-                                  ? Theme.of(
-                                      context,
-                                    ).textTheme.titleLarge?.color
-                                  : Colors.white,
-                            ),
-                            duration: const Duration(milliseconds: 600),
-                          ),
-                        ],
+                    ],
+                  ),
+                  const Spacer(),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Total Balance',
+                        style: TextStyle(
+                          color: isHighContrast
+                              ? Theme.of(context).textTheme.bodySmall?.color
+                              : Colors.white.withOpacity(0.6),
+                          fontSize: 13,
+                        ),
                       ),
-                      const Spacer(),
+                      const SizedBox(height: 4),
+                      AnimatedDigitText(
+                        value: NumberFormat.currency(
+                          symbol: provider.currencySymbol,
+                          decimalDigits: 0,
+                        ).format(provider.totalBalance),
+                        style: TextStyle(
+                          fontSize: 34,
+                          fontWeight: FontWeight.bold,
+                          color: isHighContrast
+                              ? Theme.of(context).textTheme.titleLarge?.color
+                              : Colors.white,
+                        ),
+                        duration: const Duration(milliseconds: 600),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'CARD HOLDER',
+                              style: TextStyle(
+                                color: isHighContrast
+                                    ? Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall?.color
+                                    : Colors.white.withOpacity(0.4),
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              provider.userName.toUpperCase(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: isHighContrast
+                                    ? Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium?.color
+                                    : Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'CARD HOLDER',
-                                style: TextStyle(
-                                  color: isHighContrast
-                                      ? Theme.of(
-                                          context,
-                                        ).textTheme.bodySmall?.color
-                                      : Colors.white.withOpacity(0.4),
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                provider.userName.toUpperCase(),
-                                style: TextStyle(
-                                  color: isHighContrast
-                                      ? Theme.of(
-                                          context,
-                                        ).textTheme.titleMedium?.color
-                                      : Colors.white,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
+                          _buildMiniStat(
+                            provider.totalIncome,
+                            AppTheme.income,
+                            Icons.arrow_downward,
+                            provider.currencySymbol,
+                            isAmoled,
+                            isHighContrast,
                           ),
-                          Row(
-                            children: [
-                              _buildMiniStat(
-                                provider.totalIncome,
-                                AppTheme.income,
-                                Icons.arrow_downward,
-                                provider.currencySymbol,
-                                isAmoled,
-                                isHighContrast,
-                              ),
-                              const SizedBox(width: 16),
-                              _buildMiniStat(
-                                provider.totalExpense,
-                                AppTheme.expense,
-                                Icons.arrow_upward,
-                                provider.currencySymbol,
-                                isAmoled,
-                                isHighContrast,
-                              ),
-                            ],
+                          const SizedBox(width: 16),
+                          _buildMiniStat(
+                            provider.totalExpense,
+                            AppTheme.expense,
+                            Icons.arrow_upward,
+                            provider.currencySymbol,
+                            isAmoled,
+                            isHighContrast,
                           ),
                         ],
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
             ),
+          ),
+        ),
       ],
     );
   }
-  
 
   Widget _buildMainCard(
     BuildContext context,
@@ -716,68 +805,81 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
                       ],
                     ],
                   ),
-                  GestureDetector(
-                    onTap: () => _showCardNameDialog(context, provider),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isHighContrast
-                                ? Theme.of(context).dividerColor
-                                : account.color.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            account.name.toUpperCase(),
-                            style: TextStyle(
-                              color: isHighContrast
-                                  ? Theme.of(
-                                      context,
-                                    ).textTheme.bodyMedium?.color
-                                  : Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1,
+                  Flexible(
+                    child: GestureDetector(
+                      onTap: () => _showCardNameDialog(context, provider),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isHighContrast
+                                    ? Theme.of(context).dividerColor
+                                    : account.color.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                account.name.toUpperCase(),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: isHighContrast
+                                      ? Theme.of(
+                                          context,
+                                        ).textTheme.bodyMedium?.color
+                                      : Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          provider.cardName,
-                          style: TextStyle(
-                            color: isHighContrast
-                                ? Theme.of(context).textTheme.titleLarge?.color
-                                : Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
-                            fontStyle: FontStyle.italic,
-                            letterSpacing: 1.5,
-                            shadows: isHighContrast
-                                ? []
-                                : [
-                                    Shadow(
-                                      color: Colors.black26,
-                                      offset: Offset(0, 2),
-                                      blurRadius: 4,
-                                    ),
-                                  ],
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              provider.cardName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: isHighContrast
+                                    ? Theme.of(
+                                        context,
+                                      ).textTheme.titleLarge?.color
+                                    : Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w900,
+                                fontStyle: FontStyle.italic,
+                                letterSpacing: 1.5,
+                                shadows: isHighContrast
+                                    ? []
+                                    : [
+                                        Shadow(
+                                          color: Colors.black26,
+                                          offset: Offset(0, 2),
+                                          blurRadius: 4,
+                                        ),
+                                      ],
+                              ),
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        Icon(
-                          Icons.edit,
-                          color: isHighContrast
-                              ? Theme.of(
-                                  context,
-                                ).iconTheme.color!.withOpacity(0.5)
-                              : Colors.white.withOpacity(0.5),
-                          size: 16,
-                        ),
-                      ],
+                          const SizedBox(width: 6),
+                          Icon(
+                            Icons.edit,
+                            color: isHighContrast
+                                ? Theme.of(
+                                    context,
+                                  ).iconTheme.color!.withOpacity(0.5)
+                                : Colors.white.withOpacity(0.5),
+                            size: 16,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -831,34 +933,39 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'CARD HOLDER',
-                        style: TextStyle(
-                          color: isHighContrast
-                              ? Theme.of(context).textTheme.bodySmall?.color
-                              : Colors.white.withOpacity(0.4),
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.0,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'CARD HOLDER',
+                          style: TextStyle(
+                            color: isHighContrast
+                                ? Theme.of(context).textTheme.bodySmall?.color
+                                : Colors.white.withOpacity(0.4),
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.0,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        provider.userName.toUpperCase(),
-                        style: TextStyle(
-                          color: isHighContrast
-                              ? Theme.of(context).textTheme.titleMedium?.color
-                              : Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1.0,
+                        const SizedBox(height: 2),
+                        Text(
+                          provider.userName.toUpperCase(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: isHighContrast
+                                ? Theme.of(context).textTheme.titleMedium?.color
+                                : Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1.0,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 8),
                   // Income/Expense Stats
                   Row(
                     children: [
@@ -1203,11 +1310,18 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.expense,
+              foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Delete'),
+            child: const Text(
+              'Delete',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
@@ -1218,53 +1332,109 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
     final cardNameController = TextEditingController(text: provider.cardName);
     final cardHolderController = TextEditingController(text: provider.userName);
 
+    final isAmoled = provider.appThemeMode == AppThemeMode.amoled;
+    final isLight = provider.appThemeMode == AppThemeMode.light;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surface,
-        title: const Text(
+        backgroundColor: isAmoled
+            ? Colors.black
+            : (isLight ? Colors.white : AppTheme.surface),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: isLight
+              ? const BorderSide(color: Colors.black12)
+              : (isAmoled
+                    ? const BorderSide(color: Colors.white24)
+                    : BorderSide.none),
+        ),
+        title: Text(
           'Edit Card Details',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: isLight ? Colors.black : Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: cardNameController,
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: isLight ? Colors.black : Colors.white),
               textCapitalization: TextCapitalization.characters,
               maxLength: 20,
               decoration: InputDecoration(
                 labelText: 'Card Name',
-                labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+                labelStyle: TextStyle(
+                  color: isLight
+                      ? Colors.black54
+                      : Colors.white.withOpacity(0.7),
+                ),
                 hintText: 'e.g., VISA, MASTERCARD',
-                hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-                counterStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                hintStyle: TextStyle(
+                  color: isLight
+                      ? Colors.black26
+                      : Colors.white.withOpacity(0.5),
+                ),
+                counterStyle: TextStyle(
+                  color: isLight
+                      ? Colors.black38
+                      : Colors.white.withOpacity(0.5),
+                ),
                 enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                  borderSide: BorderSide(
+                    color: isLight
+                        ? Colors.black26
+                        : Colors.white.withOpacity(0.3),
+                  ),
                 ),
                 focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: AppTheme.primary),
+                  borderSide: BorderSide(
+                    color: isLight
+                        ? Colors.black
+                        : (isAmoled ? Colors.white : AppTheme.primary),
+                  ),
                 ),
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: cardHolderController,
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: isLight ? Colors.black : Colors.white),
               textCapitalization: TextCapitalization.words,
               maxLength: 30,
               decoration: InputDecoration(
                 labelText: 'Cardholder Name',
-                labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+                labelStyle: TextStyle(
+                  color: isLight
+                      ? Colors.black54
+                      : Colors.white.withOpacity(0.7),
+                ),
                 hintText: 'e.g., John Doe',
-                hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-                counterStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                hintStyle: TextStyle(
+                  color: isLight
+                      ? Colors.black26
+                      : Colors.white.withOpacity(0.5),
+                ),
+                counterStyle: TextStyle(
+                  color: isLight
+                      ? Colors.black38
+                      : Colors.white.withOpacity(0.5),
+                ),
                 enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                  borderSide: BorderSide(
+                    color: isLight
+                        ? Colors.black26
+                        : Colors.white.withOpacity(0.3),
+                  ),
                 ),
                 focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: AppTheme.primary),
+                  borderSide: BorderSide(
+                    color: isLight
+                        ? Colors.black
+                        : (isAmoled ? Colors.white : AppTheme.primary),
+                  ),
                 ),
               ),
             ),
@@ -1273,9 +1443,15 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: isLight ? Colors.black54 : Colors.white70,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               if (cardNameController.text.isNotEmpty) {
                 provider.setCardName(cardNameController.text.toUpperCase());
@@ -1285,7 +1461,27 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
               }
               Navigator.pop(context);
             },
-            child: const Text('Save'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isAmoled || isLight
+                  ? (isLight ? Colors.black : Colors.white)
+                  : AppTheme.primary,
+              foregroundColor: isAmoled || isLight
+                  ? (isLight ? Colors.white : Colors.black)
+                  : Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              'Save',
+              style: TextStyle(
+                color: isAmoled || isLight
+                    ? (isLight ? Colors.white : Colors.black)
+                    : Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),

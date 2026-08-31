@@ -169,37 +169,43 @@ class _HomeScreenState extends State<HomeScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                                'Welcome Back,',
-                                style: TextStyle(
-                                  color: theme.textTheme.bodySmall?.color
-                                      ?.withOpacity(0.6),
-                                  fontSize: 14,
-                                  letterSpacing: 0.5,
-                                ),
-                              )
-                              .animate(value: _shouldAnimate ? null : 1)
-                              .fadeIn()
-                              .slideX(begin: -0.2),
-                          const SizedBox(height: 4),
-                          Text(
-                                provider.userName,
-                                style: TextStyle(
-                                  color: theme.textTheme.titleLarge?.color,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.5,
-                                ),
-                              )
-                              .animate(value: _shouldAnimate ? 0 : 1)
-                              .fadeIn(delay: 100.ms)
-                              .slideX(begin: -0.2),
-                        ],
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                  'Welcome Back,',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: theme.textTheme.bodySmall?.color
+                                        ?.withOpacity(0.6),
+                                    fontSize: 14,
+                                    letterSpacing: 0.5,
+                                  ),
+                                )
+                                .animate(value: _shouldAnimate ? null : 1)
+                                .fadeIn()
+                                .slideX(begin: -0.2),
+                            const SizedBox(height: 4),
+                            Text(
+                                  provider.userName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: theme.textTheme.titleLarge?.color,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.5,
+                                  ),
+                                )
+                                .animate(value: _shouldAnimate ? 0 : 1)
+                                .fadeIn(delay: 100.ms)
+                                .slideX(begin: -0.2),
+                          ],
+                        ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 12),
                       const TriThemeToggle(),
                       const SizedBox(width: 12),
                       GestureDetector(
@@ -275,7 +281,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   const SizedBox(height: 32),
 
-                    HomeBalanceCard(shouldAnimate: _shouldAnimate),
+                  HomeBalanceCard(shouldAnimate: _shouldAnimate),
                   const SizedBox(height: 16),
 
                   BudgetWidget()

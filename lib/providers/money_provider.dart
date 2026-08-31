@@ -12,6 +12,7 @@ import '../repositories/hive_transaction_repository.dart';
 import '../repositories/firestore_transaction_repository.dart';
 import '../services/sms_service.dart';
 import '../services/account_service.dart';
+import '../services/auth_service.dart';
 import '../utils/app_theme.dart';
 
 class MoneyProvider extends ChangeNotifier {
@@ -356,439 +357,883 @@ class MoneyProvider extends ChangeNotifier {
   }
 
   Future<void> _initCategories() async {
+    final defaultCategories = [
+      // Food & Drinks
+      Category(
+        id: 'food',
+        name: 'Food & Drinks',
+        iconCode: Icons.fastfood.codePoint,
+        colorValue: Colors.orange.toARGB32(),
+        isCustom: false,
+        subcategoryIds: [
+          'food_groceries',
+          'food_restaurant',
+          'food_coffee',
+          'food_delivery',
+          'food_snacks',
+        ],
+      ),
+      Category(
+        id: 'food_groceries',
+        name: 'Groceries',
+        iconCode: Icons.local_grocery_store.codePoint,
+        colorValue: Colors.orange.toARGB32(),
+        isCustom: false,
+        parentId: 'food',
+      ),
+      Category(
+        id: 'food_restaurant',
+        name: 'Restaurants',
+        iconCode: Icons.restaurant.codePoint,
+        colorValue: Colors.orange.shade700.toARGB32(),
+        isCustom: false,
+        parentId: 'food',
+      ),
+      Category(
+        id: 'food_coffee',
+        name: 'Coffee & Tea',
+        iconCode: Icons.local_cafe.codePoint,
+        colorValue: Colors.brown.toARGB32(),
+        isCustom: false,
+        parentId: 'food',
+      ),
+      Category(
+        id: 'food_delivery',
+        name: 'Food Delivery',
+        iconCode: Icons.delivery_dining.codePoint,
+        colorValue: Colors.deepOrange.toARGB32(),
+        isCustom: false,
+        parentId: 'food',
+      ),
+      Category(
+        id: 'food_snacks',
+        name: 'Snacks',
+        iconCode: Icons.cookie.codePoint,
+        colorValue: Colors.amber.toARGB32(),
+        isCustom: false,
+        parentId: 'food',
+      ),
+
+      // Transport
+      Category(
+        id: 'transport',
+        name: 'Transport',
+        iconCode: Icons.directions_bus.codePoint,
+        colorValue: Colors.blue.toARGB32(),
+        isCustom: false,
+        subcategoryIds: [
+          'transport_fuel',
+          'transport_public',
+          'transport_taxi',
+          'transport_parking',
+          'transport_maintenance',
+        ],
+      ),
+      Category(
+        id: 'transport_fuel',
+        name: 'Fuel',
+        iconCode: Icons.local_gas_station.codePoint,
+        colorValue: Colors.blue.shade700.toARGB32(),
+        isCustom: false,
+        parentId: 'transport',
+      ),
+      Category(
+        id: 'transport_public',
+        name: 'Public Transport',
+        iconCode: Icons.train.codePoint,
+        colorValue: Colors.blue.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'transport',
+      ),
+      Category(
+        id: 'transport_taxi',
+        name: 'Taxi & Rideshare',
+        iconCode: Icons.local_taxi.codePoint,
+        colorValue: Colors.yellow.shade700.toARGB32(),
+        isCustom: false,
+        parentId: 'transport',
+      ),
+      Category(
+        id: 'transport_parking',
+        name: 'Parking',
+        iconCode: Icons.local_parking.codePoint,
+        colorValue: Colors.blueGrey.toARGB32(),
+        isCustom: false,
+        parentId: 'transport',
+      ),
+      Category(
+        id: 'transport_maintenance',
+        name: 'Vehicle Maintenance',
+        iconCode: Icons.build.codePoint,
+        colorValue: Colors.grey.toARGB32(),
+        isCustom: false,
+        parentId: 'transport',
+      ),
+
+      // Shopping
+      Category(
+        id: 'shopping',
+        name: 'Shopping',
+        iconCode: Icons.shopping_bag.codePoint,
+        colorValue: Colors.purple.toARGB32(),
+        isCustom: false,
+        subcategoryIds: [
+          'shopping_clothes',
+          'shopping_electronics',
+          'shopping_home',
+          'shopping_beauty',
+          'shopping_gifts',
+        ],
+      ),
+      Category(
+        id: 'shopping_clothes',
+        name: 'Clothing',
+        iconCode: Icons.checkroom.codePoint,
+        colorValue: Colors.purple.shade400.toARGB32(),
+        isCustom: false,
+        parentId: 'shopping',
+      ),
+      Category(
+        id: 'shopping_electronics',
+        name: 'Electronics',
+        iconCode: Icons.devices.codePoint,
+        colorValue: Colors.indigo.toARGB32(),
+        isCustom: false,
+        parentId: 'shopping',
+      ),
+      Category(
+        id: 'shopping_home',
+        name: 'Home & Garden',
+        iconCode: Icons.home.codePoint,
+        colorValue: Colors.teal.toARGB32(),
+        isCustom: false,
+        parentId: 'shopping',
+      ),
+      Category(
+        id: 'shopping_beauty',
+        name: 'Beauty & Personal Care',
+        iconCode: Icons.face.codePoint,
+        colorValue: Colors.pink.toARGB32(),
+        isCustom: false,
+        parentId: 'shopping',
+      ),
+      Category(
+        id: 'shopping_gifts',
+        name: 'Gifts',
+        iconCode: Icons.card_giftcard.codePoint,
+        colorValue: Colors.red.shade300.toARGB32(),
+        isCustom: false,
+        parentId: 'shopping',
+      ),
+
+      // Entertainment
+      Category(
+        id: 'entertainment',
+        name: 'Entertainment',
+        iconCode: Icons.movie.codePoint,
+        colorValue: Colors.red.toARGB32(),
+        isCustom: false,
+        subcategoryIds: [
+          'entertainment_movies',
+          'entertainment_games',
+          'entertainment_music',
+          'entertainment_sports',
+          'entertainment_subscriptions',
+        ],
+      ),
+      Category(
+        id: 'entertainment_movies',
+        name: 'Movies & Cinema',
+        iconCode: Icons.theaters.codePoint,
+        colorValue: Colors.red.shade700.toARGB32(),
+        isCustom: false,
+        parentId: 'entertainment',
+      ),
+      Category(
+        id: 'entertainment_games',
+        name: 'Games',
+        iconCode: Icons.sports_esports.codePoint,
+        colorValue: Colors.deepPurple.toARGB32(),
+        isCustom: false,
+        parentId: 'entertainment',
+      ),
+      Category(
+        id: 'entertainment_music',
+        name: 'Music & Concerts',
+        iconCode: Icons.music_note.codePoint,
+        colorValue: Colors.pink.shade400.toARGB32(),
+        isCustom: false,
+        parentId: 'entertainment',
+      ),
+      Category(
+        id: 'entertainment_sports',
+        name: 'Sports Events',
+        iconCode: Icons.sports.codePoint,
+        colorValue: Colors.green.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'entertainment',
+      ),
+      Category(
+        id: 'entertainment_subscriptions',
+        name: 'Subscriptions',
+        iconCode: Icons.subscriptions.codePoint,
+        colorValue: Colors.blue.shade400.toARGB32(),
+        isCustom: false,
+        parentId: 'entertainment',
+      ),
+
+      // Health
+      Category(
+        id: 'health',
+        name: 'Health',
+        iconCode: Icons.local_hospital.codePoint,
+        colorValue: Colors.green.toARGB32(),
+        isCustom: false,
+        subcategoryIds: [
+          'health_doctor',
+          'health_pharmacy',
+          'health_fitness',
+          'health_insurance',
+        ],
+      ),
+      Category(
+        id: 'health_doctor',
+        name: 'Doctor & Hospital',
+        iconCode: Icons.medical_services.codePoint,
+        colorValue: Colors.red.shade400.toARGB32(),
+        isCustom: false,
+        parentId: 'health',
+      ),
+      Category(
+        id: 'health_pharmacy',
+        name: 'Pharmacy',
+        iconCode: Icons.local_pharmacy.codePoint,
+        colorValue: Colors.green.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'health',
+      ),
+      Category(
+        id: 'health_fitness',
+        name: 'Gym & Fitness',
+        iconCode: Icons.fitness_center.codePoint,
+        colorValue: Colors.orange.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'health',
+      ),
+      Category(
+        id: 'health_insurance',
+        name: 'Health Insurance',
+        iconCode: Icons.health_and_safety.codePoint,
+        colorValue: Colors.blue.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'health',
+      ),
+
+      // Education
+      Category(
+        id: 'education',
+        name: 'Education',
+        iconCode: Icons.school.codePoint,
+        colorValue: Colors.yellow.shade700.toARGB32(),
+        isCustom: false,
+        subcategoryIds: [
+          'education_books',
+          'education_courses',
+          'education_supplies',
+          'education_tuition',
+        ],
+      ),
+      Category(
+        id: 'education_books',
+        name: 'Books',
+        iconCode: Icons.menu_book.codePoint,
+        colorValue: Colors.brown.shade400.toARGB32(),
+        isCustom: false,
+        parentId: 'education',
+      ),
+      Category(
+        id: 'education_courses',
+        name: 'Online Courses',
+        iconCode: Icons.laptop.codePoint,
+        colorValue: Colors.blue.shade500.toARGB32(),
+        isCustom: false,
+        parentId: 'education',
+      ),
+      Category(
+        id: 'education_supplies',
+        name: 'School Supplies',
+        iconCode: Icons.edit.codePoint,
+        colorValue: Colors.amber.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'education',
+      ),
+      Category(
+        id: 'education_tuition',
+        name: 'Tuition',
+        iconCode: Icons.account_balance.codePoint,
+        colorValue: Colors.indigo.shade400.toARGB32(),
+        isCustom: false,
+        parentId: 'education',
+      ),
+
+      // Bills & Utilities
+      Category(
+        id: 'bills',
+        name: 'Bills & Utilities',
+        iconCode: Icons.receipt.codePoint,
+        colorValue: Colors.grey.toARGB32(),
+        isCustom: false,
+        subcategoryIds: [
+          'bills_electricity',
+          'bills_water',
+          'bills_internet',
+          'bills_phone',
+          'bills_rent',
+        ],
+      ),
+      Category(
+        id: 'bills_electricity',
+        name: 'Electricity',
+        iconCode: Icons.electric_bolt.codePoint,
+        colorValue: Colors.yellow.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'bills',
+      ),
+      Category(
+        id: 'bills_water',
+        name: 'Water',
+        iconCode: Icons.water_drop.codePoint,
+        colorValue: Colors.blue.shade300.toARGB32(),
+        isCustom: false,
+        parentId: 'bills',
+      ),
+      Category(
+        id: 'bills_internet',
+        name: 'Internet & WiFi',
+        iconCode: Icons.wifi.codePoint,
+        colorValue: Colors.cyan.toARGB32(),
+        isCustom: false,
+        parentId: 'bills',
+      ),
+      Category(
+        id: 'bills_phone',
+        name: 'Phone Bill',
+        iconCode: Icons.phone_android.codePoint,
+        colorValue: Colors.green.shade400.toARGB32(),
+        isCustom: false,
+        parentId: 'bills',
+      ),
+      Category(
+        id: 'bills_rent',
+        name: 'Rent',
+        iconCode: Icons.house.codePoint,
+        colorValue: Colors.brown.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'bills',
+      ),
+
+      // Pets
+      Category(
+        id: 'pets',
+        name: 'Pets',
+        iconCode: Icons.pets.codePoint,
+        colorValue: Colors.deepOrange.shade400.toARGB32(),
+        isCustom: false,
+        subcategoryIds: [
+          'pets_food',
+          'pets_vet',
+          'pets_supplies',
+          'pets_grooming',
+        ],
+      ),
+      Category(
+        id: 'pets_food',
+        name: 'Pet Food',
+        iconCode: Icons.restaurant.codePoint,
+        colorValue: Colors.orange.shade400.toARGB32(),
+        isCustom: false,
+        parentId: 'pets',
+      ),
+      Category(
+        id: 'pets_vet',
+        name: 'Veterinary & Medicine',
+        iconCode: Icons.medical_services.codePoint,
+        colorValue: Colors.red.shade400.toARGB32(),
+        isCustom: false,
+        parentId: 'pets',
+      ),
+      Category(
+        id: 'pets_supplies',
+        name: 'Toys & Accessories',
+        iconCode: Icons.toys.codePoint,
+        colorValue: Colors.amber.shade700.toARGB32(),
+        isCustom: false,
+        parentId: 'pets',
+      ),
+      Category(
+        id: 'pets_grooming',
+        name: 'Grooming & Spa',
+        iconCode: Icons.spa.codePoint,
+        colorValue: Colors.teal.shade400.toARGB32(),
+        isCustom: false,
+        parentId: 'pets',
+      ),
+
+      // Travel & Vacation
+      Category(
+        id: 'travel',
+        name: 'Travel & Vacation',
+        iconCode: Icons.flight.codePoint,
+        colorValue: Colors.teal.shade600.toARGB32(),
+        isCustom: false,
+        subcategoryIds: [
+          'travel_flights',
+          'travel_hotels',
+          'travel_sightseeing',
+          'travel_visa',
+        ],
+      ),
+      Category(
+        id: 'travel_flights',
+        name: 'Flights & Transit',
+        iconCode: Icons.flight_takeoff.codePoint,
+        colorValue: Colors.cyan.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'travel',
+      ),
+      Category(
+        id: 'travel_hotels',
+        name: 'Hotels & Stay',
+        iconCode: Icons.hotel.codePoint,
+        colorValue: Colors.teal.shade400.toARGB32(),
+        isCustom: false,
+        parentId: 'travel',
+      ),
+      Category(
+        id: 'travel_sightseeing',
+        name: 'Sightseeing & Tours',
+        iconCode: Icons.camera_alt.codePoint,
+        colorValue: Colors.green.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'travel',
+      ),
+      Category(
+        id: 'travel_visa',
+        name: 'Visa & Travel Insurance',
+        iconCode: Icons.badge.codePoint,
+        colorValue: Colors.indigo.shade400.toARGB32(),
+        isCustom: false,
+        parentId: 'travel',
+      ),
+
+      // Investments & Savings
+      Category(
+        id: 'investments',
+        name: 'Investments & Savings',
+        iconCode: Icons.trending_up.codePoint,
+        colorValue: Colors.indigo.shade600.toARGB32(),
+        isCustom: false,
+        subcategoryIds: [
+          'invest_stocks',
+          'invest_crypto',
+          'invest_funds',
+          'invest_savings',
+          'invest_realestate',
+          'invest_gold',
+        ],
+      ),
+      Category(
+        id: 'invest_stocks',
+        name: 'Stocks & Equity',
+        iconCode: Icons.show_chart.codePoint,
+        colorValue: Colors.indigo.shade700.toARGB32(),
+        isCustom: false,
+        parentId: 'investments',
+      ),
+      Category(
+        id: 'invest_crypto',
+        name: 'Crypto & Assets',
+        iconCode: Icons.currency_bitcoin.codePoint,
+        colorValue: Colors.amber.shade800.toARGB32(),
+        isCustom: false,
+        parentId: 'investments',
+      ),
+      Category(
+        id: 'invest_funds',
+        name: 'Mutual Funds & SIP',
+        iconCode: Icons.account_balance.codePoint,
+        colorValue: Colors.blue.shade700.toARGB32(),
+        isCustom: false,
+        parentId: 'investments',
+      ),
+      Category(
+        id: 'invest_savings',
+        name: 'Fixed Deposits & Savings',
+        iconCode: Icons.savings.codePoint,
+        colorValue: Colors.green.shade700.toARGB32(),
+        isCustom: false,
+        parentId: 'investments',
+      ),
+      Category(
+        id: 'invest_realestate',
+        name: 'Real Estate',
+        iconCode: Icons.location_city.codePoint,
+        colorValue: Colors.brown.shade500.toARGB32(),
+        isCustom: false,
+        parentId: 'investments',
+      ),
+      Category(
+        id: 'invest_gold',
+        name: 'Gold & Commodities',
+        iconCode: Icons.diamond.codePoint,
+        colorValue: Colors.amber.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'investments',
+      ),
+
+      // Personal Care & Wellness
+      Category(
+        id: 'personal_care',
+        name: 'Personal Care',
+        iconCode: Icons.self_improvement.codePoint,
+        colorValue: Colors.pink.shade400.toARGB32(),
+        isCustom: false,
+        subcategoryIds: [
+          'care_salon',
+          'care_spa',
+          'care_skincare',
+          'care_therapy',
+        ],
+      ),
+      Category(
+        id: 'care_salon',
+        name: 'Salon & Haircut',
+        iconCode: Icons.content_cut.codePoint,
+        colorValue: Colors.pink.shade300.toARGB32(),
+        isCustom: false,
+        parentId: 'personal_care',
+      ),
+      Category(
+        id: 'care_spa',
+        name: 'Spa & Massage',
+        iconCode: Icons.spa.codePoint,
+        colorValue: Colors.purple.shade300.toARGB32(),
+        isCustom: false,
+        parentId: 'personal_care',
+      ),
+      Category(
+        id: 'care_skincare',
+        name: 'Skincare & Cosmetics',
+        iconCode: Icons.face.codePoint,
+        colorValue: Colors.pink.shade200.toARGB32(),
+        isCustom: false,
+        parentId: 'personal_care',
+      ),
+      Category(
+        id: 'care_therapy',
+        name: 'Therapy & Mental Wellness',
+        iconCode: Icons.psychology.codePoint,
+        colorValue: Colors.teal.shade300.toARGB32(),
+        isCustom: false,
+        parentId: 'personal_care',
+      ),
+
+      // Family & Kids
+      Category(
+        id: 'family',
+        name: 'Family & Kids',
+        iconCode: Icons.family_restroom.codePoint,
+        colorValue: Colors.cyan.shade700.toARGB32(),
+        isCustom: false,
+        subcategoryIds: [
+          'family_childcare',
+          'family_toys',
+          'family_allowance',
+          'family_elderly',
+        ],
+      ),
+      Category(
+        id: 'family_childcare',
+        name: 'Baby & Childcare',
+        iconCode: Icons.child_care.codePoint,
+        colorValue: Colors.cyan.shade400.toARGB32(),
+        isCustom: false,
+        parentId: 'family',
+      ),
+      Category(
+        id: 'family_toys',
+        name: 'Kids Activities & Toys',
+        iconCode: Icons.toys.codePoint,
+        colorValue: Colors.orange.shade400.toARGB32(),
+        isCustom: false,
+        parentId: 'family',
+      ),
+      Category(
+        id: 'family_allowance',
+        name: 'Allowance & Pocket Money',
+        iconCode: Icons.payments.codePoint,
+        colorValue: Colors.green.shade500.toARGB32(),
+        isCustom: false,
+        parentId: 'family',
+      ),
+      Category(
+        id: 'family_elderly',
+        name: 'Elderly Care',
+        iconCode: Icons.elderly.codePoint,
+        colorValue: Colors.blueGrey.shade400.toARGB32(),
+        isCustom: false,
+        parentId: 'family',
+      ),
+
+      // Financial & Taxes
+      Category(
+        id: 'financial',
+        name: 'Financial & Taxes',
+        iconCode: Icons.account_balance_wallet.codePoint,
+        colorValue: Colors.blueGrey.shade700.toARGB32(),
+        isCustom: false,
+        subcategoryIds: [
+          'financial_taxes',
+          'financial_insurance',
+          'financial_fees',
+          'financial_legal',
+        ],
+      ),
+      Category(
+        id: 'financial_taxes',
+        name: 'Taxes & Levies',
+        iconCode: Icons.request_quote.codePoint,
+        colorValue: Colors.red.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'financial',
+      ),
+      Category(
+        id: 'financial_insurance',
+        name: 'Insurance Premiums',
+        iconCode: Icons.security.codePoint,
+        colorValue: Colors.indigo.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'financial',
+      ),
+      Category(
+        id: 'financial_fees',
+        name: 'Bank Charges & Fees',
+        iconCode: Icons.credit_card.codePoint,
+        colorValue: Colors.blueGrey.shade500.toARGB32(),
+        isCustom: false,
+        parentId: 'financial',
+      ),
+      Category(
+        id: 'financial_legal',
+        name: 'Legal & Advisory',
+        iconCode: Icons.gavel.codePoint,
+        colorValue: Colors.brown.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'financial',
+      ),
+
+      // Charity & Donations
+      Category(
+        id: 'charity',
+        name: 'Charity & Donations',
+        iconCode: Icons.volunteer_activism.codePoint,
+        colorValue: Colors.pink.shade600.toARGB32(),
+        isCustom: false,
+        subcategoryIds: [
+          'charity_donations',
+          'charity_community',
+          'charity_religious',
+        ],
+      ),
+      Category(
+        id: 'charity_donations',
+        name: 'Non-profit & Donations',
+        iconCode: Icons.volunteer_activism.codePoint,
+        colorValue: Colors.pink.shade400.toARGB32(),
+        isCustom: false,
+        parentId: 'charity',
+      ),
+      Category(
+        id: 'charity_community',
+        name: 'Community & Cause',
+        iconCode: Icons.groups.codePoint,
+        colorValue: Colors.teal.shade500.toARGB32(),
+        isCustom: false,
+        parentId: 'charity',
+      ),
+      Category(
+        id: 'charity_religious',
+        name: 'Religious Giving',
+        iconCode: Icons.church.codePoint,
+        colorValue: Colors.amber.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'charity',
+      ),
+
+      // Business & Work
+      Category(
+        id: 'business',
+        name: 'Business & Freelance',
+        iconCode: Icons.business_center.codePoint,
+        colorValue: Colors.blueGrey.shade800.toARGB32(),
+        isCustom: false,
+        subcategoryIds: [
+          'business_software',
+          'business_supplies',
+          'business_marketing',
+          'business_workspace',
+        ],
+      ),
+      Category(
+        id: 'business_software',
+        name: 'Software & Tools',
+        iconCode: Icons.cloud.codePoint,
+        colorValue: Colors.indigo.shade500.toARGB32(),
+        isCustom: false,
+        parentId: 'business',
+      ),
+      Category(
+        id: 'business_supplies',
+        name: 'Office Equipment',
+        iconCode: Icons.print.codePoint,
+        colorValue: Colors.grey.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'business',
+      ),
+      Category(
+        id: 'business_marketing',
+        name: 'Marketing & Ads',
+        iconCode: Icons.campaign.codePoint,
+        colorValue: Colors.orange.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'business',
+      ),
+      Category(
+        id: 'business_workspace',
+        name: 'Workspace & Rent',
+        iconCode: Icons.domain.codePoint,
+        colorValue: Colors.teal.shade700.toARGB32(),
+        isCustom: false,
+        parentId: 'business',
+      ),
+
+      // Income - Salary
+      Category(
+        id: 'salary',
+        name: 'Income',
+        iconCode: Icons.attach_money.codePoint,
+        colorValue: Colors.green.shade800.toARGB32(),
+        isCustom: false,
+        subcategoryIds: [
+          'income_salary',
+          'income_freelance',
+          'income_investments',
+          'income_business',
+          'income_rental',
+          'income_gifts',
+          'income_bonus',
+        ],
+      ),
+      Category(
+        id: 'income_salary',
+        name: 'Salary',
+        iconCode: Icons.work.codePoint,
+        colorValue: Colors.green.shade700.toARGB32(),
+        isCustom: false,
+        parentId: 'salary',
+      ),
+      Category(
+        id: 'income_freelance',
+        name: 'Freelance & Side Hustle',
+        iconCode: Icons.laptop_mac.codePoint,
+        colorValue: Colors.teal.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'salary',
+      ),
+      Category(
+        id: 'income_investments',
+        name: 'Dividends & Capital Gains',
+        iconCode: Icons.trending_up.codePoint,
+        colorValue: Colors.blue.shade700.toARGB32(),
+        isCustom: false,
+        parentId: 'salary',
+      ),
+      Category(
+        id: 'income_business',
+        name: 'Business Revenue',
+        iconCode: Icons.store.codePoint,
+        colorValue: Colors.cyan.shade700.toARGB32(),
+        isCustom: false,
+        parentId: 'salary',
+      ),
+      Category(
+        id: 'income_rental',
+        name: 'Rental Income',
+        iconCode: Icons.apartment.codePoint,
+        colorValue: Colors.amber.shade700.toARGB32(),
+        isCustom: false,
+        parentId: 'salary',
+      ),
+      Category(
+        id: 'income_gifts',
+        name: 'Gifts Received',
+        iconCode: Icons.redeem.codePoint,
+        colorValue: Colors.pink.shade300.toARGB32(),
+        isCustom: false,
+        parentId: 'salary',
+      ),
+      Category(
+        id: 'income_bonus',
+        name: 'Bonus & Grants',
+        iconCode: Icons.card_giftcard.codePoint,
+        colorValue: Colors.lightGreen.shade600.toARGB32(),
+        isCustom: false,
+        parentId: 'salary',
+      ),
+
+      // Other
+      Category(
+        id: 'other',
+        name: 'Other',
+        iconCode: Icons.category.codePoint,
+        colorValue: Colors.grey.shade400.toARGB32(),
+        isCustom: false,
+      ),
+    ];
+
     if (_categoryBox.isEmpty) {
-      final defaultCategories = [
-        // Food & Drinks
-        Category(
-          id: 'food',
-          name: 'Food & Drinks',
-          iconCode: Icons.fastfood.codePoint,
-          colorValue: Colors.orange.toARGB32(),
-          isCustom: false,
-          subcategoryIds: [
-            'food_groceries',
-            'food_restaurant',
-            'food_coffee',
-            'food_delivery',
-            'food_snacks',
-          ],
-        ),
-        Category(
-          id: 'food_groceries',
-          name: 'Groceries',
-          iconCode: Icons.local_grocery_store.codePoint,
-          colorValue: Colors.orange.toARGB32(),
-          isCustom: false,
-          parentId: 'food',
-        ),
-        Category(
-          id: 'food_restaurant',
-          name: 'Restaurants',
-          iconCode: Icons.restaurant.codePoint,
-          colorValue: Colors.orange.shade700.toARGB32(),
-          isCustom: false,
-          parentId: 'food',
-        ),
-        Category(
-          id: 'food_coffee',
-          name: 'Coffee & Tea',
-          iconCode: Icons.local_cafe.codePoint,
-          colorValue: Colors.brown.toARGB32(),
-          isCustom: false,
-          parentId: 'food',
-        ),
-        Category(
-          id: 'food_delivery',
-          name: 'Food Delivery',
-          iconCode: Icons.delivery_dining.codePoint,
-          colorValue: Colors.deepOrange.toARGB32(),
-          isCustom: false,
-          parentId: 'food',
-        ),
-        Category(
-          id: 'food_snacks',
-          name: 'Snacks',
-          iconCode: Icons.cookie.codePoint,
-          colorValue: Colors.amber.toARGB32(),
-          isCustom: false,
-          parentId: 'food',
-        ),
-
-        // Transport
-        Category(
-          id: 'transport',
-          name: 'Transport',
-          iconCode: Icons.directions_bus.codePoint,
-          colorValue: Colors.blue.toARGB32(),
-          isCustom: false,
-          subcategoryIds: [
-            'transport_fuel',
-            'transport_public',
-            'transport_taxi',
-            'transport_parking',
-            'transport_maintenance',
-          ],
-        ),
-        Category(
-          id: 'transport_fuel',
-          name: 'Fuel',
-          iconCode: Icons.local_gas_station.codePoint,
-          colorValue: Colors.blue.shade700.toARGB32(),
-          isCustom: false,
-          parentId: 'transport',
-        ),
-        Category(
-          id: 'transport_public',
-          name: 'Public Transport',
-          iconCode: Icons.train.codePoint,
-          colorValue: Colors.blue.shade600.toARGB32(),
-          isCustom: false,
-          parentId: 'transport',
-        ),
-        Category(
-          id: 'transport_taxi',
-          name: 'Taxi & Rideshare',
-          iconCode: Icons.local_taxi.codePoint,
-          colorValue: Colors.yellow.shade700.toARGB32(),
-          isCustom: false,
-          parentId: 'transport',
-        ),
-        Category(
-          id: 'transport_parking',
-          name: 'Parking',
-          iconCode: Icons.local_parking.codePoint,
-          colorValue: Colors.blueGrey.toARGB32(),
-          isCustom: false,
-          parentId: 'transport',
-        ),
-        Category(
-          id: 'transport_maintenance',
-          name: 'Vehicle Maintenance',
-          iconCode: Icons.build.codePoint,
-          colorValue: Colors.grey.toARGB32(),
-          isCustom: false,
-          parentId: 'transport',
-        ),
-
-        // Shopping
-        Category(
-          id: 'shopping',
-          name: 'Shopping',
-          iconCode: Icons.shopping_bag.codePoint,
-          colorValue: Colors.purple.toARGB32(),
-          isCustom: false,
-          subcategoryIds: [
-            'shopping_clothes',
-            'shopping_electronics',
-            'shopping_home',
-            'shopping_beauty',
-            'shopping_gifts',
-          ],
-        ),
-        Category(
-          id: 'shopping_clothes',
-          name: 'Clothing',
-          iconCode: Icons.checkroom.codePoint,
-          colorValue: Colors.purple.shade400.toARGB32(),
-          isCustom: false,
-          parentId: 'shopping',
-        ),
-        Category(
-          id: 'shopping_electronics',
-          name: 'Electronics',
-          iconCode: Icons.devices.codePoint,
-          colorValue: Colors.indigo.toARGB32(),
-          isCustom: false,
-          parentId: 'shopping',
-        ),
-        Category(
-          id: 'shopping_home',
-          name: 'Home & Garden',
-          iconCode: Icons.home.codePoint,
-          colorValue: Colors.teal.toARGB32(),
-          isCustom: false,
-          parentId: 'shopping',
-        ),
-        Category(
-          id: 'shopping_beauty',
-          name: 'Beauty & Personal Care',
-          iconCode: Icons.face.codePoint,
-          colorValue: Colors.pink.toARGB32(),
-          isCustom: false,
-          parentId: 'shopping',
-        ),
-        Category(
-          id: 'shopping_gifts',
-          name: 'Gifts',
-          iconCode: Icons.card_giftcard.codePoint,
-          colorValue: Colors.red.shade300.toARGB32(),
-          isCustom: false,
-          parentId: 'shopping',
-        ),
-
-        // Entertainment
-        Category(
-          id: 'entertainment',
-          name: 'Entertainment',
-          iconCode: Icons.movie.codePoint,
-          colorValue: Colors.red.toARGB32(),
-          isCustom: false,
-          subcategoryIds: [
-            'entertainment_movies',
-            'entertainment_games',
-            'entertainment_music',
-            'entertainment_sports',
-            'entertainment_subscriptions',
-          ],
-        ),
-        Category(
-          id: 'entertainment_movies',
-          name: 'Movies & Cinema',
-          iconCode: Icons.theaters.codePoint,
-          colorValue: Colors.red.shade700.toARGB32(),
-          isCustom: false,
-          parentId: 'entertainment',
-        ),
-        Category(
-          id: 'entertainment_games',
-          name: 'Games',
-          iconCode: Icons.sports_esports.codePoint,
-          colorValue: Colors.deepPurple.toARGB32(),
-          isCustom: false,
-          parentId: 'entertainment',
-        ),
-        Category(
-          id: 'entertainment_music',
-          name: 'Music & Concerts',
-          iconCode: Icons.music_note.codePoint,
-          colorValue: Colors.pink.shade400.toARGB32(),
-          isCustom: false,
-          parentId: 'entertainment',
-        ),
-        Category(
-          id: 'entertainment_sports',
-          name: 'Sports Events',
-          iconCode: Icons.sports.codePoint,
-          colorValue: Colors.green.shade600.toARGB32(),
-          isCustom: false,
-          parentId: 'entertainment',
-        ),
-        Category(
-          id: 'entertainment_subscriptions',
-          name: 'Subscriptions',
-          iconCode: Icons.subscriptions.codePoint,
-          colorValue: Colors.blue.shade400.toARGB32(),
-          isCustom: false,
-          parentId: 'entertainment',
-        ),
-
-        // Health
-        Category(
-          id: 'health',
-          name: 'Health',
-          iconCode: Icons.local_hospital.codePoint,
-          colorValue: Colors.green.toARGB32(),
-          isCustom: false,
-          subcategoryIds: [
-            'health_doctor',
-            'health_pharmacy',
-            'health_fitness',
-            'health_insurance',
-          ],
-        ),
-        Category(
-          id: 'health_doctor',
-          name: 'Doctor & Hospital',
-          iconCode: Icons.medical_services.codePoint,
-          colorValue: Colors.red.shade400.toARGB32(),
-          isCustom: false,
-          parentId: 'health',
-        ),
-        Category(
-          id: 'health_pharmacy',
-          name: 'Pharmacy',
-          iconCode: Icons.local_pharmacy.codePoint,
-          colorValue: Colors.green.shade600.toARGB32(),
-          isCustom: false,
-          parentId: 'health',
-        ),
-        Category(
-          id: 'health_fitness',
-          name: 'Gym & Fitness',
-          iconCode: Icons.fitness_center.codePoint,
-          colorValue: Colors.orange.shade600.toARGB32(),
-          isCustom: false,
-          parentId: 'health',
-        ),
-        Category(
-          id: 'health_insurance',
-          name: 'Health Insurance',
-          iconCode: Icons.health_and_safety.codePoint,
-          colorValue: Colors.blue.shade600.toARGB32(),
-          isCustom: false,
-          parentId: 'health',
-        ),
-
-        // Education
-        Category(
-          id: 'education',
-          name: 'Education',
-          iconCode: Icons.school.codePoint,
-          colorValue: Colors.yellow.shade700.toARGB32(),
-          isCustom: false,
-          subcategoryIds: [
-            'education_books',
-            'education_courses',
-            'education_supplies',
-            'education_tuition',
-          ],
-        ),
-        Category(
-          id: 'education_books',
-          name: 'Books',
-          iconCode: Icons.menu_book.codePoint,
-          colorValue: Colors.brown.shade400.toARGB32(),
-          isCustom: false,
-          parentId: 'education',
-        ),
-        Category(
-          id: 'education_courses',
-          name: 'Online Courses',
-          iconCode: Icons.laptop.codePoint,
-          colorValue: Colors.blue.shade500.toARGB32(),
-          isCustom: false,
-          parentId: 'education',
-        ),
-        Category(
-          id: 'education_supplies',
-          name: 'School Supplies',
-          iconCode: Icons.edit.codePoint,
-          colorValue: Colors.amber.shade600.toARGB32(),
-          isCustom: false,
-          parentId: 'education',
-        ),
-        Category(
-          id: 'education_tuition',
-          name: 'Tuition',
-          iconCode: Icons.account_balance.codePoint,
-          colorValue: Colors.indigo.shade400.toARGB32(),
-          isCustom: false,
-          parentId: 'education',
-        ),
-
-        // Bills & Utilities
-        Category(
-          id: 'bills',
-          name: 'Bills & Utilities',
-          iconCode: Icons.receipt.codePoint,
-          colorValue: Colors.grey.toARGB32(),
-          isCustom: false,
-          subcategoryIds: [
-            'bills_electricity',
-            'bills_water',
-            'bills_internet',
-            'bills_phone',
-            'bills_rent',
-          ],
-        ),
-        Category(
-          id: 'bills_electricity',
-          name: 'Electricity',
-          iconCode: Icons.electric_bolt.codePoint,
-          colorValue: Colors.yellow.shade600.toARGB32(),
-          isCustom: false,
-          parentId: 'bills',
-        ),
-        Category(
-          id: 'bills_water',
-          name: 'Water',
-          iconCode: Icons.water_drop.codePoint,
-          colorValue: Colors.blue.shade300.toARGB32(),
-          isCustom: false,
-          parentId: 'bills',
-        ),
-        Category(
-          id: 'bills_internet',
-          name: 'Internet & WiFi',
-          iconCode: Icons.wifi.codePoint,
-          colorValue: Colors.cyan.toARGB32(),
-          isCustom: false,
-          parentId: 'bills',
-        ),
-        Category(
-          id: 'bills_phone',
-          name: 'Phone Bill',
-          iconCode: Icons.phone_android.codePoint,
-          colorValue: Colors.green.shade400.toARGB32(),
-          isCustom: false,
-          parentId: 'bills',
-        ),
-        Category(
-          id: 'bills_rent',
-          name: 'Rent',
-          iconCode: Icons.house.codePoint,
-          colorValue: Colors.brown.shade600.toARGB32(),
-          isCustom: false,
-          parentId: 'bills',
-        ),
-
-        // Income - Salary
-        Category(
-          id: 'salary',
-          name: 'Income',
-          iconCode: Icons.attach_money.codePoint,
-          colorValue: Colors.green.shade800.toARGB32(),
-          isCustom: false,
-          subcategoryIds: [
-            'income_salary',
-            'income_freelance',
-            'income_investments',
-            'income_gifts',
-          ],
-        ),
-        Category(
-          id: 'income_salary',
-          name: 'Salary',
-          iconCode: Icons.work.codePoint,
-          colorValue: Colors.green.shade700.toARGB32(),
-          isCustom: false,
-          parentId: 'salary',
-        ),
-        Category(
-          id: 'income_freelance',
-          name: 'Freelance',
-          iconCode: Icons.laptop_mac.codePoint,
-          colorValue: Colors.teal.shade600.toARGB32(),
-          isCustom: false,
-          parentId: 'salary',
-        ),
-        Category(
-          id: 'income_investments',
-          name: 'Investments',
-          iconCode: Icons.trending_up.codePoint,
-          colorValue: Colors.blue.shade700.toARGB32(),
-          isCustom: false,
-          parentId: 'salary',
-        ),
-        Category(
-          id: 'income_gifts',
-          name: 'Gifts Received',
-          iconCode: Icons.redeem.codePoint,
-          colorValue: Colors.pink.shade300.toARGB32(),
-          isCustom: false,
-          parentId: 'salary',
-        ),
-
-        // Other
-        Category(
-          id: 'other',
-          name: 'Other',
-          iconCode: Icons.category.codePoint,
-          colorValue: Colors.grey.shade400.toARGB32(),
-          isCustom: false,
-        ),
-      ];
       await _categoryBox.addAll(defaultCategories);
+    } else {
+      // Automatically synchronize any missing default categories/subcategories into existing database
+      final existingIds = _categoryBox.values.map((c) => c.id).toSet();
+      final missingDefaults = defaultCategories
+          .where((c) => !existingIds.contains(c.id))
+          .toList();
+      if (missingDefaults.isNotEmpty) {
+        await _categoryBox.addAll(missingDefaults);
+      }
+
+      // Update default parent categories with any new subcategory IDs
+      for (final defaultCat in defaultCategories) {
+        if (defaultCat.hasSubcategories) {
+          final parentIndex = _categoryBox.values.toList().indexWhere(
+            (c) => c.id == defaultCat.id,
+          );
+          if (parentIndex != -1) {
+            final parent = _categoryBox.getAt(parentIndex)!;
+            final mergedSubIds = <String>{
+              ...parent.subcategoryIds,
+              ...defaultCat.subcategoryIds,
+            }.toList();
+            if (mergedSubIds.length != parent.subcategoryIds.length) {
+              final updatedParent = parent.copyWith(
+                subcategoryIds: mergedSubIds,
+              );
+              await _categoryBox.putAt(parentIndex, updatedParent);
+            }
+          }
+        }
+      }
     }
     _categories = _categoryBox.values.toList();
     notifyListeners();
@@ -1794,6 +2239,69 @@ class MoneyProvider extends ChangeNotifier {
     _activeAccountId = null;
     _loans = [];
     _goals = [];
+
+    notifyListeners();
+  }
+
+  /// Permanently delete the entire user account, all Firestore data, and all local Hive storage
+  Future<void> permanentlyDeleteUserAccount() async {
+    // 1. Delete all Firestore data
+    if (_accountService != null) {
+      try {
+        await _accountService!.deleteAllUserData();
+      } catch (e) {
+        debugPrint('Error deleting account service data: $e');
+      }
+      _accountService?.stopAllSync();
+      _accountService?.dispose();
+      _accountService = null;
+    } else if (_userId != null) {
+      try {
+        final service = AccountService(_userId!);
+        await service.deleteAllUserData();
+      } catch (e) {
+        debugPrint('Error deleting account service data: $e');
+      }
+    }
+
+    // 2. Delete Firebase Auth user
+    try {
+      await AuthService().deleteUserAccount();
+    } catch (e) {
+      debugPrint('Error deleting auth user: $e');
+    }
+
+    // 3. Clear all local Hive boxes
+    try {
+      final transactionBox = Hive.box<Transaction>('transactions');
+      await transactionBox.clear();
+      await _budgetBox.clear();
+      await _loanBox.clear();
+      await _goalBox.clear();
+      await _deletedSmsBox.clear();
+      await _categoryBox.clear();
+      await _settingsBox.clear();
+    } catch (e) {
+      debugPrint('Error clearing local Hive boxes: $e');
+    }
+
+    // 4. Reset in-memory state
+    _userName = 'User';
+    _cardName = 'VISA';
+    _currencySymbol = '₹';
+    _currencyCode = 'INR';
+    _userId = null;
+    _photoURL = null;
+    _transactions = [];
+    _currentBudget = null;
+    _accounts = [];
+    _activeAccount = null;
+    _activeAccountId = null;
+    _loans = [];
+    _goals = [];
+
+    // Re-initialize default categories
+    await _initCategories();
 
     notifyListeners();
   }

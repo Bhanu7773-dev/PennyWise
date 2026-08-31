@@ -104,14 +104,19 @@ class GlassmorphismHeader extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          provider.userName.toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1.0,
+                        Expanded(
+                          child: Text(
+                            provider.userName.toUpperCase(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1.0,
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 8),
                         const Text(
                           '**** 8892',
                           style: TextStyle(
@@ -539,14 +544,19 @@ class GoldenStandardHeader extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                provider.userName.toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.black87,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.0,
+              Expanded(
+                child: Text(
+                  provider.userName.toUpperCase(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.0,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               const Text(
                 'PLATINUM',
                 style: TextStyle(
@@ -996,15 +1006,20 @@ class MetallicPlatinumHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Color(0xFF3D3D3D),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 2.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFF3D3D3D),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 2.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Row(
                       children: [
                         Icon(
@@ -1173,6 +1188,8 @@ class HolographicAuroraHeader extends StatelessWidget {
                 ),
                 Text(
                   provider.userName.toUpperCase(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -1312,15 +1329,20 @@ class MatteBlackLuxuryHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 2.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 2.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Row(
                       children: List.generate(
                         3,
@@ -1504,29 +1526,34 @@ class RoseGoldEliteHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'CARD HOLDER',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.6),
-                            fontSize: 9,
-                            letterSpacing: 1.0,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'CARD HOLDER',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.6),
+                              fontSize: 9,
+                              letterSpacing: 1.0,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          provider.userName.toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1.0,
+                          const SizedBox(height: 2),
+                          Text(
+                            provider.userName.toUpperCase(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1.0,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     const Icon(Icons.diamond, color: Colors.white, size: 28),
                   ],
                 ),
@@ -1674,15 +1701,20 @@ class CarbonFiberProHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.5,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.5,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Row(
                       children: [
                         _buildStatChip(
@@ -1915,6 +1947,8 @@ class GradientMeshFluidHeader extends StatelessWidget {
                 ),
                 Text(
                   provider.userName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.8),
                     fontSize: 14,
@@ -2055,14 +2089,19 @@ class NeonGlowEdgeHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
-                        fontSize: 14,
-                        letterSpacing: 2.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 14,
+                          letterSpacing: 2.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Row(
                       children: [
                         _glowDot(const Color(0xFF00D9FF)),
@@ -2221,15 +2260,20 @@ class DiamondPatternHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 1.5,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 1.5,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Row(
                       children: [
                         const Icon(
@@ -2414,6 +2458,8 @@ class AmexPlatinumGlassHeader extends StatelessWidget {
                         ),
                         Text(
                           provider.userName.toUpperCase(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             color: Color(0xFF3D3D3D),
                             fontSize: 14,
@@ -2563,15 +2609,20 @@ class AmexGoldFrostedHeader extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          provider.userName.toUpperCase(),
-                          style: const TextStyle(
-                            color: Color(0xFF1A1F71),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.5,
+                        Expanded(
+                          child: Text(
+                            provider.userName.toUpperCase(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Color(0xFF1A1F71),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.5,
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 8),
                         Row(
                           children: [
                             Icon(
@@ -2640,10 +2691,7 @@ class AmexCenturionHeader extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [
-                    Colors.white.withOpacity(0.08),
-                    Colors.transparent,
-                  ],
+                  colors: [Colors.white.withOpacity(0.08), Colors.transparent],
                 ),
               ),
             ),
@@ -2735,15 +2783,20 @@ class AmexCenturionHeader extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          provider.userName.toUpperCase(),
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 2.0,
+                        Expanded(
+                          child: Text(
+                            provider.userName.toUpperCase(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 2.0,
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 8),
                         const Text(
                           'BY INVITATION ONLY',
                           style: TextStyle(
@@ -2907,15 +2960,20 @@ class VisaInfiniteGlassHeader extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          provider.userName.toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1.5,
+                        Expanded(
+                          child: Text(
+                            provider.userName.toUpperCase(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1.5,
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 8),
                         const Text(
                           'INFINITE',
                           style: TextStyle(
@@ -3008,9 +3066,7 @@ class MastercardWorldEliteHeader extends StatelessWidget {
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.08),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.15),
-                  ),
+                  border: Border.all(color: Colors.white.withOpacity(0.15)),
                 ),
                 padding: const EdgeInsets.all(24),
                 child: Column(
@@ -3091,15 +3147,20 @@ class MastercardWorldEliteHeader extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          provider.userName.toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1.5,
+                        Expanded(
+                          child: Text(
+                            provider.userName.toUpperCase(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1.5,
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 8),
                         const Text(
                           'WORLD ELITE',
                           style: TextStyle(
@@ -3234,6 +3295,8 @@ class FrostedOceanGlassHeader extends StatelessWidget {
                     ),
                     Text(
                       provider.userName.toUpperCase(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.9),
                         fontSize: 14,
@@ -3434,15 +3497,20 @@ class AuroraBorealisGlassHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 2.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 2.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Row(
                       children: [
                         Container(
@@ -3572,9 +3640,7 @@ class SapphireReserveGlassHeader extends StatelessWidget {
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.08),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.15),
-                  ),
+                  border: Border.all(color: Colors.white.withOpacity(0.15)),
                 ),
                 padding: const EdgeInsets.all(24),
                 child: Column(
@@ -3678,15 +3744,20 @@ class SapphireReserveGlassHeader extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          provider.userName.toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1.5,
+                        Expanded(
+                          child: Text(
+                            provider.userName.toUpperCase(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1.5,
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 8),
                         const Icon(
                           Icons.contactless,
                           color: Colors.white54,
@@ -3779,14 +3850,19 @@ class OceanWaveHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -3897,14 +3973,19 @@ class ForestGreenHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -4009,14 +4090,19 @@ class SunsetOrangeHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -4131,14 +4217,19 @@ class MidnightBlueHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -4244,14 +4335,19 @@ class LavenderDreamHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -4362,14 +4458,19 @@ class CrimsonRedHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -4473,14 +4574,19 @@ class ArcticWhiteHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.black87,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -4567,14 +4673,19 @@ class DesertSandHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -4695,14 +4806,19 @@ class GalaxyPurpleHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -4817,14 +4933,19 @@ class EmeraldGreenHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -4912,14 +5033,19 @@ class CosmicNebulaHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -5024,14 +5150,19 @@ class QuantumDotHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -5150,14 +5281,19 @@ class LiquidGoldHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -5265,15 +5401,20 @@ class CyberGlitchHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'Courier',
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Courier',
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: const TextStyle(
@@ -5354,14 +5495,19 @@ class ZenGardenHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.brown[800],
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.brown[800],
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Text(
                       '**** 8892',
                       style: TextStyle(
@@ -5471,14 +5617,19 @@ class RetroVaporwaveHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -5596,14 +5747,19 @@ class NeonCityHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -5742,14 +5898,19 @@ class PrismRefractionHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.black87,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -5829,14 +5990,19 @@ class ObsidianShardHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -5938,14 +6104,19 @@ class BioluminescenceHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      provider.userName.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
+                    Expanded(
+                      child: Text(
+                        provider.userName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     const Text(
                       '**** 8892',
                       style: TextStyle(
@@ -6070,27 +6241,32 @@ class AmoledPitchBlackHeader extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'CARD HOLDER',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.4),
-                      fontSize: 9,
-                      fontWeight: FontWeight.bold,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'CARD HOLDER',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.4),
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Text(
-                    provider.userName.toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
+                    Text(
+                      provider.userName.toUpperCase(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Row(
                 children: [
                   _buildAmoledPill(

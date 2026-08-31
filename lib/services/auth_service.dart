@@ -77,4 +77,24 @@ class AuthService {
     await _googleSignIn.signOut();
     await _auth.signOut();
   }
+
+  // Delete current Firebase user account
+  Future<void> deleteUserAccount() async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        // Delete user document in Firestore if not already deleted
+        try {
+          await _firestore.collection('users').doc(user.uid).delete();
+        } catch (e) {
+          debugPrint('Error deleting user document in Firestore: $e');
+        }
+        await user.delete();
+      }
+    } catch (e) {
+      debugPrint("Error deleting user from Firebase Auth: $e");
+    } finally {
+      await signOut();
+    }
+  }
 }

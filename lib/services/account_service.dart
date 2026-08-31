@@ -114,6 +114,22 @@ class AccountService {
     debugPrint('Account $accountId deleted');
   }
 
+  /// Delete all accounts, all subcollections, and the user's document from Firestore
+  Future<void> deleteAllUserData() async {
+    stopAllSync();
+    try {
+      final accountsSnapshot = await _accountsCollection.get();
+      for (final doc in accountsSnapshot.docs) {
+        await deleteAccount(doc.id);
+      }
+      // Delete user root document in Firestore
+      await _userDoc.delete();
+      debugPrint('All Firestore data for user $userId deleted');
+    } catch (e) {
+      debugPrint('Error deleting user Firestore data: $e');
+    }
+  }
+
   Future<void> _deleteSubcollection(
     String accountId,
     String subcollection,

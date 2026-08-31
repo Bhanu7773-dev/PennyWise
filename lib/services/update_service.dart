@@ -42,7 +42,7 @@ class UpdateService {
       final packageInfo = await PackageInfo.fromPlatform();
       return packageInfo.version;
     } catch (e) {
-      return '1.0.0';
+      return '1.0.4';
     }
   }
 

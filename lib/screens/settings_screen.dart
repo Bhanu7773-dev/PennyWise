@@ -24,7 +24,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _isBackingUp = false;
   bool _isRestoring = false;
   BackupInfo? _backupInfo;
-  String _currentVersion = '1.0.0';
+  String _currentVersion = '1.0.4';
 
   @override
   void initState() {
